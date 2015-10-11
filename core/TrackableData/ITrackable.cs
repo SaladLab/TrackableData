@@ -1,24 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Collections.Generic;
 
 namespace TrackableData
 {
     public interface ITrackable
     {
+        // changed or not = Tracker.HasChange
         bool Changed { get; }
 
+        // return tracker that will track this
         ITracker Tracker { get; set; }
 
+        // Tracker = new DefaultTracker();
+        void SetDefaultTracker();
+
+        // return tracker's children trackables
         IEnumerable<ITrackable> ChildrenTrackables { get; }
     }
 
-    public interface ITracker
+    public interface ITrackable<T> : ITrackable
     {
-        bool HasChange { get; }
-        void Clear();
-        void ApplyTo(object obj);
-        void ApplyTo(ITracker tracker);
-        void RollbackTo(object obj);
+        new ITracker<T> Tracker { get; set; }
     }
 }

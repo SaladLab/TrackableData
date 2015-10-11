@@ -30,18 +30,20 @@ namespace CodeGen
             var sb = new StringBuilder();
             var className = "Trackable" + type.Name;
 
-            sb.Append($"public class {className} : {type.Name}, ITrackable\n");
+            sb.Append($"public class {className} : {type.Name}, ITrackable<{type.Name}>\n");
             sb.Append("{\n");
-
-            // Changed
-
-            sb.Append("\tpublic bool Changed { get { return Tracker != null && Tracker.HasChange; } }\n");
-            sb.Append("\n");
 
             // Tracker
 
             sb.AppendFormat("\tpublic TrackablePocoTracker<{0}> Tracker {{ get; set; }}\n", type.Name);
             sb.Append("\n");
+
+            // ITrackable.Changed
+
+            sb.Append("\tpublic bool Changed { get { return Tracker != null && Tracker.HasChange; } }\n");
+            sb.Append("\n");
+
+            // ITrackable.Tracker
 
             sb.Append("\tITracker ITrackable.Tracker\n");
             sb.Append("\t{\n");
@@ -55,10 +57,33 @@ namespace CodeGen
             sb.Append("\t\t\tTracker = t;\n");
             sb.Append("\t\t}\n");
             sb.Append("\t}\n");
-
             sb.Append("\n");
 
-            // ChildrenTrackables
+            // ITrackable<T>.Tracker
+
+            sb.Append($"\tITracker<{type.Name}> ITrackable<{type.Name}>.Tracker\n");
+            sb.Append("\t{\n");
+            sb.Append("\t\tget\n");
+            sb.Append("\t\t{\n");
+            sb.Append("\t\t\treturn Tracker;\n");
+            sb.Append("\t\t}\n");
+            sb.Append("\t\tset\n");
+            sb.Append("\t\t{\n");
+            sb.AppendFormat("\t\t\tvar t = (TrackablePocoTracker<{0}>)value;\n", type.Name);
+            sb.Append("\t\t\tTracker = t;\n");
+            sb.Append("\t\t}\n");
+            sb.Append("\t}\n");
+            sb.Append("\n");
+
+            // ITrackable.SetDefaultTracker
+
+            sb.Append("\tpublic void SetDefaultTracker()\n");
+            sb.Append("\t{\n");
+            sb.AppendFormat("\t\tTracker = new TrackablePocoTracker<{0}>();\n", type.Name);
+            sb.Append("\t}\n");
+            sb.Append("\n");
+
+            // ITrackable.ChildrenTrackables
 
             sb.Append("\tpublic IEnumerable<ITrackable> ChildrenTrackables\n");
             sb.Append("\t{\n");

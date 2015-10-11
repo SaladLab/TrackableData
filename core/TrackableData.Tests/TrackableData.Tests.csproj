@@ -62,6 +62,8 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="DictionaryTest.cs" />
+    <Compile Include="ListTest.cs" />
     <Compile Include="PocoTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

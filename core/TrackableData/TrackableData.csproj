@@ -42,10 +42,14 @@
   <ItemGroup>
     <Compile Include="ITrackable.cs" />
     <Compile Include="ITrackablePoco.cs" />
+    <Compile Include="ITracker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TrackableDictionary.cs" />
     <Compile Include="TrackableDictionaryTracker.cs" />
+    <Compile Include="TrackableExtentions.cs" />
     <Compile Include="TrackableFieldAttribute.cs" />
+    <Compile Include="TrackableList.cs" />
+    <Compile Include="TrackableListTracker.cs" />
     <Compile Include="TrackablePocoTracker.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

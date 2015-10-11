@@ -49,8 +49,7 @@ namespace TrackableData
         }
     }
 
-    public class TrackableDictionaryTracker<TKey, TValue> : ITracker
-        where TValue : new()
+    public class TrackableDictionaryTracker<TKey, TValue> : ITracker<IDictionary<TKey, TValue>>
     {
         public struct Change
         {
@@ -241,31 +240,38 @@ namespace TrackableData
             ChangeMap.Clear();
         }
 
-        public void ApplyTo(object obj)
+        public void ApplyTo(object trackable)
         {
-            var dictionary = (IDictionary<TKey, TValue>)obj;
-            ApplyTo(dictionary);
+            ApplyTo((IDictionary<TKey, TValue>)trackable);
         }
 
-        public void ApplyTo(IDictionary<TKey, TValue> dictionary, bool strict = false)
+        public void ApplyTo(IDictionary<TKey, TValue> trackable)
         {
+            ApplyTo(trackable, false);
+        }
+
+        public void ApplyTo(IDictionary<TKey, TValue> trackable, bool strict)
+        {
+            if (trackable == null)
+                throw new ArgumentNullException("trackable");
+
             foreach (var item in ChangeMap)
             {
                 switch (item.Value.Operation)
                 {
                     case TrackableDictionaryOperation.Add:
                         if (strict)
-                            dictionary.Add(item.Key, item.Value.NewValue);
+                            trackable.Add(item.Key, item.Value.NewValue);
                         else
-                            dictionary[item.Key] = item.Value.NewValue;
+                            trackable[item.Key] = item.Value.NewValue;
                         break;
 
                     case TrackableDictionaryOperation.Remove:
-                        dictionary.Remove(item.Key);
+                        trackable.Remove(item.Key);
                         break;
 
                     case TrackableDictionaryOperation.Modify:
-                        dictionary[item.Key] = item.Value.NewValue;
+                        trackable[item.Key] = item.Value.NewValue;
                         break;
                 }
             }
@@ -273,15 +279,19 @@ namespace TrackableData
 
         public void ApplyTo(ITracker tracker)
         {
-            var t = (TrackableDictionaryTracker<TKey, TValue>)tracker;
-            if (t == null)
-                throw new ArgumentException("tracker");
+            ApplyTo((TrackableDictionaryTracker<TKey, TValue>)tracker);
+        }
 
-            ApplyTo(t);
+        public void ApplyTo(ITracker<IDictionary<TKey, TValue>> tracker)
+        {
+            ApplyTo((TrackableDictionaryTracker<TKey, TValue>)tracker);
         }
 
         public void ApplyTo(TrackableDictionaryTracker<TKey, TValue> tracker)
         {
+            if (tracker == null)
+                throw new ArgumentNullException("tracker");
+
             foreach (var item in ChangeMap)
             {
                 switch (item.Value.Operation)
@@ -301,28 +311,64 @@ namespace TrackableData
             }
         }
 
-        public void RollbackTo(object obj)
+        public void RollbackTo(object trackable)
         {
-            var dictionary = (IDictionary<TKey, TValue>)obj;
-            ApplyTo(dictionary);
+            RollbackTo((IDictionary<TKey, TValue>)trackable);
         }
 
-        public void RollbackTo(IDictionary<TKey, TValue> dictionary)
+        public void RollbackTo(IDictionary<TKey, TValue> trackable)
         {
+            if (trackable == null)
+                throw new ArgumentNullException("trackable");
+
             foreach (var item in ChangeMap)
             {
                 switch (item.Value.Operation)
                 {
                     case TrackableDictionaryOperation.Add:
-                        dictionary.Remove(item.Key);
+                        trackable.Remove(item.Key);
                         break;
 
                     case TrackableDictionaryOperation.Remove:
-                        dictionary[item.Key] = item.Value.OldValue;
+                        trackable[item.Key] = item.Value.OldValue;
                         break;
 
                     case TrackableDictionaryOperation.Modify:
-                        dictionary[item.Key] = item.Value.OldValue;
+                        trackable[item.Key] = item.Value.OldValue;
+                        break;
+                }
+            }
+        }
+
+        public void RollbackTo(ITracker tracker)
+        {
+            RollbackTo((TrackableDictionaryTracker<TKey, TValue>)tracker);
+        }
+
+        public void RollbackTo(ITracker<IDictionary<TKey, TValue>> tracker)
+        {
+            RollbackTo((TrackableDictionaryTracker<TKey, TValue>)tracker);
+        }
+
+        public void RollbackTo(TrackableDictionaryTracker<TKey, TValue> tracker)
+        {
+            if (tracker == null)
+                throw new ArgumentNullException("tracker");
+
+            foreach (var item in ChangeMap)
+            {
+                switch (item.Value.Operation)
+                {
+                    case TrackableDictionaryOperation.Add:
+                        tracker.TrackRemove(item.Key, item.Value.NewValue);
+                        break;
+
+                    case TrackableDictionaryOperation.Remove:
+                        tracker.TrackAdd(item.Key, item.Value.OldValue);
+                        break;
+
+                    case TrackableDictionaryOperation.Modify:
+                        tracker.TrackModify(item.Key, item.Value.NewValue, item.Value.OldValue);
                         break;
                 }
             }
@@ -339,11 +385,11 @@ namespace TrackableData
                     case TrackableDictionaryOperation.Add:
                         return "+" + x.Key + ":" + x.Value.NewValue;
 
-                    case TrackableDictionaryOperation.Modify:
-                        return "=" + x.Key + ":" + x.Value.OldValue + "=>" + x.Value.NewValue;
-
                     case TrackableDictionaryOperation.Remove:
                         return "-" + x.Key + ":" + x.Value.OldValue;
+
+                    case TrackableDictionaryOperation.Modify:
+                        return "=" + x.Key + ":" + x.Value.OldValue + "=>" + x.Value.NewValue;
 
                     default:
                         return "";

@@ -16,11 +16,11 @@ using TrackableData;
 
 namespace Basic.Data
 {
-    public class TrackableUserData : UserData, ITrackable
+    public class TrackableUserData : UserData, ITrackable<UserData>
     {
-        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
-
         public TrackablePocoTracker<UserData> Tracker { get; set; }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
         {
@@ -33,6 +33,24 @@ namespace Basic.Data
                 var t = (TrackablePocoTracker<UserData>)value;
                 Tracker = t;
             }
+        }
+
+        ITracker<UserData> ITrackable<UserData>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<UserData>)value;
+                Tracker = t;
+            }
+        }
+
+        public void SetDefaultTracker()
+        {
+            Tracker = new TrackablePocoTracker<UserData>();
         }
 
         public IEnumerable<ITrackable> ChildrenTrackables
@@ -132,11 +150,11 @@ namespace Basic.Data
 
 namespace Basic.Data
 {
-    public class TrackableUserHandData : UserHandData, ITrackable
+    public class TrackableUserHandData : UserHandData, ITrackable<UserHandData>
     {
-        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
-
         public TrackablePocoTracker<UserHandData> Tracker { get; set; }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
         {
@@ -149,6 +167,24 @@ namespace Basic.Data
                 var t = (TrackablePocoTracker<UserHandData>)value;
                 Tracker = t;
             }
+        }
+
+        ITracker<UserHandData> ITrackable<UserHandData>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<UserHandData>)value;
+                Tracker = t;
+            }
+        }
+
+        public void SetDefaultTracker()
+        {
+            Tracker = new TrackablePocoTracker<UserHandData>();
         }
 
         public IEnumerable<ITrackable> ChildrenTrackables

@@ -4,12 +4,11 @@ using System.Collections.Generic;
 
 namespace TrackableData
 {
-    public class TrackableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, ITrackable
-        where TValue : new()
+    public class TrackableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, ITrackable<IDictionary<TKey, TValue>>
     {
         private readonly Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
 
-        // Tracker
+        // Specific tracker
 
         public TrackableDictionaryTracker<TKey, TValue> Tracker { get; set; }
 
@@ -35,6 +34,25 @@ namespace TrackableData
                 var tracker = (TrackableDictionaryTracker<TKey, TValue>)value;
                 Tracker = tracker;
             }
+        }
+
+        ITracker<IDictionary<TKey, TValue>> ITrackable<IDictionary<TKey, TValue>>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+
+            set
+            {
+                var tracker = (TrackableDictionaryTracker<TKey, TValue>)value;
+                Tracker = tracker;
+            }
+        }
+
+        public void SetDefaultTracker()
+        {
+            Tracker = new TrackableDictionaryTracker<TKey, TValue>();
         }
 
         public IEnumerable<ITrackable> ChildrenTrackables
@@ -112,16 +130,6 @@ namespace TrackableData
             get { return _dictionary.Values; }
         }
 
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
-        {
-            return _dictionary.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return ((IEnumerable)_dictionary).GetEnumerator();
-        }
-
         // ICollection<KeyValuePair<TKey, TValue>>
 
         public void Add(KeyValuePair<TKey, TValue> item)
@@ -140,11 +148,9 @@ namespace TrackableData
             if (Tracker != null)
             {
                 foreach (var i in _dictionary)
-                {
-                    if (Tracker != null)
-                        Tracker.TrackRemove(i.Key, i.Value);
-                }
+                    Tracker.TrackRemove(i.Key, i.Value);
             }
+
             _dictionary.Clear();
         }
 
@@ -177,6 +183,20 @@ namespace TrackableData
         public bool IsReadOnly
         {
             get { return false; }
+        }
+
+        // IEnumerator<T>
+
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        {
+            return _dictionary.GetEnumerator();
+        }
+
+        // IEnumerable
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable)_dictionary).GetEnumerator();
         }
     }
 }

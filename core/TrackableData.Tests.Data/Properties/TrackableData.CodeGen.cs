@@ -12,15 +12,15 @@ using System.Collections.Generic;
 using System.Reflection;
 using TrackableData;
 
-#region TrackableData.Tests.Data.Employee
+#region TrackableData.Tests.Data.Hand
 
 namespace TrackableData.Tests.Data
 {
-    public class TrackableEmployee : Employee, ITrackable
+    public class TrackableHand : Hand, ITrackable<Hand>
     {
-        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
+        public TrackablePocoTracker<Hand> Tracker { get; set; }
 
-        public TrackablePocoTracker<Employee> Tracker { get; set; }
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
         {
@@ -30,21 +30,133 @@ namespace TrackableData.Tests.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<Employee>)value;
+                var t = (TrackablePocoTracker<Hand>)value;
                 Tracker = t;
             }
+        }
+
+        ITracker<Hand> ITrackable<Hand>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<Hand>)value;
+                Tracker = t;
+            }
+        }
+
+        public void SetDefaultTracker()
+        {
+            Tracker = new TrackablePocoTracker<Hand>();
         }
 
         public IEnumerable<ITrackable> ChildrenTrackables
         {
             get
             {
-                yield break;
+                var trackableMainRing = (TrackableRing)MainRing;
+                if (trackableMainRing != null)
+                    yield return trackableMainRing;
+                var trackableSubRing = (TrackableRing)SubRing;
+                if (trackableSubRing != null)
+                    yield return trackableSubRing;
             }
         }
 
 
-        private static readonly PropertyInfo NameProperty = typeof(TrackableEmployee).GetProperty("Name");
+        private static readonly PropertyInfo MainRingProperty = typeof(TrackableHand).GetProperty("MainRing");
+        public override TrackableData.Tests.Data.Ring MainRing
+        {
+            get
+            {
+                return base.MainRing;
+            }
+            set
+            {
+                if (Tracker != null && MainRing != value)
+                    Tracker.TrackSet(MainRingProperty, base.MainRing, value);
+                base.MainRing = value;
+            }
+        }
+
+        private static readonly PropertyInfo SubRingProperty = typeof(TrackableHand).GetProperty("SubRing");
+        public override TrackableData.Tests.Data.Ring SubRing
+        {
+            get
+            {
+                return base.SubRing;
+            }
+            set
+            {
+                if (Tracker != null && SubRing != value)
+                    Tracker.TrackSet(SubRingProperty, base.SubRing, value);
+                base.SubRing = value;
+            }
+        }
+    }
+}
+
+#endregion
+
+#region TrackableData.Tests.Data.Person
+
+namespace TrackableData.Tests.Data
+{
+    public class TrackablePerson : Person, ITrackable<Person>
+    {
+        public TrackablePocoTracker<Person> Tracker { get; set; }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
+
+        ITracker ITrackable.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<Person>)value;
+                Tracker = t;
+            }
+        }
+
+        ITracker<Person> ITrackable<Person>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<Person>)value;
+                Tracker = t;
+            }
+        }
+
+        public void SetDefaultTracker()
+        {
+            Tracker = new TrackablePocoTracker<Person>();
+        }
+
+        public IEnumerable<ITrackable> ChildrenTrackables
+        {
+            get
+            {
+                var trackableLeftHand = (TrackableHand)LeftHand;
+                if (trackableLeftHand != null)
+                    yield return trackableLeftHand;
+                var trackableRightHand = (TrackableHand)RightHand;
+                if (trackableRightHand != null)
+                    yield return trackableRightHand;
+            }
+        }
+
+
+        private static readonly PropertyInfo NameProperty = typeof(TrackablePerson).GetProperty("Name");
         public override System.String Name
         {
             get
@@ -56,6 +168,135 @@ namespace TrackableData.Tests.Data
                 if (Tracker != null && Name != value)
                     Tracker.TrackSet(NameProperty, base.Name, value);
                 base.Name = value;
+            }
+        }
+
+        private static readonly PropertyInfo AgeProperty = typeof(TrackablePerson).GetProperty("Age");
+        public override System.Int32 Age
+        {
+            get
+            {
+                return base.Age;
+            }
+            set
+            {
+                if (Tracker != null && Age != value)
+                    Tracker.TrackSet(AgeProperty, base.Age, value);
+                base.Age = value;
+            }
+        }
+
+        private static readonly PropertyInfo LeftHandProperty = typeof(TrackablePerson).GetProperty("LeftHand");
+        public override TrackableData.Tests.Data.Hand LeftHand
+        {
+            get
+            {
+                return base.LeftHand;
+            }
+            set
+            {
+                if (Tracker != null && LeftHand != value)
+                    Tracker.TrackSet(LeftHandProperty, base.LeftHand, value);
+                base.LeftHand = value;
+            }
+        }
+
+        private static readonly PropertyInfo RightHandProperty = typeof(TrackablePerson).GetProperty("RightHand");
+        public override TrackableData.Tests.Data.Hand RightHand
+        {
+            get
+            {
+                return base.RightHand;
+            }
+            set
+            {
+                if (Tracker != null && RightHand != value)
+                    Tracker.TrackSet(RightHandProperty, base.RightHand, value);
+                base.RightHand = value;
+            }
+        }
+    }
+}
+
+#endregion
+
+#region TrackableData.Tests.Data.Ring
+
+namespace TrackableData.Tests.Data
+{
+    public class TrackableRing : Ring, ITrackable<Ring>
+    {
+        public TrackablePocoTracker<Ring> Tracker { get; set; }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
+
+        ITracker ITrackable.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<Ring>)value;
+                Tracker = t;
+            }
+        }
+
+        ITracker<Ring> ITrackable<Ring>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<Ring>)value;
+                Tracker = t;
+            }
+        }
+
+        public void SetDefaultTracker()
+        {
+            Tracker = new TrackablePocoTracker<Ring>();
+        }
+
+        public IEnumerable<ITrackable> ChildrenTrackables
+        {
+            get
+            {
+                yield break;
+            }
+        }
+
+
+        private static readonly PropertyInfo NameProperty = typeof(TrackableRing).GetProperty("Name");
+        public override System.String Name
+        {
+            get
+            {
+                return base.Name;
+            }
+            set
+            {
+                if (Tracker != null && Name != value)
+                    Tracker.TrackSet(NameProperty, base.Name, value);
+                base.Name = value;
+            }
+        }
+
+        private static readonly PropertyInfo PowerProperty = typeof(TrackableRing).GetProperty("Power");
+        public override System.Int32 Power
+        {
+            get
+            {
+                return base.Power;
+            }
+            set
+            {
+                if (Tracker != null && Power != value)
+                    Tracker.TrackSet(PowerProperty, base.Power, value);
+                base.Power = value;
             }
         }
     }

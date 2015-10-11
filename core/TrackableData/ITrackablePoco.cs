@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-
-namespace TrackableData
+﻿namespace TrackableData
 {
     public interface ITrackablePoco
     {

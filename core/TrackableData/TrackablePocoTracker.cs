@@ -6,7 +6,7 @@ using System.Text;
 
 namespace TrackableData
 {
-    public class TrackablePocoTracker<T> : ITracker
+    public class TrackablePocoTracker<T> : ITracker<T>
     {
         public struct Change
         {
@@ -41,42 +41,83 @@ namespace TrackableData
             ChangeMap.Clear();
         }
 
-        public void ApplyTo(object obj)
+        public void ApplyTo(object trackable)
         {
-            if ((obj is T) == false)
-                throw new ArgumentException("obj");
+            var poco = (T)trackable;
+            ApplyTo(poco);
+        }
+
+        public void ApplyTo(T trackable)
+        {
+            if (trackable == null)
+                throw new ArgumentNullException("trackable");
 
             foreach (var item in ChangeMap)
             {
                 var setter = item.Key.GetSetMethod().GetBaseDefinition();
-                setter.Invoke(obj, new[] { item.Value.NewValue });
+                setter.Invoke(trackable, new[] { item.Value.NewValue });
             }
         }
 
         public void ApplyTo(ITracker tracker)
         {
-            var t = (TrackablePocoTracker<T>)tracker;
-            if (t == null)
-                throw new ArgumentException("tracker");
+            ApplyTo((TrackablePocoTracker<T>)tracker);
+        }
 
-            ApplyTo(t);
+        public void ApplyTo(ITracker<T> tracker)
+        {
+            ApplyTo((TrackablePocoTracker<T>)tracker);
         }
 
         public void ApplyTo(TrackablePocoTracker<T> tracker)
         {
+            if (tracker == null)
+                throw new ArgumentNullException("tracker");
+
             foreach (var item in ChangeMap)
-                tracker.TrackSet(item.Key, item.Value.NewValue, item.Value.OldValue);
+                tracker.TrackSet(item.Key, item.Value.OldValue, item.Value.NewValue);
         }
 
-        public void RollbackTo(object obj)
+        public void RollbackTo(object trackable)
         {
-            if ((obj is T) == false)
-                throw new ArgumentException("obj");
+            RollbackTo((T)trackable);
+        }
+
+        public void RollbackTo(T trackable)
+        {
+            if (trackable == null)
+                throw new ArgumentNullException("trackable");
 
             foreach (var item in ChangeMap)
             {
                 var setter = item.Key.GetSetMethod().GetBaseDefinition();
-                setter.Invoke(obj, new[] { item.Value.OldValue });
+                setter.Invoke(trackable, new[] { item.Value.OldValue });
+            }
+        }
+     
+        public void RollbackTo(ITracker tracker)
+        {
+            RollbackTo((TrackablePocoTracker<T>)tracker);
+        }
+
+        public void RollbackTo(ITracker<T> tracker)
+        {
+            RollbackTo((TrackablePocoTracker<T>)tracker);
+        }
+
+        public void RollbackTo(TrackablePocoTracker<T> tracker)
+        {
+            if (tracker == null)
+                throw new ArgumentNullException("tracker");
+
+            if (this == tracker)
+            {
+                ChangeMap.Clear();
+            }
+            else
+            {
+                foreach (var item in ChangeMap)
+                    tracker.TrackSet(item.Key, item.Value.NewValue, item.Value.OldValue);
             }
         }
 
