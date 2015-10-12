@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using TrackableData;
 using Xunit;
 
-namespace TrackableData.JsonNet.Tests
+namespace TrackableData.Json.Tests
 {
     public class DictionaryTrackerTest
     {

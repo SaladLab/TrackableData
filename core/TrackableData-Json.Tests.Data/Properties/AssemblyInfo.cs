@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TrackableData-JsonNet")]
+[assembly: AssemblyTitle("TrackableData-Json.Tests.Data")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("TrackableData-JsonNet")]
+[assembly: AssemblyProduct("TrackableData-Json.Tests.Data")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f4185a6a-b952-4ea5-9b23-5c7af6ae7712")]
+[assembly: Guid("76a37981-ac8c-4031-9e13-0574625a513a")]
 
 // Version information for an assembly consists of the following four values:
 //

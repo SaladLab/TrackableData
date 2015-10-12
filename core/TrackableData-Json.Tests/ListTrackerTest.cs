@@ -2,7 +2,7 @@
 using TrackableData;
 using Xunit;
 
-namespace TrackableData.JsonNet.Tests
+namespace TrackableData.Json.Tests
 {
     public class ListTrackerTest
     {

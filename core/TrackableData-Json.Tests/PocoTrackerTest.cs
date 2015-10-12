@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using TrackableData.JsonNet.Tests.Data;
+using TrackableData.Json.Tests.Data;
 using Xunit;
 
-namespace TrackableData.JsonNet.Tests
+namespace TrackableData.Json.Tests
 {
     public class PocoTrackerTest
     {

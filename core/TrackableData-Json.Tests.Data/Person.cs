@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrackableData.JsonNet.Tests.Data
+namespace TrackableData.Json.Tests.Data
 {
     public class Person : ITrackablePoco
     {
