@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using CommandLine;
 
 namespace CodeGen
@@ -83,11 +81,10 @@ namespace CodeGen
                 if (options.UseProtobuf)
                 {
                     writer.AddUsing("ProtoBuf");
-                    writer.AddUsing("TypeAlias");
                     writer.AddUsing("System.ComponentModel");
                 }
 
-                var trackablePocoTypes = assembly.GetTypes().OrderBy(t => t.FullName).Where(t => Utility.IsTrackablePoco(t)).ToArray();
+                var trackablePocoTypes = GetTypesSafely(assembly).OrderBy(t => t.FullName).Where(t => Utility.IsTrackablePoco(t)).ToArray();
 
                 var pocoCodeGen = new TrackablePocoCodeGenerator() { Options = options };
                 foreach (var type in trackablePocoTypes)
@@ -117,6 +114,9 @@ namespace CodeGen
             }
             catch (ReflectionTypeLoadException ex)
             {
+                Console.WriteLine(ex);
+                foreach (var e in ex.LoaderExceptions)
+                    Console.WriteLine(e);
                 return ex.Types.Where(x => x != null);
             }
         }

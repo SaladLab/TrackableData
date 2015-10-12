@@ -5,11 +5,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2E3DF5C2-8A38-4A03-86D7-8D463C917E47}</ProjectGuid>
+    <ProjectGuid>{6FC26014-DDB1-47B8-9F21-874F18926ABC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TrackableData.Tests</RootNamespace>
-    <AssemblyName>TrackableData.Tests</AssemblyName>
+    <RootNamespace>TrackableData.Protobuf.Tests</RootNamespace>
+    <AssemblyName>TrackableData-Protobuf.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -39,6 +39,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
@@ -62,18 +66,20 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="DictionaryTest.cs" />
-    <Compile Include="ListTest.cs" />
-    <Compile Include="PocoTest.cs" />
+    <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TrackableData.Tests.Data\TrackableData.Tests.Data.csproj">
-      <Project>{c2a74279-ab63-4da8-a9d3-ee2d38984006}</Project>
-      <Name>TrackableData.Tests.Data</Name>
+    <ProjectReference Include="..\TrackableData-Protobuf.Tests.Data\TrackableData-Protobuf.Tests.Data.csproj">
+      <Project>{d4f1768d-6827-4981-a0bf-f615649b6560}</Project>
+      <Name>TrackableData-Protobuf.Tests.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TrackableData-Protobuf\TrackableData-Protobuf.csproj">
+      <Project>{182f783a-ed38-4245-89d1-20086c98a372}</Project>
+      <Name>TrackableData-Protobuf</Name>
     </ProjectReference>
     <ProjectReference Include="..\TrackableData\TrackableData.csproj">
       <Project>{c2c3a8ca-62f9-4c5a-8b2b-5091e5a41c54}</Project>
