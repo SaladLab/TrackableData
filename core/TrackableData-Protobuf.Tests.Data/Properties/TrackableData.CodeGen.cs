@@ -15,3 +15,305 @@ using TrackableData;
 using ProtoBuf;
 using System.ComponentModel;
 
+#region TrackableData.Protobuf.Tests.Data.Hand
+
+namespace TrackableData.Protobuf.Tests.Data
+{
+    public class TrackableHand : Hand, ITrackable<Hand>
+    {
+        [IgnoreDataMember]
+        public TrackablePocoTracker<Hand> Tracker { get; set; }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
+
+        ITracker ITrackable.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<Hand>)value;
+                Tracker = t;
+            }
+        }
+
+        ITracker<Hand> ITrackable<Hand>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<Hand>)value;
+                Tracker = t;
+            }
+        }
+
+        public ITrackable GetChildTrackable(object name)
+        {
+            switch ((string)name)
+            {
+                case "MainRing":
+                    return MainRing as ITrackable;
+                case "SubRing":
+                    return SubRing as ITrackable;
+                default:
+                    return null;
+            }
+        }
+
+        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
+        {
+            var trackableMainRing = MainRing as ITrackable;
+            if (trackableMainRing != null && (changedOnly == false || trackableMainRing.Changed))
+                yield return new KeyValuePair<object, ITrackable>("MainRing", trackableMainRing);
+            var trackableSubRing = SubRing as ITrackable;
+            if (trackableSubRing != null && (changedOnly == false || trackableSubRing.Changed))
+                yield return new KeyValuePair<object, ITrackable>("SubRing", trackableSubRing);
+        }
+
+        private static readonly PropertyInfo MainRingProperty = typeof(TrackableHand).GetProperty("MainRing");
+        public override TrackableData.Protobuf.Tests.Data.Ring MainRing
+        {
+            get
+            {
+                return base.MainRing;
+            }
+            set
+            {
+                if (Tracker != null && MainRing != value)
+                    Tracker.TrackSet(MainRingProperty, base.MainRing, value);
+                base.MainRing = value;
+            }
+        }
+
+        private static readonly PropertyInfo SubRingProperty = typeof(TrackableHand).GetProperty("SubRing");
+        public override TrackableData.Protobuf.Tests.Data.Ring SubRing
+        {
+            get
+            {
+                return base.SubRing;
+            }
+            set
+            {
+                if (Tracker != null && SubRing != value)
+                    Tracker.TrackSet(SubRingProperty, base.SubRing, value);
+                base.SubRing = value;
+            }
+        }
+    }
+}
+
+#endregion
+
+#region TrackableData.Protobuf.Tests.Data.Person
+
+namespace TrackableData.Protobuf.Tests.Data
+{
+    public class TrackablePerson : Person, ITrackable<Person>
+    {
+        [IgnoreDataMember]
+        public TrackablePocoTracker<Person> Tracker { get; set; }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
+
+        ITracker ITrackable.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<Person>)value;
+                Tracker = t;
+            }
+        }
+
+        ITracker<Person> ITrackable<Person>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<Person>)value;
+                Tracker = t;
+            }
+        }
+
+        public ITrackable GetChildTrackable(object name)
+        {
+            switch ((string)name)
+            {
+                case "LeftHand":
+                    return LeftHand as ITrackable;
+                case "RightHand":
+                    return RightHand as ITrackable;
+                default:
+                    return null;
+            }
+        }
+
+        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
+        {
+            var trackableLeftHand = LeftHand as ITrackable;
+            if (trackableLeftHand != null && (changedOnly == false || trackableLeftHand.Changed))
+                yield return new KeyValuePair<object, ITrackable>("LeftHand", trackableLeftHand);
+            var trackableRightHand = RightHand as ITrackable;
+            if (trackableRightHand != null && (changedOnly == false || trackableRightHand.Changed))
+                yield return new KeyValuePair<object, ITrackable>("RightHand", trackableRightHand);
+        }
+
+        private static readonly PropertyInfo NameProperty = typeof(TrackablePerson).GetProperty("Name");
+        public override System.String Name
+        {
+            get
+            {
+                return base.Name;
+            }
+            set
+            {
+                if (Tracker != null && Name != value)
+                    Tracker.TrackSet(NameProperty, base.Name, value);
+                base.Name = value;
+            }
+        }
+
+        private static readonly PropertyInfo AgeProperty = typeof(TrackablePerson).GetProperty("Age");
+        public override System.Int32 Age
+        {
+            get
+            {
+                return base.Age;
+            }
+            set
+            {
+                if (Tracker != null && Age != value)
+                    Tracker.TrackSet(AgeProperty, base.Age, value);
+                base.Age = value;
+            }
+        }
+
+        private static readonly PropertyInfo LeftHandProperty = typeof(TrackablePerson).GetProperty("LeftHand");
+        public override TrackableData.Protobuf.Tests.Data.Hand LeftHand
+        {
+            get
+            {
+                return base.LeftHand;
+            }
+            set
+            {
+                if (Tracker != null && LeftHand != value)
+                    Tracker.TrackSet(LeftHandProperty, base.LeftHand, value);
+                base.LeftHand = value;
+            }
+        }
+
+        private static readonly PropertyInfo RightHandProperty = typeof(TrackablePerson).GetProperty("RightHand");
+        public override TrackableData.Protobuf.Tests.Data.Hand RightHand
+        {
+            get
+            {
+                return base.RightHand;
+            }
+            set
+            {
+                if (Tracker != null && RightHand != value)
+                    Tracker.TrackSet(RightHandProperty, base.RightHand, value);
+                base.RightHand = value;
+            }
+        }
+    }
+}
+
+#endregion
+
+#region TrackableData.Protobuf.Tests.Data.Ring
+
+namespace TrackableData.Protobuf.Tests.Data
+{
+    public class TrackableRing : Ring, ITrackable<Ring>
+    {
+        [IgnoreDataMember]
+        public TrackablePocoTracker<Ring> Tracker { get; set; }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
+
+        ITracker ITrackable.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<Ring>)value;
+                Tracker = t;
+            }
+        }
+
+        ITracker<Ring> ITrackable<Ring>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<Ring>)value;
+                Tracker = t;
+            }
+        }
+
+        public ITrackable GetChildTrackable(object name)
+        {
+            switch ((string)name)
+            {
+                default:
+                    return null;
+            }
+        }
+
+        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
+        {
+            yield break;
+        }
+
+        private static readonly PropertyInfo NameProperty = typeof(TrackableRing).GetProperty("Name");
+        public override System.String Name
+        {
+            get
+            {
+                return base.Name;
+            }
+            set
+            {
+                if (Tracker != null && Name != value)
+                    Tracker.TrackSet(NameProperty, base.Name, value);
+                base.Name = value;
+            }
+        }
+
+        private static readonly PropertyInfo PowerProperty = typeof(TrackableRing).GetProperty("Power");
+        public override System.Int32 Power
+        {
+            get
+            {
+                return base.Power;
+            }
+            set
+            {
+                if (Tracker != null && Power != value)
+                    Tracker.TrackSet(PowerProperty, base.Power, value);
+                base.Power = value;
+            }
+        }
+    }
+}
+
+#endregion

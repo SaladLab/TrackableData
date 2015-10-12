@@ -18,7 +18,7 @@ namespace CodeGen
         public static Assembly BuildAndLoad(string[] sourcePaths, string[] referencePaths, string[] defines)
         {
             var assemblyName = Path.GetRandomFileName();
-            var syntaxTrees = sourcePaths.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file))).ToArray();
+            var syntaxTrees = sourcePaths.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file)).ToArray();
             var references = referencePaths.Select(file => MetadataReference.CreateFromFile(file)).ToArray();
 
             // TODO: how to handle defines option?
@@ -41,8 +41,10 @@ namespace CodeGen
 
                     foreach (Diagnostic diagnostic in failures)
                     {
-                        Console.Error.WriteLine("{0}: {1} {2}", 
-                            diagnostic.Location,
+                        var line = diagnostic.Location.GetLineSpan();
+                        Console.Error.WriteLine("{0}({1}): {2} {3}", 
+                            line.Path, 
+                            line.StartLinePosition.Line + 1,
                             diagnostic.Id,
                             diagnostic.GetMessage());
                     }
