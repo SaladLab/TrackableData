@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
 using Newtonsoft.Json;
 
 namespace TrackableData
@@ -46,7 +44,7 @@ namespace TrackableData
             foreach (var item in tracker.ChangeMap)
             {
                 writer.WritePropertyName(item.Key.Name);
-                serializer.Serialize(writer, item.Value);
+                serializer.Serialize(writer, item.Value.NewValue);
             }
 
             writer.WriteEndObject();

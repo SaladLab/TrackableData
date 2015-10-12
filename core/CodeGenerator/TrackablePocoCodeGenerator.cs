@@ -35,6 +35,7 @@ namespace CodeGen
 
             // Tracker
 
+            sb.Append("\t[IgnoreDataMember]\n");
             sb.AppendFormat("\tpublic TrackablePocoTracker<{0}> Tracker {{ get; set; }}\n", type.Name);
             sb.Append("\n");
 
@@ -75,36 +76,46 @@ namespace CodeGen
             sb.Append("\t}\n");
             sb.Append("\n");
 
-            // ITrackable.SetDefaultTracker
+            // ITrackable.GetChildTrackable
 
-            sb.Append("\tpublic void SetDefaultTracker()\n");
+            var childTrackableProperties = type.GetProperties()
+                .Where(p => p.GetMethod.IsVirtual)
+                .Where(p => Utility.IsTrackable(p.PropertyType))
+                .ToArray();
+
+            sb.Append("\tpublic ITrackable GetChildTrackable(object name)\n");
             sb.Append("\t{\n");
-            sb.AppendFormat("\t\tTracker = new TrackablePocoTracker<{0}>();\n", type.Name);
-            sb.Append("\t}\n");
-            sb.Append("\n");
-
-            // ITrackable.ChildrenTrackables
-
-            sb.Append("\tpublic IEnumerable<ITrackable> ChildrenTrackables\n");
-            sb.Append("\t{\n");
-            sb.Append("\t\tget\n");
+            sb.Append("\t\tswitch ((string)name)\n");
             sb.Append("\t\t{\n");
-            var childrenTrackablesCount = 0;
-            foreach (var p in type.GetProperties().Where(p => p.GetMethod.IsVirtual))
+            foreach (var ctp in childTrackableProperties)
             {
-                if (Utility.IsTrackablePoco(p.PropertyType))
-                {
-                    sb.AppendFormat("\t\t\tvar trackable{0} = (Trackable{1}){0};\n", p.Name, p.PropertyType.Name);
-                    sb.AppendFormat("\t\t\tif (trackable{0} != null)\n", p.Name);
-                    sb.AppendFormat("\t\t\t\tyield return trackable{0};\n", p.Name);
-                    childrenTrackablesCount += 1;
-                }
+                sb.AppendFormat("\t\t\tcase \"{0}\":\n", ctp.Name);
+                sb.AppendFormat("\t\t\t\treturn {0} as ITrackable;\n", ctp.Name);
             }
-            if (childrenTrackablesCount == 0)
-                sb.Append("\t\t\tyield break;\n");
+            sb.Append("\t\t\tdefault:\n");
+            sb.Append("\t\t\t\treturn null;\n");
             sb.Append("\t\t}\n");
             sb.Append("\t}\n");
             sb.Append("\n");
+
+            // ITrackable.GetChildTrackables
+
+            sb.Append("\tpublic IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)\n");
+            sb.Append("\t{\n");
+            if (childTrackableProperties.Any())
+            {
+                foreach (var ctp in childTrackableProperties)
+                {
+                    sb.AppendFormat("\t\tvar trackable{0} = {0} as ITrackable;\n", ctp.Name, ctp.PropertyType.Name);
+                    sb.AppendFormat("\t\tif (trackable{0} != null && (changedOnly == false || trackable{0}.Changed))\n", ctp.Name);
+                    sb.AppendFormat("\t\t\tyield return new KeyValuePair<object, ITrackable>(\"{0}\", trackable{0});\n", ctp.Name);
+                }
+            }
+            else
+            {
+                sb.Append("\t\tyield break;\n");
+            }
+            sb.Append("\t}\n");
 
             // Properties
 

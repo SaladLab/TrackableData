@@ -12,43 +12,6 @@ namespace TrackableData
         Modify = 3,
     }
 
-    [Serializable]
-    public struct TrackableDictionaryOperationItem<TKey, TValue>
-    {
-        private readonly TKey _key;
-        private readonly TrackableDictionaryOperation _operation;
-        private readonly TValue _oldValue;
-        private readonly TValue _newValue;
-
-        public TKey Key
-        {
-            get { return _key; }
-        }
-
-        public TrackableDictionaryOperation Operation
-        {
-            get { return _operation; }
-        }
-
-        public TValue OldValue
-        {
-            get { return _oldValue; }
-        }
-
-        public TValue NewValue
-        {
-            get { return _newValue; }
-        }
-
-        public TrackableDictionaryOperationItem(TKey key, TrackableDictionaryOperation operation, TValue oldValue, TValue newValue)
-        {
-            _key = key;
-            _operation = operation;
-            _oldValue = oldValue;
-            _newValue = newValue;
-        }
-    }
-
     public class TrackableDictionaryTracker<TKey, TValue> : ITracker<IDictionary<TKey, TValue>>
     {
         public struct Change
@@ -200,32 +163,6 @@ namespace TrackableData
                 return ChangeMap.Where(i => i.Value.Operation == TrackableDictionaryOperation.Remove)
                                 .Select(i => i.Key);
             }
-        }
-
-        public TrackableDictionaryOperationItem<TKey, TValue>[] GetChanges()
-        {
-            if (ChangeMap.Count == 0)
-                return null;
-
-            var changes = new TrackableDictionaryOperationItem<TKey, TValue>[ChangeMap.Count];
-            var cur = 0;
-            foreach (var i in ChangeMap)
-            {
-                changes[cur] = new TrackableDictionaryOperationItem<TKey, TValue>(
-                    i.Key, i.Value.Operation, i.Value.OldValue, i.Value.NewValue);
-                cur += 1;
-            }
-            return changes;
-        }
-
-        public void SetChanges(TrackableDictionaryOperationItem<TKey, TValue>[] changes)
-        {
-            ChangeMap.Clear();
-            if (changes == null || changes.Length == 0)
-                return;
-
-            foreach (var i in changes)
-                ChangeMap[i.Key] = new Change { Operation = i.Operation, OldValue = i.OldValue, NewValue = i.NewValue };
         }
 
         // ITracker

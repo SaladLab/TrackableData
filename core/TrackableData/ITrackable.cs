@@ -10,11 +10,11 @@ namespace TrackableData
         // return tracker that will track this
         ITracker Tracker { get; set; }
 
-        // Tracker = new DefaultTracker();
-        void SetDefaultTracker();
+        // return child trackable which have specified name, otherwise null
+        ITrackable GetChildTrackable(object name);
 
-        // return tracker's children trackables
-        IEnumerable<ITrackable> ChildrenTrackables { get; }
+        // return all child trackables with name
+        IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false);
     }
 
     public interface ITrackable<T> : ITrackable

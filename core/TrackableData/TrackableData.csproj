@@ -51,6 +51,7 @@
     <Compile Include="TrackableList.cs" />
     <Compile Include="TrackableListTracker.cs" />
     <Compile Include="TrackablePocoTracker.cs" />
+    <Compile Include="TrackerResolver.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.Serialization;
 using TrackableData;
 
 #region Basic.Data.UserData
@@ -18,6 +19,7 @@ namespace Basic.Data
 {
     public class TrackableUserData : UserData, ITrackable<UserData>
     {
+        [IgnoreDataMember]
         public TrackablePocoTracker<UserData> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
@@ -48,24 +50,28 @@ namespace Basic.Data
             }
         }
 
-        public void SetDefaultTracker()
+        public ITrackable GetChildTrackable(object name)
         {
-            Tracker = new TrackablePocoTracker<UserData>();
-        }
-
-        public IEnumerable<ITrackable> ChildrenTrackables
-        {
-            get
+            switch ((string)name)
             {
-                var trackableLeftHand = (TrackableUserHandData)LeftHand;
-                if (trackableLeftHand != null)
-                    yield return trackableLeftHand;
-                var trackableRightHand = (TrackableUserHandData)RightHand;
-                if (trackableRightHand != null)
-                    yield return trackableRightHand;
+                case "LeftHand":
+                    return LeftHand as ITrackable;
+                case "RightHand":
+                    return RightHand as ITrackable;
+                default:
+                    return null;
             }
         }
 
+        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
+        {
+            var trackableLeftHand = LeftHand as ITrackable;
+            if (trackableLeftHand != null && (changedOnly == false || trackableLeftHand.Changed))
+                yield return new KeyValuePair<object, ITrackable>("LeftHand", trackableLeftHand);
+            var trackableRightHand = RightHand as ITrackable;
+            if (trackableRightHand != null && (changedOnly == false || trackableRightHand.Changed))
+                yield return new KeyValuePair<object, ITrackable>("RightHand", trackableRightHand);
+        }
 
         private static readonly PropertyInfo NameProperty = typeof(TrackableUserData).GetProperty("Name");
         public override System.String Name
@@ -152,6 +158,7 @@ namespace Basic.Data
 {
     public class TrackableUserHandData : UserHandData, ITrackable<UserHandData>
     {
+        [IgnoreDataMember]
         public TrackablePocoTracker<UserHandData> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
@@ -182,19 +189,19 @@ namespace Basic.Data
             }
         }
 
-        public void SetDefaultTracker()
+        public ITrackable GetChildTrackable(object name)
         {
-            Tracker = new TrackablePocoTracker<UserHandData>();
-        }
-
-        public IEnumerable<ITrackable> ChildrenTrackables
-        {
-            get
+            switch ((string)name)
             {
-                yield break;
+                default:
+                    return null;
             }
         }
 
+        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
+        {
+            yield break;
+        }
 
         private static readonly PropertyInfo FingerCountProperty = typeof(TrackableUserHandData).GetProperty("FingerCount");
         public override System.Int32 FingerCount

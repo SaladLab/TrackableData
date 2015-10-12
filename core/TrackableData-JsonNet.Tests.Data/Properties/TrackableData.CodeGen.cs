@@ -13,9 +13,9 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using TrackableData;
 
-#region TrackableData.Tests.Data.Hand
+#region TrackableData.JsonNet.Tests.Data.Hand
 
-namespace TrackableData.Tests.Data
+namespace TrackableData.JsonNet.Tests.Data
 {
     public class TrackableHand : Hand, ITrackable<Hand>
     {
@@ -74,7 +74,7 @@ namespace TrackableData.Tests.Data
         }
 
         private static readonly PropertyInfo MainRingProperty = typeof(TrackableHand).GetProperty("MainRing");
-        public override TrackableData.Tests.Data.Ring MainRing
+        public override TrackableData.JsonNet.Tests.Data.Ring MainRing
         {
             get
             {
@@ -89,7 +89,7 @@ namespace TrackableData.Tests.Data
         }
 
         private static readonly PropertyInfo SubRingProperty = typeof(TrackableHand).GetProperty("SubRing");
-        public override TrackableData.Tests.Data.Ring SubRing
+        public override TrackableData.JsonNet.Tests.Data.Ring SubRing
         {
             get
             {
@@ -107,9 +107,9 @@ namespace TrackableData.Tests.Data
 
 #endregion
 
-#region TrackableData.Tests.Data.Person
+#region TrackableData.JsonNet.Tests.Data.Person
 
-namespace TrackableData.Tests.Data
+namespace TrackableData.JsonNet.Tests.Data
 {
     public class TrackablePerson : Person, ITrackable<Person>
     {
@@ -198,7 +198,7 @@ namespace TrackableData.Tests.Data
         }
 
         private static readonly PropertyInfo LeftHandProperty = typeof(TrackablePerson).GetProperty("LeftHand");
-        public override TrackableData.Tests.Data.Hand LeftHand
+        public override TrackableData.JsonNet.Tests.Data.Hand LeftHand
         {
             get
             {
@@ -213,7 +213,7 @@ namespace TrackableData.Tests.Data
         }
 
         private static readonly PropertyInfo RightHandProperty = typeof(TrackablePerson).GetProperty("RightHand");
-        public override TrackableData.Tests.Data.Hand RightHand
+        public override TrackableData.JsonNet.Tests.Data.Hand RightHand
         {
             get
             {
@@ -231,9 +231,9 @@ namespace TrackableData.Tests.Data
 
 #endregion
 
-#region TrackableData.Tests.Data.Ring
+#region TrackableData.JsonNet.Tests.Data.Ring
 
-namespace TrackableData.Tests.Data
+namespace TrackableData.JsonNet.Tests.Data
 {
     public class TrackableRing : Ring, ITrackable<Ring>
     {

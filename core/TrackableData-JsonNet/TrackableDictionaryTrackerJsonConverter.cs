@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 namespace TrackableData
 {
     public class TrackableDictionaryTrackerJsonConverter<TKey, TValue> : JsonConverter
-        where TValue : new()
     {
         public override bool CanConvert(Type objectType)
         {

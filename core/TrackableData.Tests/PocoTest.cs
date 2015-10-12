@@ -15,13 +15,13 @@ namespace TrackableData.Tests
                 Age = 20,
                 LeftHand = new TrackableHand
                 {
-                    MainRing = new Ring { Name = "NormalRing", Power = 10 },
-                    SubRing = new Ring { Name = "TutorialRing", Power = 5 }
+                    MainRing = new TrackableRing { Name = "NormalRing", Power = 10 },
+                    SubRing = new TrackableRing { Name = "TutorialRing", Power = 5 }
                 },
                 RightHand = new TrackableHand
                 {
-                    MainRing = new Ring { Name = "NormalRing", Power = 9 },
-                    SubRing = new Ring { Name = "DummyRing", Power = 1 }
+                    MainRing = new TrackableRing { Name = "NormalRing", Power = 9 },
+                    SubRing = new TrackableRing { Name = "DummyRing", Power = 1 }
                 }
             };
         }

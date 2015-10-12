@@ -50,17 +50,28 @@ namespace TrackableData
             }
         }
 
-        public void SetDefaultTracker()
+        public ITrackable GetChildTrackable(object name)
         {
-            Tracker = new TrackableDictionaryTracker<TKey, TValue>();
+            TKey key = (name.GetType() == typeof (TKey))
+                ? (TKey)name
+                : (TKey)Convert.ChangeType(name, typeof (TKey));
+
+            TValue value;
+            return _dictionary.TryGetValue(key, out value)
+                ? (ITrackable)value
+                : null;
         }
 
-        public IEnumerable<ITrackable> ChildrenTrackables
+        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
         {
-            get
-            {
-                // TODO: DO IT LATER
+            if (typeof(ITrackable).IsAssignableFrom(typeof(TValue)) == false)
                 yield break;
+
+            foreach (var item in _dictionary)
+            {
+                var trackable = (ITrackable)item.Value;
+                if (changedOnly == false || trackable.Changed)
+                    yield return new KeyValuePair<object, ITrackable>(item.Key, trackable);
             }
         }
 

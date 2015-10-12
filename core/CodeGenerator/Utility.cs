@@ -19,6 +19,12 @@ namespace CodeGen
             }
         }
 
+        public static bool IsTrackable(Type type)
+        {
+            return type.IsClass &&
+                   type.GetInterfaces().Any(i => i.FullName.StartsWith("TrackableData.ITrackable"));
+        }
+
         public static bool IsTrackablePoco(Type type)
         {
             return type.IsClass &&
