@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using ProtoBuf;
 
 namespace CodeGen
 {
@@ -20,9 +21,25 @@ namespace CodeGen
             writer.PushNamespace(type.Namespace);
 
             GenerateTrackablePocoCode(type, writer); 
+            if (Options.UseProtobuf)
+                GenerateTrackablePocoSurrogateCode(type, writer);
 
             writer.PopNamespace();
             writer.PopRegion();
+        }
+
+        private PropertyInfo[] GetProperties(Type type)
+        {
+            return type.GetProperties()
+                .Where(p => p.GetMethod.IsVirtual)
+                .OrderBy(p => p.Name).ToArray();
+        }
+
+        private PropertyInfo[] GetTrackableProperties(Type type)
+        {
+            return type.GetProperties()
+                .Where(p => p.GetMethod.IsVirtual && Utility.IsTrackable(p.PropertyType))
+                .OrderBy(p => p.Name).ToArray();
         }
 
         private void GenerateTrackablePocoCode(Type type, ICodeGenWriter writer)
@@ -30,6 +47,8 @@ namespace CodeGen
             var sb = new StringBuilder();
             var className = "Trackable" + type.Name;
 
+            if (Options.UseProtobuf)
+                sb.Append("[ProtoContract]\n");
             sb.Append($"public class {className} : {type.Name}, ITrackable<{type.Name}>\n");
             sb.Append("{\n");
 
@@ -78,10 +97,7 @@ namespace CodeGen
 
             // ITrackable.GetChildTrackable
 
-            var childTrackableProperties = type.GetProperties()
-                .Where(p => p.GetMethod.IsVirtual)
-                .Where(p => Utility.IsTrackable(p.PropertyType))
-                .ToArray();
+            var childTrackableProperties = GetTrackableProperties(type);
 
             sb.Append("\tpublic ITrackable GetChildTrackable(object name)\n");
             sb.Append("\t{\n");
@@ -119,12 +135,19 @@ namespace CodeGen
 
             // Properties
 
-            foreach (var p in type.GetProperties().Where(p => p.GetMethod.IsVirtual))
+            foreach (var p in GetProperties(type))
             {
                 sb.AppendLine("");
                 sb.AppendFormat(
-                    "\tprivate static readonly PropertyInfo {0}Property = typeof(Trackable{1}).GetProperty(\"{0}\");\n",
+                    "\tpublic static readonly PropertyInfo {0}Property = typeof(Trackable{1}).GetProperty(\"{0}\");\n",
                     p.Name, type.Name);
+                if (Options.UseProtobuf)
+                {
+                    var protoMemberAttr = p.GetCustomAttribute<ProtoMemberAttribute>();
+                    if (protoMemberAttr != null)
+                        sb.Append($"\t[ProtoMember({protoMemberAttr.Tag})]\n");
+                }
+
                 sb.AppendFormat("\tpublic override {0} {1}\n", p.PropertyType, p.Name);
                 sb.AppendLine("\t{");
                 sb.AppendFormat("\t\tget\n");
@@ -139,6 +162,97 @@ namespace CodeGen
                 sb.AppendLine("\t\t}");
                 sb.AppendLine("\t}");
             }
+
+            sb.Append("}");
+
+            writer.AddCode(sb.ToString());
+        }
+
+        private void GenerateTrackablePocoSurrogateCode(Type type, ICodeGenWriter writer)
+        {
+            var sb = new StringBuilder();
+            var className = "Trackable" + type.Name + "TrackerSurrogate";
+
+            sb.Append("[ProtoContract]\n");
+            sb.Append($"public class {className}\n");
+            sb.Append("{\n");
+
+            // Assign unique id to properties
+
+            var properties = GetProperties(type);
+            var propertyIds = new Dictionary<PropertyInfo, int>();
+            foreach (var p in properties)
+            {
+                var protoMemberAttr = p.GetCustomAttribute<ProtoMemberAttribute>();
+                if (protoMemberAttr != null)
+                    propertyIds[p] = protoMemberAttr.Tag;
+            }
+
+            // ProtoMember
+
+            foreach (var item in propertyIds.OrderBy(x => x.Value))
+            {
+                var p = item.Key;
+                sb.AppendFormat($"\t[ProtoMember({item.Value})] ");
+
+                if (p.PropertyType.IsValueType)
+                    sb.AppendFormat("public {0}? {1};\n", p.PropertyType, p.Name);
+                else
+                    sb.AppendFormat("public EnvelopedObject<{0}> {1};\n", p.PropertyType, p.Name);
+            }
+
+            // ConvertTrackerToSurrogate
+
+            sb.Append("\n");
+            sb.Append($"\tpublic static implicit operator {className}(TrackablePocoTracker<{type.Name}> tracker)\n");
+            sb.Append("\t{\n");
+            sb.Append("\t\tif (tracker == null)\n");
+            sb.Append("\t\t\treturn null;\n");
+            sb.Append("\n");
+            sb.Append($"\t\tvar surrogate = new {className}();\n");
+            sb.Append("\t\tforeach(var changeItem in tracker.ChangeMap)\n");
+            sb.Append("\t\t{\n");
+            sb.Append("\t\t\tvar tag = changeItem.Key.GetCustomAttribute<ProtoMemberAttribute>().Tag;\n");
+            sb.Append("\t\t\tswitch (tag)\n");
+            sb.Append("\t\t\t{\n");
+            foreach (var item in propertyIds.OrderBy(x => x.Value))
+            {
+                var p = item.Key;
+                var typeName = Utility.GetTypeName(p.PropertyType);
+
+                sb.Append($"\t\t\t\tcase {item.Value}:\n");
+                if (p.PropertyType.IsValueType)
+                    sb.Append($"\t\t\t\t\tsurrogate.{p.Name} = ({typeName})changeItem.Value.NewValue;\n");
+                else
+                    sb.Append($"\t\t\t\t\tsurrogate.{p.Name} = new EnvelopedObject<{typeName}> {{ Value = ({typeName})changeItem.Value.NewValue }};\n");
+
+                sb.Append($"\t\t\t\t\tbreak;\n");
+            }
+            sb.Append("\t\t\t}\n");
+            sb.Append("\t\t}\n");
+            sb.Append("\t\treturn surrogate;\n");
+            sb.Append("\t}\n");
+
+            // ConvertSurrogateToTracker
+
+            sb.Append("\n");
+            sb.Append($"\tpublic static implicit operator TrackablePocoTracker<{type.Name}>({className} surrogate)\n");
+            sb.Append("\t{\n");
+            sb.Append("\t\tif (surrogate == null)\n");
+            sb.Append("\t\t\treturn null;\n");
+            sb.Append("\n");
+            sb.Append($"\t\tvar tracker = new TrackablePocoTracker<{type.Name}>();\n");
+            foreach (var item in propertyIds.OrderBy(x => x.Value))
+            {
+                var p = item.Key;
+                var typeName = Utility.GetTypeName(p.PropertyType);
+
+                sb.Append($"\t\tif (surrogate.{p.Name} != null)\n");
+                sb.Append($"\t\t\ttracker.ChangeMap.Add(Trackable{type.Name}.{p.Name}Property, " +
+                          $"new TrackablePocoTracker<{type.Name}>.Change {{ NewValue = surrogate.{p.Name}.Value }});\n");
+            }
+            sb.Append("\t\treturn tracker;\n");
+            sb.Append("\t}\n");
 
             sb.Append("}");
 

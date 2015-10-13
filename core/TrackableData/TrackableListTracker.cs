@@ -13,45 +13,6 @@ namespace TrackableData
         Modify = 3,
     }
 
-    /*
-    [Serializable]
-    public struct TrackableListOperationItem<T>
-    {
-        private readonly int _index;
-        private readonly TrackableListOperation _operation;
-        private readonly T _oldValue;
-        private readonly T _newValue;
-
-        public int Index
-        {
-            get { return _index; }
-        }
-
-        public TrackableListOperation Operation
-        {
-            get { return _operation; }
-        }
-
-        public T OldValue
-        {
-            get { return _oldValue; }
-        }
-
-        public T NewValue
-        {
-            get { return _newValue; }
-        }
-
-        public TrackableListOperationItem(int index, TrackableListOperation operation, T oldValue, T newValue)
-        {
-            _index = index;
-            _operation = operation;
-            _oldValue = oldValue;
-            _newValue = newValue;
-        }
-    }
-    */
-
     public class TrackableListTracker<T> : ITracker<IList<T>>
     {
         public struct Change

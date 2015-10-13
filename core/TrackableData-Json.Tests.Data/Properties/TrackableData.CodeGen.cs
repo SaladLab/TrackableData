@@ -73,7 +73,7 @@ namespace TrackableData.Json.Tests.Data
                 yield return new KeyValuePair<object, ITrackable>("SubRing", trackableSubRing);
         }
 
-        private static readonly PropertyInfo MainRingProperty = typeof(TrackableHand).GetProperty("MainRing");
+        public static readonly PropertyInfo MainRingProperty = typeof(TrackableHand).GetProperty("MainRing");
         public override TrackableData.Json.Tests.Data.Ring MainRing
         {
             get
@@ -88,7 +88,7 @@ namespace TrackableData.Json.Tests.Data
             }
         }
 
-        private static readonly PropertyInfo SubRingProperty = typeof(TrackableHand).GetProperty("SubRing");
+        public static readonly PropertyInfo SubRingProperty = typeof(TrackableHand).GetProperty("SubRing");
         public override TrackableData.Json.Tests.Data.Ring SubRing
         {
             get
@@ -167,7 +167,7 @@ namespace TrackableData.Json.Tests.Data
                 yield return new KeyValuePair<object, ITrackable>("RightHand", trackableRightHand);
         }
 
-        private static readonly PropertyInfo NameProperty = typeof(TrackablePerson).GetProperty("Name");
+        public static readonly PropertyInfo NameProperty = typeof(TrackablePerson).GetProperty("Name");
         public override System.String Name
         {
             get
@@ -182,7 +182,7 @@ namespace TrackableData.Json.Tests.Data
             }
         }
 
-        private static readonly PropertyInfo AgeProperty = typeof(TrackablePerson).GetProperty("Age");
+        public static readonly PropertyInfo AgeProperty = typeof(TrackablePerson).GetProperty("Age");
         public override System.Int32 Age
         {
             get
@@ -197,7 +197,7 @@ namespace TrackableData.Json.Tests.Data
             }
         }
 
-        private static readonly PropertyInfo LeftHandProperty = typeof(TrackablePerson).GetProperty("LeftHand");
+        public static readonly PropertyInfo LeftHandProperty = typeof(TrackablePerson).GetProperty("LeftHand");
         public override TrackableData.Json.Tests.Data.Hand LeftHand
         {
             get
@@ -212,7 +212,7 @@ namespace TrackableData.Json.Tests.Data
             }
         }
 
-        private static readonly PropertyInfo RightHandProperty = typeof(TrackablePerson).GetProperty("RightHand");
+        public static readonly PropertyInfo RightHandProperty = typeof(TrackablePerson).GetProperty("RightHand");
         public override TrackableData.Json.Tests.Data.Hand RightHand
         {
             get
@@ -282,7 +282,7 @@ namespace TrackableData.Json.Tests.Data
             yield break;
         }
 
-        private static readonly PropertyInfo NameProperty = typeof(TrackableRing).GetProperty("Name");
+        public static readonly PropertyInfo NameProperty = typeof(TrackableRing).GetProperty("Name");
         public override System.String Name
         {
             get
@@ -297,7 +297,7 @@ namespace TrackableData.Json.Tests.Data
             }
         }
 
-        private static readonly PropertyInfo PowerProperty = typeof(TrackableRing).GetProperty("Power");
+        public static readonly PropertyInfo PowerProperty = typeof(TrackableRing).GetProperty("Power");
         public override System.Int32 Power
         {
             get

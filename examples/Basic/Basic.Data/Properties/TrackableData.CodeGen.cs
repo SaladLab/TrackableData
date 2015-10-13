@@ -73,7 +73,7 @@ namespace Basic.Data
                 yield return new KeyValuePair<object, ITrackable>("RightHand", trackableRightHand);
         }
 
-        private static readonly PropertyInfo NameProperty = typeof(TrackableUserData).GetProperty("Name");
+        public static readonly PropertyInfo NameProperty = typeof(TrackableUserData).GetProperty("Name");
         public override System.String Name
         {
             get
@@ -88,7 +88,7 @@ namespace Basic.Data
             }
         }
 
-        private static readonly PropertyInfo GoldProperty = typeof(TrackableUserData).GetProperty("Gold");
+        public static readonly PropertyInfo GoldProperty = typeof(TrackableUserData).GetProperty("Gold");
         public override System.Int32 Gold
         {
             get
@@ -103,7 +103,7 @@ namespace Basic.Data
             }
         }
 
-        private static readonly PropertyInfo LevelProperty = typeof(TrackableUserData).GetProperty("Level");
+        public static readonly PropertyInfo LevelProperty = typeof(TrackableUserData).GetProperty("Level");
         public override System.Int32 Level
         {
             get
@@ -118,7 +118,7 @@ namespace Basic.Data
             }
         }
 
-        private static readonly PropertyInfo LeftHandProperty = typeof(TrackableUserData).GetProperty("LeftHand");
+        public static readonly PropertyInfo LeftHandProperty = typeof(TrackableUserData).GetProperty("LeftHand");
         public override Basic.Data.UserHandData LeftHand
         {
             get
@@ -133,7 +133,7 @@ namespace Basic.Data
             }
         }
 
-        private static readonly PropertyInfo RightHandProperty = typeof(TrackableUserData).GetProperty("RightHand");
+        public static readonly PropertyInfo RightHandProperty = typeof(TrackableUserData).GetProperty("RightHand");
         public override Basic.Data.UserHandData RightHand
         {
             get
@@ -203,7 +203,7 @@ namespace Basic.Data
             yield break;
         }
 
-        private static readonly PropertyInfo FingerCountProperty = typeof(TrackableUserHandData).GetProperty("FingerCount");
+        public static readonly PropertyInfo FingerCountProperty = typeof(TrackableUserHandData).GetProperty("FingerCount");
         public override System.Int32 FingerCount
         {
             get
@@ -218,7 +218,7 @@ namespace Basic.Data
             }
         }
 
-        private static readonly PropertyInfo DirtyProperty = typeof(TrackableUserHandData).GetProperty("Dirty");
+        public static readonly PropertyInfo DirtyProperty = typeof(TrackableUserHandData).GetProperty("Dirty");
         public override System.Boolean Dirty
         {
             get

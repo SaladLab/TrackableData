@@ -19,6 +19,7 @@ using System.ComponentModel;
 
 namespace TrackableData.Protobuf.Tests.Data
 {
+    [ProtoContract]
     public class TrackableHand : Hand, ITrackable<Hand>
     {
         [IgnoreDataMember]
@@ -75,7 +76,8 @@ namespace TrackableData.Protobuf.Tests.Data
                 yield return new KeyValuePair<object, ITrackable>("SubRing", trackableSubRing);
         }
 
-        private static readonly PropertyInfo MainRingProperty = typeof(TrackableHand).GetProperty("MainRing");
+        public static readonly PropertyInfo MainRingProperty = typeof(TrackableHand).GetProperty("MainRing");
+        [ProtoMember(1)]
         public override TrackableData.Protobuf.Tests.Data.Ring MainRing
         {
             get
@@ -90,7 +92,8 @@ namespace TrackableData.Protobuf.Tests.Data
             }
         }
 
-        private static readonly PropertyInfo SubRingProperty = typeof(TrackableHand).GetProperty("SubRing");
+        public static readonly PropertyInfo SubRingProperty = typeof(TrackableHand).GetProperty("SubRing");
+        [ProtoMember(2)]
         public override TrackableData.Protobuf.Tests.Data.Ring SubRing
         {
             get
@@ -105,6 +108,48 @@ namespace TrackableData.Protobuf.Tests.Data
             }
         }
     }
+
+    [ProtoContract]
+    public class TrackableHandTrackerSurrogate
+    {
+        [ProtoMember(1)] public EnvelopedObject<TrackableData.Protobuf.Tests.Data.Ring> MainRing;
+        [ProtoMember(2)] public EnvelopedObject<TrackableData.Protobuf.Tests.Data.Ring> SubRing;
+
+        public static implicit operator TrackableHandTrackerSurrogate(TrackablePocoTracker<Hand> tracker)
+        {
+            if (tracker == null)
+                return null;
+
+            var surrogate = new TrackableHandTrackerSurrogate();
+            foreach(var changeItem in tracker.ChangeMap)
+            {
+                var tag = changeItem.Key.GetCustomAttribute<ProtoMemberAttribute>().Tag;
+                switch (tag)
+                {
+                    case 1:
+                        surrogate.MainRing = new EnvelopedObject<TrackableData.Protobuf.Tests.Data.Ring> { Value = (TrackableData.Protobuf.Tests.Data.Ring)changeItem.Value.NewValue };
+                        break;
+                    case 2:
+                        surrogate.SubRing = new EnvelopedObject<TrackableData.Protobuf.Tests.Data.Ring> { Value = (TrackableData.Protobuf.Tests.Data.Ring)changeItem.Value.NewValue };
+                        break;
+                }
+            }
+            return surrogate;
+        }
+
+        public static implicit operator TrackablePocoTracker<Hand>(TrackableHandTrackerSurrogate surrogate)
+        {
+            if (surrogate == null)
+                return null;
+
+            var tracker = new TrackablePocoTracker<Hand>();
+            if (surrogate.MainRing != null)
+                tracker.ChangeMap.Add(TrackableHand.MainRingProperty, new TrackablePocoTracker<Hand>.Change { NewValue = surrogate.MainRing.Value });
+            if (surrogate.SubRing != null)
+                tracker.ChangeMap.Add(TrackableHand.SubRingProperty, new TrackablePocoTracker<Hand>.Change { NewValue = surrogate.SubRing.Value });
+            return tracker;
+        }
+    }
 }
 
 #endregion
@@ -113,6 +158,7 @@ namespace TrackableData.Protobuf.Tests.Data
 
 namespace TrackableData.Protobuf.Tests.Data
 {
+    [ProtoContract]
     public class TrackablePerson : Person, ITrackable<Person>
     {
         [IgnoreDataMember]
@@ -169,22 +215,8 @@ namespace TrackableData.Protobuf.Tests.Data
                 yield return new KeyValuePair<object, ITrackable>("RightHand", trackableRightHand);
         }
 
-        private static readonly PropertyInfo NameProperty = typeof(TrackablePerson).GetProperty("Name");
-        public override System.String Name
-        {
-            get
-            {
-                return base.Name;
-            }
-            set
-            {
-                if (Tracker != null && Name != value)
-                    Tracker.TrackSet(NameProperty, base.Name, value);
-                base.Name = value;
-            }
-        }
-
-        private static readonly PropertyInfo AgeProperty = typeof(TrackablePerson).GetProperty("Age");
+        public static readonly PropertyInfo AgeProperty = typeof(TrackablePerson).GetProperty("Age");
+        [ProtoMember(2)]
         public override System.Int32 Age
         {
             get
@@ -199,7 +231,8 @@ namespace TrackableData.Protobuf.Tests.Data
             }
         }
 
-        private static readonly PropertyInfo LeftHandProperty = typeof(TrackablePerson).GetProperty("LeftHand");
+        public static readonly PropertyInfo LeftHandProperty = typeof(TrackablePerson).GetProperty("LeftHand");
+        [ProtoMember(3)]
         public override TrackableData.Protobuf.Tests.Data.Hand LeftHand
         {
             get
@@ -214,7 +247,24 @@ namespace TrackableData.Protobuf.Tests.Data
             }
         }
 
-        private static readonly PropertyInfo RightHandProperty = typeof(TrackablePerson).GetProperty("RightHand");
+        public static readonly PropertyInfo NameProperty = typeof(TrackablePerson).GetProperty("Name");
+        [ProtoMember(1)]
+        public override System.String Name
+        {
+            get
+            {
+                return base.Name;
+            }
+            set
+            {
+                if (Tracker != null && Name != value)
+                    Tracker.TrackSet(NameProperty, base.Name, value);
+                base.Name = value;
+            }
+        }
+
+        public static readonly PropertyInfo RightHandProperty = typeof(TrackablePerson).GetProperty("RightHand");
+        [ProtoMember(4)]
         public override TrackableData.Protobuf.Tests.Data.Hand RightHand
         {
             get
@@ -229,6 +279,60 @@ namespace TrackableData.Protobuf.Tests.Data
             }
         }
     }
+
+    [ProtoContract]
+    public class TrackablePersonTrackerSurrogate
+    {
+        [ProtoMember(1)] public EnvelopedObject<System.String> Name;
+        [ProtoMember(2)] public System.Int32? Age;
+        [ProtoMember(3)] public EnvelopedObject<TrackableData.Protobuf.Tests.Data.Hand> LeftHand;
+        [ProtoMember(4)] public EnvelopedObject<TrackableData.Protobuf.Tests.Data.Hand> RightHand;
+
+        public static implicit operator TrackablePersonTrackerSurrogate(TrackablePocoTracker<Person> tracker)
+        {
+            if (tracker == null)
+                return null;
+
+            var surrogate = new TrackablePersonTrackerSurrogate();
+            foreach(var changeItem in tracker.ChangeMap)
+            {
+                var tag = changeItem.Key.GetCustomAttribute<ProtoMemberAttribute>().Tag;
+                switch (tag)
+                {
+                    case 1:
+                        surrogate.Name = new EnvelopedObject<System.String> { Value = (System.String)changeItem.Value.NewValue };
+                        break;
+                    case 2:
+                        surrogate.Age = (System.Int32)changeItem.Value.NewValue;
+                        break;
+                    case 3:
+                        surrogate.LeftHand = new EnvelopedObject<TrackableData.Protobuf.Tests.Data.Hand> { Value = (TrackableData.Protobuf.Tests.Data.Hand)changeItem.Value.NewValue };
+                        break;
+                    case 4:
+                        surrogate.RightHand = new EnvelopedObject<TrackableData.Protobuf.Tests.Data.Hand> { Value = (TrackableData.Protobuf.Tests.Data.Hand)changeItem.Value.NewValue };
+                        break;
+                }
+            }
+            return surrogate;
+        }
+
+        public static implicit operator TrackablePocoTracker<Person>(TrackablePersonTrackerSurrogate surrogate)
+        {
+            if (surrogate == null)
+                return null;
+
+            var tracker = new TrackablePocoTracker<Person>();
+            if (surrogate.Name != null)
+                tracker.ChangeMap.Add(TrackablePerson.NameProperty, new TrackablePocoTracker<Person>.Change { NewValue = surrogate.Name.Value });
+            if (surrogate.Age != null)
+                tracker.ChangeMap.Add(TrackablePerson.AgeProperty, new TrackablePocoTracker<Person>.Change { NewValue = surrogate.Age.Value });
+            if (surrogate.LeftHand != null)
+                tracker.ChangeMap.Add(TrackablePerson.LeftHandProperty, new TrackablePocoTracker<Person>.Change { NewValue = surrogate.LeftHand.Value });
+            if (surrogate.RightHand != null)
+                tracker.ChangeMap.Add(TrackablePerson.RightHandProperty, new TrackablePocoTracker<Person>.Change { NewValue = surrogate.RightHand.Value });
+            return tracker;
+        }
+    }
 }
 
 #endregion
@@ -237,6 +341,7 @@ namespace TrackableData.Protobuf.Tests.Data
 
 namespace TrackableData.Protobuf.Tests.Data
 {
+    [ProtoContract]
     public class TrackableRing : Ring, ITrackable<Ring>
     {
         [IgnoreDataMember]
@@ -284,7 +389,8 @@ namespace TrackableData.Protobuf.Tests.Data
             yield break;
         }
 
-        private static readonly PropertyInfo NameProperty = typeof(TrackableRing).GetProperty("Name");
+        public static readonly PropertyInfo NameProperty = typeof(TrackableRing).GetProperty("Name");
+        [ProtoMember(1)]
         public override System.String Name
         {
             get
@@ -299,7 +405,8 @@ namespace TrackableData.Protobuf.Tests.Data
             }
         }
 
-        private static readonly PropertyInfo PowerProperty = typeof(TrackableRing).GetProperty("Power");
+        public static readonly PropertyInfo PowerProperty = typeof(TrackableRing).GetProperty("Power");
+        [ProtoMember(2)]
         public override System.Int32 Power
         {
             get
@@ -312,6 +419,48 @@ namespace TrackableData.Protobuf.Tests.Data
                     Tracker.TrackSet(PowerProperty, base.Power, value);
                 base.Power = value;
             }
+        }
+    }
+
+    [ProtoContract]
+    public class TrackableRingTrackerSurrogate
+    {
+        [ProtoMember(1)] public EnvelopedObject<System.String> Name;
+        [ProtoMember(2)] public System.Int32? Power;
+
+        public static implicit operator TrackableRingTrackerSurrogate(TrackablePocoTracker<Ring> tracker)
+        {
+            if (tracker == null)
+                return null;
+
+            var surrogate = new TrackableRingTrackerSurrogate();
+            foreach(var changeItem in tracker.ChangeMap)
+            {
+                var tag = changeItem.Key.GetCustomAttribute<ProtoMemberAttribute>().Tag;
+                switch (tag)
+                {
+                    case 1:
+                        surrogate.Name = new EnvelopedObject<System.String> { Value = (System.String)changeItem.Value.NewValue };
+                        break;
+                    case 2:
+                        surrogate.Power = (System.Int32)changeItem.Value.NewValue;
+                        break;
+                }
+            }
+            return surrogate;
+        }
+
+        public static implicit operator TrackablePocoTracker<Ring>(TrackableRingTrackerSurrogate surrogate)
+        {
+            if (surrogate == null)
+                return null;
+
+            var tracker = new TrackablePocoTracker<Ring>();
+            if (surrogate.Name != null)
+                tracker.ChangeMap.Add(TrackableRing.NameProperty, new TrackablePocoTracker<Ring>.Change { NewValue = surrogate.Name.Value });
+            if (surrogate.Power != null)
+                tracker.ChangeMap.Add(TrackableRing.PowerProperty, new TrackablePocoTracker<Ring>.Change { NewValue = surrogate.Power.Value });
+            return tracker;
         }
     }
 }
