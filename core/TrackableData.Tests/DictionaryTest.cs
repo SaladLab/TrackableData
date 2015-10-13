@@ -32,19 +32,20 @@ namespace TrackableData.Tests
             dict.Remove(2);
             dict[4] = "FourAdded";
 
-            Assert.Equal(3, dict.Tracker.ChangeMap.Count);
+            var changeMap = ((TrackableDictionaryTracker<int, string>)dict.Tracker).ChangeMap;
+            Assert.Equal(3, changeMap.Count);
 
-            var change1 = dict.Tracker.ChangeMap[1];
+            var change1 = changeMap[1];
             Assert.Equal(TrackableDictionaryOperation.Modify, change1.Operation);
             Assert.Equal("One", change1.OldValue);
             Assert.Equal("OneModified", change1.NewValue);
 
-            var change2 = dict.Tracker.ChangeMap[2];
+            var change2 = changeMap[2];
             Assert.Equal(TrackableDictionaryOperation.Remove, change2.Operation);
             Assert.Equal("Two", change2.OldValue);
             Assert.Equal(null, change2.NewValue);
 
-            var change4 = dict.Tracker.ChangeMap[4];
+            var change4 = changeMap[4];
             Assert.Equal(TrackableDictionaryOperation.Add, change4.Operation);
             Assert.Equal(null, change4.OldValue);
             Assert.Equal("FourAdded", change4.NewValue);

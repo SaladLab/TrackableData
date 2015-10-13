@@ -62,7 +62,7 @@ namespace CodeGen
             sb.AppendLine("\t\t\t_tracker = value;");
             foreach (var ctp in childTrackableProperties)
             {
-                sb.AppendLine($"\t\t\t((ITrackable){ctp.Name}).Tracker = value?.{ctp.Name}Tracker;");
+                sb.AppendLine($"\t\t\t{ctp.Name}.Tracker = value?.{ctp.Name}Tracker;");
             }
             sb.AppendLine("\t\t}");
             sb.AppendLine("\t}");

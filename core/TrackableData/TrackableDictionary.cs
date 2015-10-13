@@ -10,7 +10,7 @@ namespace TrackableData
 
         // Specific tracker
 
-        public TrackableDictionaryTracker<TKey, TValue> Tracker { get; set; }
+        public IDictionaryTracker<TKey, TValue> Tracker { get; set; }
 
         // ITrackable
 

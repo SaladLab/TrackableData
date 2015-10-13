@@ -10,7 +10,7 @@ namespace TrackableData
 
         // Specific tracker
 
-        public TrackableListTracker<T> Tracker { get; set; }
+        public IListTracker<T> Tracker { get; set; }
 
         // ITrackable
 
