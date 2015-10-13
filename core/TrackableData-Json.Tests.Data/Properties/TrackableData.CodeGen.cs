@@ -73,7 +73,9 @@ namespace TrackableData.Json.Tests.Data
                 yield return new KeyValuePair<object, ITrackable>("SubRing", trackableSubRing);
         }
 
-        public static readonly PropertyInfo MainRingProperty = typeof(TrackableHand).GetProperty("MainRing");
+        public static readonly PropertyInfo MainRingProperty = typeof(Hand).GetProperty("MainRing");
+        public static readonly PropertyInfo SubRingProperty = typeof(Hand).GetProperty("SubRing");
+
         public override TrackableData.Json.Tests.Data.Ring MainRing
         {
             get
@@ -88,7 +90,6 @@ namespace TrackableData.Json.Tests.Data
             }
         }
 
-        public static readonly PropertyInfo SubRingProperty = typeof(TrackableHand).GetProperty("SubRing");
         public override TrackableData.Json.Tests.Data.Ring SubRing
         {
             get
@@ -167,22 +168,11 @@ namespace TrackableData.Json.Tests.Data
                 yield return new KeyValuePair<object, ITrackable>("RightHand", trackableRightHand);
         }
 
-        public static readonly PropertyInfo NameProperty = typeof(TrackablePerson).GetProperty("Name");
-        public override System.String Name
-        {
-            get
-            {
-                return base.Name;
-            }
-            set
-            {
-                if (Tracker != null && Name != value)
-                    Tracker.TrackSet(NameProperty, base.Name, value);
-                base.Name = value;
-            }
-        }
+        public static readonly PropertyInfo AgeProperty = typeof(Person).GetProperty("Age");
+        public static readonly PropertyInfo LeftHandProperty = typeof(Person).GetProperty("LeftHand");
+        public static readonly PropertyInfo NameProperty = typeof(Person).GetProperty("Name");
+        public static readonly PropertyInfo RightHandProperty = typeof(Person).GetProperty("RightHand");
 
-        public static readonly PropertyInfo AgeProperty = typeof(TrackablePerson).GetProperty("Age");
         public override System.Int32 Age
         {
             get
@@ -197,7 +187,6 @@ namespace TrackableData.Json.Tests.Data
             }
         }
 
-        public static readonly PropertyInfo LeftHandProperty = typeof(TrackablePerson).GetProperty("LeftHand");
         public override TrackableData.Json.Tests.Data.Hand LeftHand
         {
             get
@@ -212,7 +201,20 @@ namespace TrackableData.Json.Tests.Data
             }
         }
 
-        public static readonly PropertyInfo RightHandProperty = typeof(TrackablePerson).GetProperty("RightHand");
+        public override System.String Name
+        {
+            get
+            {
+                return base.Name;
+            }
+            set
+            {
+                if (Tracker != null && Name != value)
+                    Tracker.TrackSet(NameProperty, base.Name, value);
+                base.Name = value;
+            }
+        }
+
         public override TrackableData.Json.Tests.Data.Hand RightHand
         {
             get
@@ -282,7 +284,9 @@ namespace TrackableData.Json.Tests.Data
             yield break;
         }
 
-        public static readonly PropertyInfo NameProperty = typeof(TrackableRing).GetProperty("Name");
+        public static readonly PropertyInfo NameProperty = typeof(Ring).GetProperty("Name");
+        public static readonly PropertyInfo PowerProperty = typeof(Ring).GetProperty("Power");
+
         public override System.String Name
         {
             get
@@ -297,7 +301,6 @@ namespace TrackableData.Json.Tests.Data
             }
         }
 
-        public static readonly PropertyInfo PowerProperty = typeof(TrackableRing).GetProperty("Power");
         public override System.Int32 Power
         {
             get
@@ -310,6 +313,175 @@ namespace TrackableData.Json.Tests.Data
                     Tracker.TrackSet(PowerProperty, base.Power, value);
                 base.Power = value;
             }
+        }
+    }
+}
+
+#endregion
+
+#region TrackableData.Json.Tests.Data.DataContainer
+
+namespace TrackableData.Json.Tests.Data
+{
+    public class TrackableDataContainer : DataContainer, ITrackable<DataContainer>
+    {
+        [IgnoreDataMember]
+        private TrackableDataContainerTracker _tracker;
+
+        [IgnoreDataMember]
+        public TrackableDataContainerTracker Tracker
+        {
+            get
+            {
+                return _tracker;
+            }
+            set
+            {
+                _tracker = value;
+                ((ITrackable)Dictionary).Tracker = value?.DictionaryTracker;
+                ((ITrackable)List).Tracker = value?.ListTracker;
+                ((ITrackable)Person).Tracker = value?.PersonTracker;
+            }
+        }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
+
+        ITracker ITrackable.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackableDataContainerTracker)value;
+                Tracker = t;
+            }
+        }
+
+        ITracker<DataContainer> ITrackable<DataContainer>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackableDataContainerTracker)value;
+                Tracker = t;
+            }
+        }
+
+        public ITrackable GetChildTrackable(object name)
+        {
+            switch ((string)name)
+            {
+                case "Dictionary":
+                    return Dictionary as ITrackable;
+                case "List":
+                    return List as ITrackable;
+                case "Person":
+                    return Person as ITrackable;
+                default:
+                    return null;
+            }
+        }
+
+        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
+        {
+            var trackableDictionary = Dictionary as ITrackable;
+            if (trackableDictionary != null && (changedOnly == false || trackableDictionary.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Dictionary", trackableDictionary);
+            var trackableList = List as ITrackable;
+            if (trackableList != null && (changedOnly == false || trackableList.Changed))
+                yield return new KeyValuePair<object, ITrackable>("List", trackableList);
+            var trackablePerson = Person as ITrackable;
+            if (trackablePerson != null && (changedOnly == false || trackablePerson.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Person", trackablePerson);
+        }
+    }
+
+    public class TrackableDataContainerTracker : ITracker<DataContainer>, ITrackableContainerTracker
+    {
+        public TrackableDictionaryTracker<System.Int32, System.String> DictionaryTracker = new TrackableDictionaryTracker<System.Int32, System.String>();
+        public TrackableListTracker<System.String> ListTracker = new TrackableListTracker<System.String>();
+        public TrackablePocoTracker<TrackableData.Json.Tests.Data.Person> PersonTracker = new TrackablePocoTracker<TrackableData.Json.Tests.Data.Person>();
+
+        public bool HasChange
+        {
+            get
+            {
+                return
+                    DictionaryTracker.HasChange ||
+                    ListTracker.HasChange ||
+                    PersonTracker.HasChange ||
+                    false;
+            }
+        }
+
+        public void Clear()
+        {
+            DictionaryTracker.Clear();
+            ListTracker.Clear();
+            PersonTracker.Clear();
+        }
+
+        public void ApplyTo(object trackable)
+        {
+            ApplyTo((DataContainer)trackable);
+        }
+
+        public void ApplyTo(DataContainer trackable)
+        {
+            DictionaryTracker.ApplyTo(trackable.Dictionary);
+            ListTracker.ApplyTo(trackable.List);
+            PersonTracker.ApplyTo(trackable.Person);
+        }
+
+        public void ApplyTo(ITracker tracker)
+        {
+            ApplyTo((TrackableDataContainerTracker)tracker);
+        }
+
+        public void ApplyTo(ITracker<DataContainer> tracker)
+        {
+            ApplyTo((TrackableDataContainerTracker)tracker);
+        }
+
+        public void ApplyTo(TrackableDataContainerTracker tracker)
+        {
+            DictionaryTracker.ApplyTo(tracker.DictionaryTracker);
+            ListTracker.ApplyTo(tracker.ListTracker);
+            PersonTracker.ApplyTo(tracker.PersonTracker);
+        }
+
+        public void RollbackTo(object trackable)
+        {
+            RollbackTo((DataContainer)trackable);
+        }
+
+        public void RollbackTo(DataContainer trackable)
+        {
+            DictionaryTracker.RollbackTo(trackable.Dictionary);
+            ListTracker.RollbackTo(trackable.List);
+            PersonTracker.RollbackTo(trackable.Person);
+        }
+
+        public void RollbackTo(ITracker tracker)
+        {
+            RollbackTo((TrackableDataContainerTracker)tracker);
+        }
+
+        public void RollbackTo(ITracker<DataContainer> tracker)
+        {
+            RollbackTo((TrackableDataContainerTracker)tracker);
+        }
+
+        public void RollbackTo(TrackableDataContainerTracker tracker)
+        {
+            DictionaryTracker.RollbackTo(tracker.DictionaryTracker);
+            ListTracker.RollbackTo(tracker.ListTracker);
+            PersonTracker.RollbackTo(tracker.PersonTracker);
         }
     }
 }

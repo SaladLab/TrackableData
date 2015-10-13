@@ -73,22 +73,12 @@ namespace Basic.Data
                 yield return new KeyValuePair<object, ITrackable>("RightHand", trackableRightHand);
         }
 
-        public static readonly PropertyInfo NameProperty = typeof(TrackableUserData).GetProperty("Name");
-        public override System.String Name
-        {
-            get
-            {
-                return base.Name;
-            }
-            set
-            {
-                if (Tracker != null && Name != value)
-                    Tracker.TrackSet(NameProperty, base.Name, value);
-                base.Name = value;
-            }
-        }
+        public static readonly PropertyInfo GoldProperty = typeof(UserData).GetProperty("Gold");
+        public static readonly PropertyInfo LeftHandProperty = typeof(UserData).GetProperty("LeftHand");
+        public static readonly PropertyInfo LevelProperty = typeof(UserData).GetProperty("Level");
+        public static readonly PropertyInfo NameProperty = typeof(UserData).GetProperty("Name");
+        public static readonly PropertyInfo RightHandProperty = typeof(UserData).GetProperty("RightHand");
 
-        public static readonly PropertyInfo GoldProperty = typeof(TrackableUserData).GetProperty("Gold");
         public override System.Int32 Gold
         {
             get
@@ -103,22 +93,6 @@ namespace Basic.Data
             }
         }
 
-        public static readonly PropertyInfo LevelProperty = typeof(TrackableUserData).GetProperty("Level");
-        public override System.Int32 Level
-        {
-            get
-            {
-                return base.Level;
-            }
-            set
-            {
-                if (Tracker != null && Level != value)
-                    Tracker.TrackSet(LevelProperty, base.Level, value);
-                base.Level = value;
-            }
-        }
-
-        public static readonly PropertyInfo LeftHandProperty = typeof(TrackableUserData).GetProperty("LeftHand");
         public override Basic.Data.UserHandData LeftHand
         {
             get
@@ -133,7 +107,34 @@ namespace Basic.Data
             }
         }
 
-        public static readonly PropertyInfo RightHandProperty = typeof(TrackableUserData).GetProperty("RightHand");
+        public override System.Int32 Level
+        {
+            get
+            {
+                return base.Level;
+            }
+            set
+            {
+                if (Tracker != null && Level != value)
+                    Tracker.TrackSet(LevelProperty, base.Level, value);
+                base.Level = value;
+            }
+        }
+
+        public override System.String Name
+        {
+            get
+            {
+                return base.Name;
+            }
+            set
+            {
+                if (Tracker != null && Name != value)
+                    Tracker.TrackSet(NameProperty, base.Name, value);
+                base.Name = value;
+            }
+        }
+
         public override Basic.Data.UserHandData RightHand
         {
             get
@@ -203,22 +204,9 @@ namespace Basic.Data
             yield break;
         }
 
-        public static readonly PropertyInfo FingerCountProperty = typeof(TrackableUserHandData).GetProperty("FingerCount");
-        public override System.Int32 FingerCount
-        {
-            get
-            {
-                return base.FingerCount;
-            }
-            set
-            {
-                if (Tracker != null && FingerCount != value)
-                    Tracker.TrackSet(FingerCountProperty, base.FingerCount, value);
-                base.FingerCount = value;
-            }
-        }
+        public static readonly PropertyInfo DirtyProperty = typeof(UserHandData).GetProperty("Dirty");
+        public static readonly PropertyInfo FingerCountProperty = typeof(UserHandData).GetProperty("FingerCount");
 
-        public static readonly PropertyInfo DirtyProperty = typeof(TrackableUserHandData).GetProperty("Dirty");
         public override System.Boolean Dirty
         {
             get
@@ -230,6 +218,20 @@ namespace Basic.Data
                 if (Tracker != null && Dirty != value)
                     Tracker.TrackSet(DirtyProperty, base.Dirty, value);
                 base.Dirty = value;
+            }
+        }
+
+        public override System.Int32 FingerCount
+        {
+            get
+            {
+                return base.FingerCount;
+            }
+            set
+            {
+                if (Tracker != null && FingerCount != value)
+                    Tracker.TrackSet(FingerCountProperty, base.FingerCount, value);
+                base.FingerCount = value;
             }
         }
     }

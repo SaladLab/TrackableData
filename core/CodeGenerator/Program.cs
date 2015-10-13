@@ -84,11 +84,23 @@ namespace CodeGen
                     writer.AddUsing("System.ComponentModel");
                 }
 
-                var trackablePocoTypes = GetTypesSafely(assembly).OrderBy(t => t.FullName).Where(t => Utility.IsTrackablePoco(t)).ToArray();
+                // TrackablePoco
+
+                var trackablePocoTypes = GetTypesSafely(assembly).OrderBy(t => t.FullName)
+                    .Where(Utility.IsTrackablePoco).ToArray();
 
                 var pocoCodeGen = new TrackablePocoCodeGenerator() { Options = options };
                 foreach (var type in trackablePocoTypes)
                     pocoCodeGen.GenerateCode(type, writer);
+
+                // TrackableContainer
+
+                var trackableContainerTypes = GetTypesSafely(assembly).OrderBy(t => t.FullName)
+                    .Where(Utility.IsTrackableContainer).ToArray();
+
+                var containerCodeGen = new TrackableContainerCodeGenerator() { Options = options };
+                foreach (var type in trackableContainerTypes)
+                    containerCodeGen.GenerateCode(type, writer);
 
                 // Save generated code
 

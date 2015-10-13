@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using ProtoBuf;
 
 namespace CodeGen
@@ -133,22 +131,35 @@ namespace CodeGen
             }
             sb.Append("\t}\n");
 
-            // Properties
+            // Property Table
+
+            sb.Append("\n");
+            foreach (var p in GetProperties(type))
+            {
+                sb.Append($"\tpublic static readonly PropertyInfo {p.Name}Property = " +
+                          $"typeof({type.Name}).GetProperty(\"{p.Name}\");\n");
+            }
+
+            // Property Accessors
 
             foreach (var p in GetProperties(type))
             {
-                sb.AppendLine("");
-                sb.AppendFormat(
-                    "\tpublic static readonly PropertyInfo {0}Property = typeof(Trackable{1}).GetProperty(\"{0}\");\n",
-                    p.Name, type.Name);
+                sb.Append("\n");
+
                 if (Options.UseProtobuf)
                 {
                     var protoMemberAttr = p.GetCustomAttribute<ProtoMemberAttribute>();
                     if (protoMemberAttr != null)
-                        sb.Append($"\t[ProtoMember({protoMemberAttr.Tag})]\n");
+                        sb.Append($"\t[ProtoMember({protoMemberAttr.Tag})] ");
+                    else
+                        sb.Append($"\t");
+                }
+                else
+                {
+                    sb.Append($"\t");
                 }
 
-                sb.AppendFormat("\tpublic override {0} {1}\n", p.PropertyType, p.Name);
+                sb.AppendFormat("public override {0} {1}\n", p.PropertyType, p.Name);
                 sb.AppendLine("\t{");
                 sb.AppendFormat("\t\tget\n");
                 sb.AppendLine("\t\t{");
@@ -218,7 +229,7 @@ namespace CodeGen
             foreach (var item in propertyIds.OrderBy(x => x.Value))
             {
                 var p = item.Key;
-                var typeName = Utility.GetTypeName(p.PropertyType);
+                var typeName = Utility.GetTypeFullName(p.PropertyType);
 
                 sb.Append($"\t\t\t\tcase {item.Value}:\n");
                 if (p.PropertyType.IsValueType)
@@ -245,7 +256,7 @@ namespace CodeGen
             foreach (var item in propertyIds.OrderBy(x => x.Value))
             {
                 var p = item.Key;
-                var typeName = Utility.GetTypeName(p.PropertyType);
+                var typeName = Utility.GetTypeFullName(p.PropertyType);
 
                 sb.Append($"\t\tif (surrogate.{p.Name} != null)\n");
                 sb.Append($"\t\t\ttracker.ChangeMap.Add(Trackable{type.Name}.{p.Name}Property, " +

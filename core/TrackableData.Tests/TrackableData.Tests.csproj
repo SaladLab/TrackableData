@@ -62,6 +62,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="ContainerTest.cs" />
     <Compile Include="DictionaryTest.cs" />
     <Compile Include="ListTest.cs" />
     <Compile Include="PocoTest.cs" />

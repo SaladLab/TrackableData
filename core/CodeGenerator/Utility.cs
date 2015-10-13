@@ -10,14 +10,19 @@ namespace CodeGen
         {
             if (type.IsGenericType)
             {
-                var genericParams = String.Join(", ", type.GenericTypeArguments.Select(t => GetTypeName(t)));
+                var genericParams = String.Join(", ", type.GenericTypeArguments.Select(t => GetTypeFullName(t)));
                 var delimiterPos = type.Name.IndexOf('`');
-                return type.Namespace + "." + type.Name.Substring(0, delimiterPos) + "<" + genericParams + ">";
+                return type.Name.Substring(0, delimiterPos) + "<" + genericParams + ">";
             }
             else
             {
-                return type.FullName;
+                return type.Name;
             }
+        }
+
+        public static string GetTypeFullName(Type type)
+        {
+            return type.Namespace + "." + GetTypeName(type);
         }
 
         public static bool IsTrackable(Type type)
@@ -30,6 +35,27 @@ namespace CodeGen
         {
             return type.IsClass &&
                    type.GetInterfaces().Any(i => i.FullName == "TrackableData.ITrackablePoco");
+        }
+
+        public static bool IsTrackableContainer(Type type)
+        {
+            return type.IsClass &&
+                   type.GetInterfaces().Any(i => i.FullName == "TrackableData.ITrackableContainer");
+        }
+
+        public static string GetTrackerClassName(Type type)
+        {
+            if (Utility.IsTrackablePoco(type))
+            {
+                return $"TrackablePocoTracker<{Utility.GetTypeFullName(type)}>";
+            }
+            else
+            {
+                var genericParams = String.Join(", ", type.GenericTypeArguments.Select(t => GetTypeFullName(t)));
+                var delimiterPos = type.Name.IndexOf('`');
+                return "Trackable" + type.Name.Substring(1, delimiterPos - 1) + "Tracker" +
+                       "<" + genericParams + ">";
+            }
         }
     }
 }

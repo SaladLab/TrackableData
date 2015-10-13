@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace TrackableData
 {
-    public class TrackablePocoTracker<T> : ITracker<T>
+    public class TrackablePocoTracker<T> : ITracker<T>, ITrackablePocoTracker
     {
         public struct Change
         {
@@ -31,10 +30,7 @@ namespace TrackableData
 
         // ITracker
 
-        public bool HasChange
-        {
-            get { return ChangeMap.Any(); }
-        }
+        public bool HasChange => ChangeMap.Any();
 
         public void Clear()
         {
@@ -50,7 +46,7 @@ namespace TrackableData
         public void ApplyTo(T trackable)
         {
             if (trackable == null)
-                throw new ArgumentNullException("trackable");
+                throw new ArgumentNullException(nameof(trackable));
 
             foreach (var item in ChangeMap)
             {
@@ -72,7 +68,7 @@ namespace TrackableData
         public void ApplyTo(TrackablePocoTracker<T> tracker)
         {
             if (tracker == null)
-                throw new ArgumentNullException("tracker");
+                throw new ArgumentNullException(nameof(tracker));
 
             foreach (var item in ChangeMap)
                 tracker.TrackSet(item.Key, item.Value.OldValue, item.Value.NewValue);
@@ -86,7 +82,7 @@ namespace TrackableData
         public void RollbackTo(T trackable)
         {
             if (trackable == null)
-                throw new ArgumentNullException("trackable");
+                throw new ArgumentNullException(nameof(trackable));
 
             foreach (var item in ChangeMap)
             {
@@ -108,7 +104,7 @@ namespace TrackableData
         public void RollbackTo(TrackablePocoTracker<T> tracker)
         {
             if (tracker == null)
-                throw new ArgumentNullException("tracker");
+                throw new ArgumentNullException(nameof(tracker));
 
             if (this == tracker)
             {
