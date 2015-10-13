@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace TrackableData.Tests.Data
 {
-    public class DataContainer : ITrackableContainer
+    public interface IDataContainer : ITrackableContainer
     {
-        public virtual Person Person { get; set; }
-        public virtual IDictionary<int, string> Dictionary { get; set; }
-        public virtual IList<string> List { get; set; } 
+        IPerson Person { get; set; }
+        IDictionary<int, string> Dictionary { get; set; }
+        IList<string> List { get; set; } 
     }
 }

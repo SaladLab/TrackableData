@@ -76,9 +76,9 @@ namespace TrackableData.Json.Tests
                 DefaultValueHandling = DefaultValueHandling.Ignore,
                 Converters = new JsonConverter[]
                 {
-                    new TrackablePocoTrackerJsonConverter<Person>(),
-                    new TrackablePocoTrackerJsonConverter<Hand>(),
-                    new TrackablePocoTrackerJsonConverter<Ring>(),
+                    new TrackablePocoTrackerJsonConverter<IPerson>(),
+                    new TrackablePocoTrackerJsonConverter<IHand>(),
+                    new TrackablePocoTrackerJsonConverter<IRing>(),
                     new TrackableDictionaryTrackerJsonConverter<int, string>(),
                     new TrackableListTrackerJsonConverter<string>(),
                 }

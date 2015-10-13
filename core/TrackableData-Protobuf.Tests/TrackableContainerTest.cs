@@ -45,7 +45,7 @@ namespace TrackableData.Protobuf.Tests
         private TypeModel CreateTypeModel()
         {
             var model = TypeModel.Create();
-            model.Add(typeof(TrackablePocoTracker<Person>), false)
+            model.Add(typeof(TrackablePocoTracker<IPerson>), false)
                  .SetSurrogate(typeof(TrackablePersonTrackerSurrogate));
             model.Add(typeof(TrackableDictionaryTracker<int, string>), false)
                  .SetSurrogate(typeof(TrackableDictionaryTrackerSurrogate<int, string>));

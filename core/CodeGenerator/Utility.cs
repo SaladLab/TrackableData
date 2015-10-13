@@ -27,20 +27,32 @@ namespace CodeGen
 
         public static bool IsTrackable(Type type)
         {
-            return type.IsClass &&
-                   type.GetInterfaces().Any(i => i.FullName.StartsWith("TrackableData.ITrackable"));
+            return type.GetInterfaces().Any(i => i.FullName.StartsWith("TrackableData.ITrackable"));
         }
 
         public static bool IsTrackablePoco(Type type)
         {
-            return type.IsClass &&
-                   type.GetInterfaces().Any(i => i.FullName == "TrackableData.ITrackablePoco");
+            return type.GetInterfaces().Any(i => i.FullName == "TrackableData.ITrackablePoco");
         }
 
         public static bool IsTrackableContainer(Type type)
         {
-            return type.IsClass &&
-                   type.GetInterfaces().Any(i => i.FullName == "TrackableData.ITrackableContainer");
+            return type.GetInterfaces().Any(i => i.FullName == "TrackableData.ITrackableContainer");
+        }
+
+        public static string GetTrackableClassName(Type type)
+        {
+            if (Utility.IsTrackablePoco(type))
+            {
+                return $"Trackable{type.Name.Substring(1)}";
+            }
+            else
+            {
+                var genericParams = String.Join(", ", type.GenericTypeArguments.Select(t => GetTypeFullName(t)));
+                var delimiterPos = type.Name.IndexOf('`');
+                return "Trackable" + type.Name.Substring(1, delimiterPos - 1) +
+                       "<" + genericParams + ">";
+            }
         }
 
         public static string GetTrackerClassName(Type type)

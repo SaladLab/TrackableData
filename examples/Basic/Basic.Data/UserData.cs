@@ -7,18 +7,18 @@ using TrackableData;
 
 namespace Basic.Data
 {
-    public class UserData : ITrackablePoco
+    public interface IUserData : ITrackablePoco
     {
-        public virtual string Name { get; set; }
-        public virtual int Gold { get; set; }
-        public virtual int Level { get; set; }
-        public virtual UserHandData LeftHand { get; set; }
-        public virtual UserHandData RightHand { get; set; }
+        string Name { get; set; }
+        int Gold { get; set; }
+        int Level { get; set; }
+        IUserHandData LeftHand { get; set; }
+        IUserHandData RightHand { get; set; }
     }
 
-    public class UserHandData : ITrackablePoco
+    public interface IUserHandData : ITrackablePoco
     {
-        public virtual int FingerCount { get; set; }
-        public virtual bool Dirty { get; set; }
+        int FingerCount { get; set; }
+        bool Dirty { get; set; }
     }
 }

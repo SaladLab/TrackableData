@@ -13,7 +13,7 @@ namespace Basic.Program
         public static void Run()
         {
             var ud = new TrackableUserData();
-            ud.Tracker = new TrackablePocoTracker<UserData>();
+            ud.Tracker = new TrackablePocoTracker<IUserData>();
             ud.Name = "Bob";
             ud.Level = 1;
             ud.Gold = 10;

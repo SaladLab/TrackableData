@@ -81,7 +81,7 @@ namespace TrackableData.Tests
             person.Name = "Bob";
             person.Age = 30;
 
-            var tracker2 = new TrackablePocoTracker<Person>();
+            var tracker2 = new TrackablePocoTracker<IPerson>();
             person.Tracker.ApplyTo(tracker2);
 
             var person2 = CreateTestPerson();
@@ -113,7 +113,7 @@ namespace TrackableData.Tests
             person.Name = "Bob";
             person.Age = 30;
 
-            var tracker2 = new TrackablePocoTracker<Person>();
+            var tracker2 = new TrackablePocoTracker<IPerson>();
             person.Tracker.ApplyTo(tracker2);
             person.Tracker.RollbackTo(tracker2);
 

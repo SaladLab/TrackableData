@@ -33,7 +33,7 @@ namespace TrackableData.Json.Tests
                 DefaultValueHandling = DefaultValueHandling.Ignore,
                 Converters = new JsonConverter[]
                 {
-                    new TrackablePocoTrackerJsonConverter<Person>()
+                    new TrackablePocoTrackerJsonConverter<IPerson>()
                 }
             };
         }
@@ -57,7 +57,7 @@ namespace TrackableData.Json.Tests
 
             var jsonSerializerSettings = GetJsonSerializerSettings();
             var json = JsonConvert.SerializeObject(person.Tracker, jsonSerializerSettings);
-            var tracker2 = JsonConvert.DeserializeObject<TrackablePocoTracker<Person>>(json, jsonSerializerSettings);
+            var tracker2 = JsonConvert.DeserializeObject<TrackablePocoTracker<IPerson>>(json, jsonSerializerSettings);
 
             var person2 = CreateTestPerson();
             tracker2.ApplyTo(person2);

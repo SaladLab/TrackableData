@@ -3,25 +3,25 @@
 namespace TrackableData.Protobuf.Tests.Data
 {
     [ProtoContract]
-    public class Person : ITrackablePoco
+    public interface IPerson : ITrackablePoco
     {
-        [ProtoMember(1)] public virtual string Name { get; set; }
-        [ProtoMember(2)] public virtual int Age { get; set; }
-        [ProtoMember(3)] public virtual Hand LeftHand { get; set; }
-        [ProtoMember(4)] public virtual Hand RightHand { get; set; }
+        [ProtoMember(1)] string Name { get; set; }
+        [ProtoMember(2)] int Age { get; set; }
+        [ProtoMember(3)] IHand LeftHand { get; set; }
+        [ProtoMember(4)] IHand RightHand { get; set; }
     }
 
     [ProtoContract]
-    public class Hand : ITrackablePoco
+    public interface IHand : ITrackablePoco
     {
-        [ProtoMember(1)] public virtual Ring MainRing { get; set; }
-        [ProtoMember(2)] public virtual Ring SubRing { get; set; }
+        [ProtoMember(1)] IRing MainRing { get; set; }
+        [ProtoMember(2)] IRing SubRing { get; set; }
     }
 
     [ProtoContract]
-    public class Ring : ITrackablePoco
+    public interface IRing : ITrackablePoco
     {
-        [ProtoMember(1)] public virtual string Name { get; set; }
-        [ProtoMember(2)] public virtual int Power { get; set; }
+        [ProtoMember(1)] string Name { get; set; }
+        [ProtoMember(2)] int Power { get; set; }
     }
 }

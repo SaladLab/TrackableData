@@ -43,7 +43,7 @@ namespace CodeGen
         private void GenerateTrackablePocoCode(Type type, ICodeGenWriter writer)
         {
             var sb = new StringBuilder();
-            var className = "Trackable" + type.Name;
+            var className = "Trackable" + type.Name.Substring(1);
 
             if (Options.UseProtobuf)
                 sb.Append("[ProtoContract]\n");
@@ -144,7 +144,11 @@ namespace CodeGen
 
             foreach (var p in GetProperties(type))
             {
-                sb.Append("\n");
+                sb.AppendLine("");
+
+                var propertyType = Utility.GetTypeFullName(p.PropertyType);
+                sb.AppendLine($"\tprivate {propertyType} _{p.Name};");
+                sb.AppendLine("");
 
                 if (Options.UseProtobuf)
                 {
@@ -159,17 +163,17 @@ namespace CodeGen
                     sb.Append($"\t");
                 }
 
-                sb.AppendFormat("public override {0} {1}\n", p.PropertyType, p.Name);
+                sb.AppendLine($"public {propertyType} {p.Name}");
                 sb.AppendLine("\t{");
-                sb.AppendFormat("\t\tget\n");
+                sb.AppendLine("\t\tget");
                 sb.AppendLine("\t\t{");
-                sb.AppendFormat("\t\t\treturn base.{0}; \n", p.Name);
+                sb.AppendLine($"\t\t\treturn _{p.Name};");
                 sb.AppendLine("\t\t}");
-                sb.AppendFormat("\t\tset\n");
+                sb.AppendLine("\t\tset");
                 sb.AppendLine("\t\t{");
-                sb.AppendFormat("\t\t\tif (Tracker != null && {0} != value) \n", p.Name);
-                sb.AppendFormat("\t\t\t\tTracker.TrackSet({0}Property, base.{0}, value); \n", p.Name);
-                sb.AppendFormat("\t\t\tbase.{0} = value; \n", p.Name);
+                sb.AppendLine($"\t\t\tif (Tracker != null && {p.Name} != value)");
+                sb.AppendLine($"\t\t\t\tTracker.TrackSet({p.Name}Property, _{p.Name}, value);");
+                sb.AppendLine($"\t\t\t_{p.Name} = value;");
                 sb.AppendLine("\t\t}");
                 sb.AppendLine("\t}");
             }
@@ -182,7 +186,8 @@ namespace CodeGen
         private void GenerateTrackablePocoSurrogateCode(Type type, ICodeGenWriter writer)
         {
             var sb = new StringBuilder();
-            var className = "Trackable" + type.Name + "TrackerSurrogate";
+            var trackableClassName = "Trackable" + type.Name.Substring(1);
+            var className = trackableClassName + "TrackerSurrogate";
 
             sb.Append("[ProtoContract]\n");
             sb.Append($"public class {className}\n");
@@ -259,7 +264,7 @@ namespace CodeGen
                 var typeName = Utility.GetTypeFullName(p.PropertyType);
 
                 sb.Append($"\t\tif (surrogate.{p.Name} != null)\n");
-                sb.Append($"\t\t\ttracker.ChangeMap.Add(Trackable{type.Name}.{p.Name}Property, " +
+                sb.Append($"\t\t\ttracker.ChangeMap.Add({trackableClassName}.{p.Name}Property, " +
                           $"new TrackablePocoTracker<{type.Name}>.Change {{ NewValue = surrogate.{p.Name}.Value }});\n");
             }
             sb.Append("\t\treturn tracker;\n");

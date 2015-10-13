@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace TrackableData
 {
@@ -13,8 +14,10 @@ namespace TrackableData
         {
             if (typeof(ITrackablePoco).IsAssignableFrom(trackableType))
             {
-                var pocoType = trackableType.BaseType;
-                return typeof(TrackablePocoTracker<>).MakeGenericType(pocoType);
+                var trackerType = trackableType.GetInterfaces()
+                    .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ITrackable<>)).FirstOrDefault();
+                if (trackerType != null)
+                    return typeof(TrackablePocoTracker<>).MakeGenericType(trackerType.GetGenericArguments()[0]);
             }
             if (trackableType.IsGenericType)
             {

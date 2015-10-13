@@ -6,23 +6,23 @@ using System.Threading.Tasks;
 
 namespace TrackableData.Tests.Data
 {
-    public class Person : ITrackablePoco
+    public interface IPerson : ITrackablePoco
     {
-        public virtual string Name { get; set; }
-        public virtual int Age { get; set; }
-        public virtual Hand LeftHand { get; set; }
-        public virtual Hand RightHand { get; set; }
+        string Name { get; set; }
+        int Age { get; set; }
+        IHand LeftHand { get; set; }
+        IHand RightHand { get; set; }
     }
 
-    public class Hand : ITrackablePoco
+    public interface IHand : ITrackablePoco
     {
-        public virtual Ring MainRing { get; set; }
-        public virtual Ring SubRing { get; set; }
+        IRing MainRing { get; set; }
+        IRing SubRing { get; set; }
     }
 
-    public class Ring : ITrackablePoco
+    public interface IRing : ITrackablePoco
     {
-        public virtual string Name { get; set; }
-        public virtual int Power { get; set; }
+        string Name { get; set; }
+        int Power { get; set; }
     }
 }

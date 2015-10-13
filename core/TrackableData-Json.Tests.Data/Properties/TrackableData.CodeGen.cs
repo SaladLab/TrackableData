@@ -13,14 +13,14 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using TrackableData;
 
-#region TrackableData.Json.Tests.Data.Hand
+#region TrackableData.Json.Tests.Data.IHand
 
 namespace TrackableData.Json.Tests.Data
 {
-    public class TrackableHand : Hand, ITrackable<Hand>
+    public class TrackableHand : IHand, ITrackable<IHand>
     {
         [IgnoreDataMember]
-        public TrackablePocoTracker<Hand> Tracker { get; set; }
+        public TrackablePocoTracker<IHand> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -32,12 +32,12 @@ namespace TrackableData.Json.Tests.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<Hand>)value;
+                var t = (TrackablePocoTracker<IHand>)value;
                 Tracker = t;
             }
         }
 
-        ITracker<Hand> ITrackable<Hand>.Tracker
+        ITracker<IHand> ITrackable<IHand>.Tracker
         {
             get
             {
@@ -45,7 +45,7 @@ namespace TrackableData.Json.Tests.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<Hand>)value;
+                var t = (TrackablePocoTracker<IHand>)value;
                 Tracker = t;
             }
         }
@@ -73,34 +73,38 @@ namespace TrackableData.Json.Tests.Data
                 yield return new KeyValuePair<object, ITrackable>("SubRing", trackableSubRing);
         }
 
-        public static readonly PropertyInfo MainRingProperty = typeof(Hand).GetProperty("MainRing");
-        public static readonly PropertyInfo SubRingProperty = typeof(Hand).GetProperty("SubRing");
+        public static readonly PropertyInfo MainRingProperty = typeof(IHand).GetProperty("MainRing");
+        public static readonly PropertyInfo SubRingProperty = typeof(IHand).GetProperty("SubRing");
 
-        public override TrackableData.Json.Tests.Data.Ring MainRing
+        private TrackableData.Json.Tests.Data.IRing _MainRing;
+
+        public TrackableData.Json.Tests.Data.IRing MainRing
         {
             get
             {
-                return base.MainRing;
+                return _MainRing;
             }
             set
             {
                 if (Tracker != null && MainRing != value)
-                    Tracker.TrackSet(MainRingProperty, base.MainRing, value);
-                base.MainRing = value;
+                    Tracker.TrackSet(MainRingProperty, _MainRing, value);
+                _MainRing = value;
             }
         }
 
-        public override TrackableData.Json.Tests.Data.Ring SubRing
+        private TrackableData.Json.Tests.Data.IRing _SubRing;
+
+        public TrackableData.Json.Tests.Data.IRing SubRing
         {
             get
             {
-                return base.SubRing;
+                return _SubRing;
             }
             set
             {
                 if (Tracker != null && SubRing != value)
-                    Tracker.TrackSet(SubRingProperty, base.SubRing, value);
-                base.SubRing = value;
+                    Tracker.TrackSet(SubRingProperty, _SubRing, value);
+                _SubRing = value;
             }
         }
     }
@@ -108,14 +112,14 @@ namespace TrackableData.Json.Tests.Data
 
 #endregion
 
-#region TrackableData.Json.Tests.Data.Person
+#region TrackableData.Json.Tests.Data.IPerson
 
 namespace TrackableData.Json.Tests.Data
 {
-    public class TrackablePerson : Person, ITrackable<Person>
+    public class TrackablePerson : IPerson, ITrackable<IPerson>
     {
         [IgnoreDataMember]
-        public TrackablePocoTracker<Person> Tracker { get; set; }
+        public TrackablePocoTracker<IPerson> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -127,12 +131,12 @@ namespace TrackableData.Json.Tests.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<Person>)value;
+                var t = (TrackablePocoTracker<IPerson>)value;
                 Tracker = t;
             }
         }
 
-        ITracker<Person> ITrackable<Person>.Tracker
+        ITracker<IPerson> ITrackable<IPerson>.Tracker
         {
             get
             {
@@ -140,7 +144,7 @@ namespace TrackableData.Json.Tests.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<Person>)value;
+                var t = (TrackablePocoTracker<IPerson>)value;
                 Tracker = t;
             }
         }
@@ -168,64 +172,72 @@ namespace TrackableData.Json.Tests.Data
                 yield return new KeyValuePair<object, ITrackable>("RightHand", trackableRightHand);
         }
 
-        public static readonly PropertyInfo AgeProperty = typeof(Person).GetProperty("Age");
-        public static readonly PropertyInfo LeftHandProperty = typeof(Person).GetProperty("LeftHand");
-        public static readonly PropertyInfo NameProperty = typeof(Person).GetProperty("Name");
-        public static readonly PropertyInfo RightHandProperty = typeof(Person).GetProperty("RightHand");
+        public static readonly PropertyInfo AgeProperty = typeof(IPerson).GetProperty("Age");
+        public static readonly PropertyInfo LeftHandProperty = typeof(IPerson).GetProperty("LeftHand");
+        public static readonly PropertyInfo NameProperty = typeof(IPerson).GetProperty("Name");
+        public static readonly PropertyInfo RightHandProperty = typeof(IPerson).GetProperty("RightHand");
 
-        public override System.Int32 Age
+        private System.Int32 _Age;
+
+        public System.Int32 Age
         {
             get
             {
-                return base.Age;
+                return _Age;
             }
             set
             {
                 if (Tracker != null && Age != value)
-                    Tracker.TrackSet(AgeProperty, base.Age, value);
-                base.Age = value;
+                    Tracker.TrackSet(AgeProperty, _Age, value);
+                _Age = value;
             }
         }
 
-        public override TrackableData.Json.Tests.Data.Hand LeftHand
+        private TrackableData.Json.Tests.Data.IHand _LeftHand;
+
+        public TrackableData.Json.Tests.Data.IHand LeftHand
         {
             get
             {
-                return base.LeftHand;
+                return _LeftHand;
             }
             set
             {
                 if (Tracker != null && LeftHand != value)
-                    Tracker.TrackSet(LeftHandProperty, base.LeftHand, value);
-                base.LeftHand = value;
+                    Tracker.TrackSet(LeftHandProperty, _LeftHand, value);
+                _LeftHand = value;
             }
         }
 
-        public override System.String Name
+        private System.String _Name;
+
+        public System.String Name
         {
             get
             {
-                return base.Name;
+                return _Name;
             }
             set
             {
                 if (Tracker != null && Name != value)
-                    Tracker.TrackSet(NameProperty, base.Name, value);
-                base.Name = value;
+                    Tracker.TrackSet(NameProperty, _Name, value);
+                _Name = value;
             }
         }
 
-        public override TrackableData.Json.Tests.Data.Hand RightHand
+        private TrackableData.Json.Tests.Data.IHand _RightHand;
+
+        public TrackableData.Json.Tests.Data.IHand RightHand
         {
             get
             {
-                return base.RightHand;
+                return _RightHand;
             }
             set
             {
                 if (Tracker != null && RightHand != value)
-                    Tracker.TrackSet(RightHandProperty, base.RightHand, value);
-                base.RightHand = value;
+                    Tracker.TrackSet(RightHandProperty, _RightHand, value);
+                _RightHand = value;
             }
         }
     }
@@ -233,14 +245,14 @@ namespace TrackableData.Json.Tests.Data
 
 #endregion
 
-#region TrackableData.Json.Tests.Data.Ring
+#region TrackableData.Json.Tests.Data.IRing
 
 namespace TrackableData.Json.Tests.Data
 {
-    public class TrackableRing : Ring, ITrackable<Ring>
+    public class TrackableRing : IRing, ITrackable<IRing>
     {
         [IgnoreDataMember]
-        public TrackablePocoTracker<Ring> Tracker { get; set; }
+        public TrackablePocoTracker<IRing> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -252,12 +264,12 @@ namespace TrackableData.Json.Tests.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<Ring>)value;
+                var t = (TrackablePocoTracker<IRing>)value;
                 Tracker = t;
             }
         }
 
-        ITracker<Ring> ITrackable<Ring>.Tracker
+        ITracker<IRing> ITrackable<IRing>.Tracker
         {
             get
             {
@@ -265,7 +277,7 @@ namespace TrackableData.Json.Tests.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<Ring>)value;
+                var t = (TrackablePocoTracker<IRing>)value;
                 Tracker = t;
             }
         }
@@ -284,34 +296,38 @@ namespace TrackableData.Json.Tests.Data
             yield break;
         }
 
-        public static readonly PropertyInfo NameProperty = typeof(Ring).GetProperty("Name");
-        public static readonly PropertyInfo PowerProperty = typeof(Ring).GetProperty("Power");
+        public static readonly PropertyInfo NameProperty = typeof(IRing).GetProperty("Name");
+        public static readonly PropertyInfo PowerProperty = typeof(IRing).GetProperty("Power");
 
-        public override System.String Name
+        private System.String _Name;
+
+        public System.String Name
         {
             get
             {
-                return base.Name;
+                return _Name;
             }
             set
             {
                 if (Tracker != null && Name != value)
-                    Tracker.TrackSet(NameProperty, base.Name, value);
-                base.Name = value;
+                    Tracker.TrackSet(NameProperty, _Name, value);
+                _Name = value;
             }
         }
 
-        public override System.Int32 Power
+        private System.Int32 _Power;
+
+        public System.Int32 Power
         {
             get
             {
-                return base.Power;
+                return _Power;
             }
             set
             {
                 if (Tracker != null && Power != value)
-                    Tracker.TrackSet(PowerProperty, base.Power, value);
-                base.Power = value;
+                    Tracker.TrackSet(PowerProperty, _Power, value);
+                _Power = value;
             }
         }
     }
@@ -319,11 +335,11 @@ namespace TrackableData.Json.Tests.Data
 
 #endregion
 
-#region TrackableData.Json.Tests.Data.DataContainer
+#region TrackableData.Json.Tests.Data.IDataContainer
 
 namespace TrackableData.Json.Tests.Data
 {
-    public class TrackableDataContainer : DataContainer, ITrackable<DataContainer>
+    public class TrackableDataContainer : IDataContainer, ITrackable<IDataContainer>
     {
         [IgnoreDataMember]
         private TrackableDataContainerTracker _tracker;
@@ -359,7 +375,7 @@ namespace TrackableData.Json.Tests.Data
             }
         }
 
-        ITracker<DataContainer> ITrackable<DataContainer>.Tracker
+        ITracker<IDataContainer> ITrackable<IDataContainer>.Tracker
         {
             get
             {
@@ -399,13 +415,85 @@ namespace TrackableData.Json.Tests.Data
             if (trackablePerson != null && (changedOnly == false || trackablePerson.Changed))
                 yield return new KeyValuePair<object, ITrackable>("Person", trackablePerson);
         }
+
+        private TrackableDictionary<System.Int32, System.String> _Dictionary;
+
+        public TrackableDictionary<System.Int32, System.String> Dictionary
+        {
+            get
+            {
+                return _Dictionary;
+            }
+            set
+            {
+                if (_Dictionary != null)
+                    _Dictionary.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.DictionaryTracker;
+                _Dictionary = value;
+            }
+        }
+
+        System.Collections.Generic.IDictionary<System.Int32, System.String> IDataContainer.Dictionary
+        {
+            get { return _Dictionary; }
+            set { _Dictionary = (TrackableDictionary<System.Int32, System.String>)value; }
+        }
+
+        private TrackableList<System.String> _List;
+
+        public TrackableList<System.String> List
+        {
+            get
+            {
+                return _List;
+            }
+            set
+            {
+                if (_List != null)
+                    _List.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.ListTracker;
+                _List = value;
+            }
+        }
+
+        System.Collections.Generic.IList<System.String> IDataContainer.List
+        {
+            get { return _List; }
+            set { _List = (TrackableList<System.String>)value; }
+        }
+
+        private TrackablePerson _Person;
+
+        public TrackablePerson Person
+        {
+            get
+            {
+                return _Person;
+            }
+            set
+            {
+                if (_Person != null)
+                    _Person.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.PersonTracker;
+                _Person = value;
+            }
+        }
+
+        TrackableData.Json.Tests.Data.IPerson IDataContainer.Person
+        {
+            get { return _Person; }
+            set { _Person = (TrackablePerson)value; }
+        }
     }
 
-    public class TrackableDataContainerTracker : ITracker<DataContainer>, ITrackableContainerTracker
+    public class TrackableDataContainerTracker : ITracker<IDataContainer>, ITrackableContainerTracker
     {
         public TrackableDictionaryTracker<System.Int32, System.String> DictionaryTracker = new TrackableDictionaryTracker<System.Int32, System.String>();
         public TrackableListTracker<System.String> ListTracker = new TrackableListTracker<System.String>();
-        public TrackablePocoTracker<TrackableData.Json.Tests.Data.Person> PersonTracker = new TrackablePocoTracker<TrackableData.Json.Tests.Data.Person>();
+        public TrackablePocoTracker<TrackableData.Json.Tests.Data.IPerson> PersonTracker = new TrackablePocoTracker<TrackableData.Json.Tests.Data.IPerson>();
 
         public bool HasChange
         {
@@ -428,10 +516,10 @@ namespace TrackableData.Json.Tests.Data
 
         public void ApplyTo(object trackable)
         {
-            ApplyTo((DataContainer)trackable);
+            ApplyTo((IDataContainer)trackable);
         }
 
-        public void ApplyTo(DataContainer trackable)
+        public void ApplyTo(IDataContainer trackable)
         {
             DictionaryTracker.ApplyTo(trackable.Dictionary);
             ListTracker.ApplyTo(trackable.List);
@@ -443,7 +531,7 @@ namespace TrackableData.Json.Tests.Data
             ApplyTo((TrackableDataContainerTracker)tracker);
         }
 
-        public void ApplyTo(ITracker<DataContainer> tracker)
+        public void ApplyTo(ITracker<IDataContainer> tracker)
         {
             ApplyTo((TrackableDataContainerTracker)tracker);
         }
@@ -457,10 +545,10 @@ namespace TrackableData.Json.Tests.Data
 
         public void RollbackTo(object trackable)
         {
-            RollbackTo((DataContainer)trackable);
+            RollbackTo((IDataContainer)trackable);
         }
 
-        public void RollbackTo(DataContainer trackable)
+        public void RollbackTo(IDataContainer trackable)
         {
             DictionaryTracker.RollbackTo(trackable.Dictionary);
             ListTracker.RollbackTo(trackable.List);
@@ -472,7 +560,7 @@ namespace TrackableData.Json.Tests.Data
             RollbackTo((TrackableDataContainerTracker)tracker);
         }
 
-        public void RollbackTo(ITracker<DataContainer> tracker)
+        public void RollbackTo(ITracker<IDataContainer> tracker)
         {
             RollbackTo((TrackableDataContainerTracker)tracker);
         }

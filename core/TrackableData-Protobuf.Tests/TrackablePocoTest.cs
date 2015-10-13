@@ -30,7 +30,7 @@ namespace TrackableData.Protobuf.Tests
         private TypeModel CreateTypeModel()
         {
             var model = TypeModel.Create();
-            model.Add(typeof(TrackablePocoTracker<Person>), false)
+            model.Add(typeof(TrackablePocoTracker<IPerson>), false)
                  .SetSurrogate(typeof(TrackablePersonTrackerSurrogate));
             return model;
         }
@@ -40,7 +40,7 @@ namespace TrackableData.Protobuf.Tests
         {
             var person = CreateTestPersonWithTracker();
             var typeModel = CreateTypeModel();
-            var person2 = (Person)typeModel.DeepClone(person);
+            var person2 = (IPerson)typeModel.DeepClone(person);
 
             Assert.Equal(person.Name, person2.Name);
             Assert.Equal(person.Age, person2.Age);
@@ -54,7 +54,7 @@ namespace TrackableData.Protobuf.Tests
             person.Age = 30;
 
             var typeModel = CreateTypeModel();
-            var tracker2 = (TrackablePocoTracker<Person>)typeModel.DeepClone(person.Tracker);
+            var tracker2 = (TrackablePocoTracker<IPerson>)typeModel.DeepClone(person.Tracker);
 
             var person2 = CreateTestPerson();
             tracker2.ApplyTo(person2);

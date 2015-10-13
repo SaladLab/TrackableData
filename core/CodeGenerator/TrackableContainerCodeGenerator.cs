@@ -35,20 +35,20 @@ namespace CodeGen
         private void GenerateTrackableContainerCode(Type type, ICodeGenWriter writer)
         {
             var sb = new StringBuilder();
-            var className = "Trackable" + type.Name;
+            var className = "Trackable" + type.Name.Substring(1);
 
             if (Options.UseProtobuf)
-                sb.Append("[ProtoContract]\n");
-            sb.Append($"public class {className} : {type.Name}, ITrackable<{type.Name}>\n");
-            sb.Append("{\n");
+                sb.AppendLine("[ProtoContract]");
+            sb.AppendLine($"public class {className} : {type.Name}, ITrackable<{type.Name}>");
+            sb.AppendLine("{");
 
             var childTrackableProperties = GetProperties(type);
 
             // Tracker
 
-            sb.Append("\t[IgnoreDataMember]\n");
-            sb.Append($"\tprivate {className}Tracker _tracker;\n");
-            sb.Append("\n");
+            sb.AppendLine("\t[IgnoreDataMember]");
+            sb.AppendLine($"\tprivate {className}Tracker _tracker;");
+            sb.AppendLine("");
 
             sb.Append("\t[IgnoreDataMember]\n");
             sb.Append($"\tpublic {className}Tracker Tracker\n");
@@ -147,6 +147,11 @@ namespace CodeGen
             {
                 sb.Append("\n");
 
+                var propertyType = Utility.GetTypeFullName(p.PropertyType);
+                var propertyTrackableName = Utility.GetTrackableClassName(p.PropertyType);
+                sb.AppendLine($"\tprivate {propertyTrackableName} _{p.Name};");
+                sb.AppendLine("");
+
                 if (Options.UseProtobuf)
                 {
                     var protoMemberAttr = p.GetCustomAttribute<ProtoMemberAttribute>();
@@ -160,20 +165,27 @@ namespace CodeGen
                     sb.Append($"\t");
                 }
 
-                sb.AppendFormat("public override {0} {1}\n", Utility.GetTypeFullName(p.PropertyType), p.Name);
+                sb.AppendLine($"public {propertyTrackableName} {p.Name}");
                 sb.AppendLine("\t{");
-                sb.AppendFormat("\t\tget\n");
+                sb.AppendLine("\t\tget");
                 sb.AppendLine("\t\t{");
-                sb.AppendFormat("\t\t\treturn base.{0}; \n", p.Name);
+                sb.AppendLine($"\t\t\treturn _{p.Name};");
                 sb.AppendLine("\t\t}");
-                sb.AppendFormat("\t\tset\n");
+                sb.AppendLine("\t\tset");
                 sb.AppendLine("\t\t{");
-                sb.AppendLine($"\t\t\tif ({p.Name} != null)");
-                sb.AppendLine($"\t\t\t\t((ITrackable){p.Name}).Tracker = null;");
+                sb.AppendLine($"\t\t\tif (_{p.Name} != null)");
+                sb.AppendLine($"\t\t\t\t_{p.Name}.Tracker = null;");
                 sb.AppendLine("\t\t\tif (value != null)");
-                sb.AppendLine($"\t\t\t\t((ITrackable)value).Tracker = Tracker?.{p.Name}Tracker;");
-                sb.AppendLine($"\t\t\tbase.{p.Name} = value;");
+                sb.AppendLine($"\t\t\t\tvalue.Tracker = Tracker?.{p.Name}Tracker;");
+                sb.AppendLine($"\t\t\t_{p.Name} = value;");
                 sb.AppendLine("\t\t}");
+                sb.AppendLine("\t}");
+
+                sb.AppendLine("");
+                sb.AppendLine($"\t{propertyType} {type.Name}.{p.Name}");
+                sb.AppendLine("\t{");
+                sb.AppendLine($"\t\tget {{ return _{p.Name}; }}");
+                sb.AppendLine($"\t\tset {{ _{p.Name} = ({propertyTrackableName})value; }}");
                 sb.AppendLine("\t}");
             }
 
@@ -185,7 +197,7 @@ namespace CodeGen
         private void GenerateTrackableContainerTrackerCode(Type type, ICodeGenWriter writer)
         {
             var sb = new StringBuilder();
-            var className = "Trackable" + type.Name + "Tracker";
+            var className = "Trackable" + type.Name.Substring(1) + "Tracker";
 
             if (Options.UseProtobuf)
                 sb.Append("[ProtoContract]\n");

@@ -48,7 +48,7 @@ namespace TrackableData.Json.Tests
                 Converters = new JsonConverter[]
                 {
                     new TrackableContainerTrackerJsonConverter(),
-                    new TrackablePocoTrackerJsonConverter<Person>(),
+                    new TrackablePocoTrackerJsonConverter<IPerson>(),
                     new TrackableDictionaryTrackerJsonConverter<int, string>(),
                     new TrackableListTrackerJsonConverter<string>(),
                 }
@@ -61,7 +61,7 @@ namespace TrackableData.Json.Tests
             var c = CreateTestContainerWithTracker();
             var jsonSerializerSettings = GetJsonSerializerSettings();
             var json = JsonConvert.SerializeObject(c, jsonSerializerSettings);
-            var c2 = JsonConvert.DeserializeObject<DataContainer>(json, jsonSerializerSettings);
+            var c2 = JsonConvert.DeserializeObject<TrackableDataContainer>(json, jsonSerializerSettings);
             Assert.Equal(c.Dictionary.Count, c2.Dictionary.Count);
             Assert.Equal(c.List.Count, c2.List.Count);
         }

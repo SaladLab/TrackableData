@@ -13,14 +13,14 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using TrackableData;
 
-#region Basic.Data.UserData
+#region Basic.Data.IUserData
 
 namespace Basic.Data
 {
-    public class TrackableUserData : UserData, ITrackable<UserData>
+    public class TrackableUserData : IUserData, ITrackable<IUserData>
     {
         [IgnoreDataMember]
-        public TrackablePocoTracker<UserData> Tracker { get; set; }
+        public TrackablePocoTracker<IUserData> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -32,12 +32,12 @@ namespace Basic.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<UserData>)value;
+                var t = (TrackablePocoTracker<IUserData>)value;
                 Tracker = t;
             }
         }
 
-        ITracker<UserData> ITrackable<UserData>.Tracker
+        ITracker<IUserData> ITrackable<IUserData>.Tracker
         {
             get
             {
@@ -45,7 +45,7 @@ namespace Basic.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<UserData>)value;
+                var t = (TrackablePocoTracker<IUserData>)value;
                 Tracker = t;
             }
         }
@@ -73,79 +73,89 @@ namespace Basic.Data
                 yield return new KeyValuePair<object, ITrackable>("RightHand", trackableRightHand);
         }
 
-        public static readonly PropertyInfo GoldProperty = typeof(UserData).GetProperty("Gold");
-        public static readonly PropertyInfo LeftHandProperty = typeof(UserData).GetProperty("LeftHand");
-        public static readonly PropertyInfo LevelProperty = typeof(UserData).GetProperty("Level");
-        public static readonly PropertyInfo NameProperty = typeof(UserData).GetProperty("Name");
-        public static readonly PropertyInfo RightHandProperty = typeof(UserData).GetProperty("RightHand");
+        public static readonly PropertyInfo GoldProperty = typeof(IUserData).GetProperty("Gold");
+        public static readonly PropertyInfo LeftHandProperty = typeof(IUserData).GetProperty("LeftHand");
+        public static readonly PropertyInfo LevelProperty = typeof(IUserData).GetProperty("Level");
+        public static readonly PropertyInfo NameProperty = typeof(IUserData).GetProperty("Name");
+        public static readonly PropertyInfo RightHandProperty = typeof(IUserData).GetProperty("RightHand");
 
-        public override System.Int32 Gold
+        private System.Int32 _Gold;
+
+        public System.Int32 Gold
         {
             get
             {
-                return base.Gold;
+                return _Gold;
             }
             set
             {
                 if (Tracker != null && Gold != value)
-                    Tracker.TrackSet(GoldProperty, base.Gold, value);
-                base.Gold = value;
+                    Tracker.TrackSet(GoldProperty, _Gold, value);
+                _Gold = value;
             }
         }
 
-        public override Basic.Data.UserHandData LeftHand
+        private Basic.Data.IUserHandData _LeftHand;
+
+        public Basic.Data.IUserHandData LeftHand
         {
             get
             {
-                return base.LeftHand;
+                return _LeftHand;
             }
             set
             {
                 if (Tracker != null && LeftHand != value)
-                    Tracker.TrackSet(LeftHandProperty, base.LeftHand, value);
-                base.LeftHand = value;
+                    Tracker.TrackSet(LeftHandProperty, _LeftHand, value);
+                _LeftHand = value;
             }
         }
 
-        public override System.Int32 Level
+        private System.Int32 _Level;
+
+        public System.Int32 Level
         {
             get
             {
-                return base.Level;
+                return _Level;
             }
             set
             {
                 if (Tracker != null && Level != value)
-                    Tracker.TrackSet(LevelProperty, base.Level, value);
-                base.Level = value;
+                    Tracker.TrackSet(LevelProperty, _Level, value);
+                _Level = value;
             }
         }
 
-        public override System.String Name
+        private System.String _Name;
+
+        public System.String Name
         {
             get
             {
-                return base.Name;
+                return _Name;
             }
             set
             {
                 if (Tracker != null && Name != value)
-                    Tracker.TrackSet(NameProperty, base.Name, value);
-                base.Name = value;
+                    Tracker.TrackSet(NameProperty, _Name, value);
+                _Name = value;
             }
         }
 
-        public override Basic.Data.UserHandData RightHand
+        private Basic.Data.IUserHandData _RightHand;
+
+        public Basic.Data.IUserHandData RightHand
         {
             get
             {
-                return base.RightHand;
+                return _RightHand;
             }
             set
             {
                 if (Tracker != null && RightHand != value)
-                    Tracker.TrackSet(RightHandProperty, base.RightHand, value);
-                base.RightHand = value;
+                    Tracker.TrackSet(RightHandProperty, _RightHand, value);
+                _RightHand = value;
             }
         }
     }
@@ -153,14 +163,14 @@ namespace Basic.Data
 
 #endregion
 
-#region Basic.Data.UserHandData
+#region Basic.Data.IUserHandData
 
 namespace Basic.Data
 {
-    public class TrackableUserHandData : UserHandData, ITrackable<UserHandData>
+    public class TrackableUserHandData : IUserHandData, ITrackable<IUserHandData>
     {
         [IgnoreDataMember]
-        public TrackablePocoTracker<UserHandData> Tracker { get; set; }
+        public TrackablePocoTracker<IUserHandData> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -172,12 +182,12 @@ namespace Basic.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<UserHandData>)value;
+                var t = (TrackablePocoTracker<IUserHandData>)value;
                 Tracker = t;
             }
         }
 
-        ITracker<UserHandData> ITrackable<UserHandData>.Tracker
+        ITracker<IUserHandData> ITrackable<IUserHandData>.Tracker
         {
             get
             {
@@ -185,7 +195,7 @@ namespace Basic.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<UserHandData>)value;
+                var t = (TrackablePocoTracker<IUserHandData>)value;
                 Tracker = t;
             }
         }
@@ -204,34 +214,38 @@ namespace Basic.Data
             yield break;
         }
 
-        public static readonly PropertyInfo DirtyProperty = typeof(UserHandData).GetProperty("Dirty");
-        public static readonly PropertyInfo FingerCountProperty = typeof(UserHandData).GetProperty("FingerCount");
+        public static readonly PropertyInfo DirtyProperty = typeof(IUserHandData).GetProperty("Dirty");
+        public static readonly PropertyInfo FingerCountProperty = typeof(IUserHandData).GetProperty("FingerCount");
 
-        public override System.Boolean Dirty
+        private System.Boolean _Dirty;
+
+        public System.Boolean Dirty
         {
             get
             {
-                return base.Dirty;
+                return _Dirty;
             }
             set
             {
                 if (Tracker != null && Dirty != value)
-                    Tracker.TrackSet(DirtyProperty, base.Dirty, value);
-                base.Dirty = value;
+                    Tracker.TrackSet(DirtyProperty, _Dirty, value);
+                _Dirty = value;
             }
         }
 
-        public override System.Int32 FingerCount
+        private System.Int32 _FingerCount;
+
+        public System.Int32 FingerCount
         {
             get
             {
-                return base.FingerCount;
+                return _FingerCount;
             }
             set
             {
                 if (Tracker != null && FingerCount != value)
-                    Tracker.TrackSet(FingerCountProperty, base.FingerCount, value);
-                base.FingerCount = value;
+                    Tracker.TrackSet(FingerCountProperty, _FingerCount, value);
+                _FingerCount = value;
             }
         }
     }
