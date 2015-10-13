@@ -153,7 +153,7 @@ namespace TrackableData
                 sb.Append("=");
                 sb.Append(_headKeyColumn.Value.ConvertToSqlValue(headKey));
             }
-            sb.Append(";\n");
+            sb.AppendLine(";");
 
             return sb.ToString();
         }
