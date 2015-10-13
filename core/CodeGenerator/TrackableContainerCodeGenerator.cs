@@ -201,7 +201,7 @@ namespace CodeGen
 
             if (Options.UseProtobuf)
                 sb.AppendLine("[ProtoContract]");
-            sb.AppendLine($"public class {className} : ITracker<{type.Name}>, ITrackableContainerTracker");
+            sb.AppendLine($"public class {className} : IContainerTracker<{type.Name}>");
             sb.AppendLine("{");
 
             // Property Trackers

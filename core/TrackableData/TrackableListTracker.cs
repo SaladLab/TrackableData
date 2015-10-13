@@ -13,7 +13,7 @@ namespace TrackableData
         Modify = 3,
     }
 
-    public class TrackableListTracker<T> : ITracker<IList<T>>
+    public class TrackableListTracker<T> : IListTracker<T>
     {
         public struct Change
         {

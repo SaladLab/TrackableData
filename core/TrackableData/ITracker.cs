@@ -1,4 +1,7 @@
-﻿namespace TrackableData
+﻿using System.Collections.Generic;
+using System.Reflection;
+
+namespace TrackableData
 {
     public interface ITracker
     {
@@ -27,5 +30,46 @@
         void ApplyTo(ITracker<T> tracker);
         void RollbackTo(T trackable);
         void RollbackTo(ITracker<T> tracker);
+    }
+
+    // -----
+
+    public interface IPocoTracker
+    {
+    }
+
+    public interface IPocoTracker<T> : ITracker<T>, IPocoTracker
+    {
+        void TrackSet(PropertyInfo pi, object oldValue, object newValue);
+    }
+
+    public interface IContainerTracker
+    {
+    }
+
+    public interface IContainerTracker<T> : ITracker<T>, IContainerTracker
+    {
+    }
+
+    public interface IDictionaryTracker
+    {
+    }
+
+    public interface IDictionaryTracker<TKey, TValue> : ITracker<IDictionary<TKey, TValue>>, IDictionaryTracker
+    {
+        void TrackAdd(TKey key, TValue newValue);
+        void TrackRemove(TKey key, TValue oldValue);
+        void TrackModify(TKey key, TValue oldValue, TValue newValue);
+    }
+
+    public interface IListTracker
+    {
+    }
+
+    public interface IListTracker<T> : ITracker<IList<T>>, IListTracker
+    {
+        void TrackInsert(int index, T newValue);
+        void TrackRemove(int index, T oldValue);
+        void TrackModify(int index, T oldValue, T newValue);
     }
 }

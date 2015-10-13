@@ -21,4 +21,22 @@ namespace TrackableData
     {
         new ITracker<T> Tracker { get; set; }
     }
+
+    // -----
+
+    public interface ITrackablePoco
+    {
+    }
+
+    public interface ITrackablePoco<T> : ITrackable<T>, ITrackablePoco
+    {
+    }
+
+    public interface ITrackableContainer
+    {
+    }
+
+    public interface ITrackableContainer<T> : ITrackable<T>, ITrackableContainer
+    {
+    }
 }

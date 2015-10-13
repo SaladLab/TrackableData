@@ -489,7 +489,7 @@ namespace TrackableData.Json.Tests.Data
         }
     }
 
-    public class TrackableDataContainerTracker : ITracker<IDataContainer>, ITrackableContainerTracker
+    public class TrackableDataContainerTracker : IContainerTracker<IDataContainer>
     {
         public TrackableDictionaryTracker<System.Int32, System.String> DictionaryTracker = new TrackableDictionaryTracker<System.Int32, System.String>();
         public TrackableListTracker<System.String> ListTracker = new TrackableListTracker<System.String>();

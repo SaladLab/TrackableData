@@ -8,7 +8,7 @@ namespace TrackableData
     {
         public override bool CanConvert(Type objectType)
         {
-            return typeof(ITrackableContainerTracker).IsAssignableFrom(objectType);
+            return typeof(IContainerTracker).IsAssignableFrom(objectType);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,

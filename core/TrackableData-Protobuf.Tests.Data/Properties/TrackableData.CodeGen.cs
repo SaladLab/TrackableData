@@ -634,7 +634,7 @@ namespace TrackableData.Protobuf.Tests.Data
     }
 
     [ProtoContract]
-    public class TrackableDataContainerTracker : ITracker<IDataContainer>, ITrackableContainerTracker
+    public class TrackableDataContainerTracker : IContainerTracker<IDataContainer>
     {
         [ProtoMember(2)] public TrackableDictionaryTracker<System.Int32, System.String> DictionaryTracker = new TrackableDictionaryTracker<System.Int32, System.String>();
         [ProtoMember(3)] public TrackableListTracker<System.String> ListTracker = new TrackableListTracker<System.String>();

@@ -12,7 +12,7 @@ namespace TrackableData
         Modify = 3,
     }
 
-    public class TrackableDictionaryTracker<TKey, TValue> : ITracker<IDictionary<TKey, TValue>>
+    public class TrackableDictionaryTracker<TKey, TValue> : IDictionaryTracker<TKey, TValue>
     {
         public struct Change
         {

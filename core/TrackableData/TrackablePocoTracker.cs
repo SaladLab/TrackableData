@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace TrackableData
 {
-    public class TrackablePocoTracker<T> : ITracker<T>, ITrackablePocoTracker
+    public class TrackablePocoTracker<T> : IPocoTracker<T>
     {
         public struct Change
         {
