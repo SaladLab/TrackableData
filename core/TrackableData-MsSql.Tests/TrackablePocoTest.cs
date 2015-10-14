@@ -18,7 +18,7 @@ namespace TrackableData.Sql.Tests
         private struct Context<T> : IDisposable 
             where T : ITrackablePoco
         {
-            public TrackablePocoSqlMapper<T> SqlMapper;
+            public TrackablePocoMsSqlMapper<T> SqlMapper;
             public SqlConnection Connection;
 
             public void Dispose()
@@ -34,7 +34,7 @@ namespace TrackableData.Sql.Tests
         private async Task<Context<T>> PrepareAsync<T>()
             where T : ITrackablePoco
         {
-            var sqlMapper = new TrackablePocoSqlMapper<T>(typeof(T).Name);
+            var sqlMapper = new TrackablePocoMsSqlMapper<T>(typeof(T).Name);
             var connection = _db.Connection;
             await sqlMapper.ResetTableAsync(connection);
             return new Context<T> { SqlMapper = sqlMapper, Connection = connection };
@@ -77,7 +77,7 @@ namespace TrackableData.Sql.Tests
                 var person = new TrackablePerson();
                 await ctx.SqlMapper.CreateAsync(ctx.Connection, person);
 
-                var count = await ctx.SqlMapper.RemoveAsync(ctx.Connection, 1);
+                var count = await ctx.SqlMapper.RemoveAsync(ctx.Connection, person.Id);
                 Assert.Equal(1, count);
             }
         }

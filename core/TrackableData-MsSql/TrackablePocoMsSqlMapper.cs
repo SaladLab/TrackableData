@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace TrackableData
 {
-    public class TrackablePocoSqlMapper<T>
+    public class TrackablePocoMsSqlMapper<T>
         where T : ITrackablePoco
     {
         private class Column
@@ -32,12 +32,12 @@ namespace TrackableData
         private readonly string _allColumnStringExceptIdentity;
         private readonly string _allColumnStringExceptHead;
 
-        public TrackablePocoSqlMapper(string tableName)
+        public TrackablePocoMsSqlMapper(string tableName)
             : this(tableName, null, null)
         {
         }
 
-        public TrackablePocoSqlMapper(string tableName, string headKeyColumnName, Type headKeyType)
+        public TrackablePocoMsSqlMapper(string tableName, string headKeyColumnName, Type headKeyType)
         {
             var trackableTypeName = typeof (T).Namespace + "." + ("Trackable" + typeof (T).Name.Substring(1));
             _trackableType = typeof (T).Assembly.GetType(trackableTypeName);

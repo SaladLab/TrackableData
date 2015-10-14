@@ -9,8 +9,8 @@
     <ProjectGuid>{CE8A572A-1465-4EEE-B828-176F9F44F43A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TrackableData.Sql.Tests</RootNamespace>
-    <AssemblyName>TrackableData-Sql.Tests</AssemblyName>
+    <RootNamespace>TrackableData.MsSql.Tests</RootNamespace>
+    <AssemblyName>TrackableData-MsSql.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -78,9 +78,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TrackableData-Sql\TrackableData-Sql.csproj">
+    <ProjectReference Include="..\TrackableData-MsSql\TrackableData-MsSql.csproj">
       <Project>{505edf72-41f9-499d-b213-9fc9b8932489}</Project>
-      <Name>TrackableData-Sql</Name>
+      <Name>TrackableData-MsSql</Name>
     </ProjectReference>
     <ProjectReference Include="..\TrackableData\TrackableData.csproj">
       <Project>{c2c3a8ca-62f9-4c5a-8b2b-5091e5a41c54}</Project>

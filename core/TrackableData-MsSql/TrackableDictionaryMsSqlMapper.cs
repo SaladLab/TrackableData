@@ -6,7 +6,7 @@ using System.Text;
 
 namespace TrackableData
 {
-    public class TrackableDictionarySqlMapper<TKey, TValue> where TValue : new()
+    public class TrackableDictionaryMsSqlMapper<TKey, TValue> where TValue : new()
     {
         private struct Column
         {
@@ -23,9 +23,9 @@ namespace TrackableData
         private readonly string _allColumnString;
         private readonly string _allColumnStringExceptHead;
 
-        public TrackableDictionarySqlMapper(string tableName,
-                                            string headKeyColumnName, Type headKeyType,
-                                            string keyColumnName, string valueColumnName = null)
+        public TrackableDictionaryMsSqlMapper(string tableName,
+                                              string headKeyColumnName, Type headKeyType,
+                                              string keyColumnName, string valueColumnName = null)
         {
             _tableName = tableName;
 

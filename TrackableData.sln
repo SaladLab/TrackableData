@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{4E8FE3E2-E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData-Json", "core\TrackableData-Json\TrackableData-Json.csproj", "{F4185A6A-B952-4EA5-9B23-5C7AF6AE7712}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData-Sql", "core\TrackableData-Sql\TrackableData-Sql.csproj", "{505EDF72-41F9-499D-B213-9FC9B8932489}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData-MsSql", "core\TrackableData-MsSql\TrackableData-MsSql.csproj", "{505EDF72-41F9-499D-B213-9FC9B8932489}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Example-Basic", "Example-Basic", "{C06A38EC-AF66-42FE-A5EE-A8C7B1AA1937}"
 EndProject
@@ -36,7 +36,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData-Protobuf", "c
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData-Protobuf.Tests", "core\TrackableData-Protobuf.Tests\TrackableData-Protobuf.Tests.csproj", "{6FC26014-DDB1-47B8-9F21-874F18926ABC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData-Sql.Tests", "core\TrackableData-Sql.Tests\TrackableData-Sql.Tests.csproj", "{CE8A572A-1465-4EEE-B828-176F9F44F43A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData-MsSql.Tests", "core\TrackableData-MsSql.Tests\TrackableData-MsSql.Tests.csproj", "{CE8A572A-1465-4EEE-B828-176F9F44F43A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

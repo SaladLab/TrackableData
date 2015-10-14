@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TrackableData</RootNamespace>
-    <AssemblyName>TrackableData-Sql</AssemblyName>
+    <AssemblyName>TrackableData-MsSql</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseIntermediateOutputPath>..\..\output\$(AssemblyName)\obj\</BaseIntermediateOutputPath>
@@ -41,10 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlKeys.cs" />
     <Compile Include="SqlMapperHelper.cs" />
-    <Compile Include="TrackableDictionarySqlMapper.cs" />
-    <Compile Include="TrackablePocoSqlMapper.cs" />
+    <Compile Include="TrackableDictionaryMsSqlMapper.cs" />
+    <Compile Include="TrackablePocoMsSqlMapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TrackableData\TrackableData.csproj">
