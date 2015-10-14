@@ -71,7 +71,8 @@ namespace TrackableData
 
         public static string GetSqlType(Type type)
         {
-            if (type == typeof (int))
+            // TODO: Make this code complete
+            if (type == typeof(int))
                 return "[int]";
             if (type == typeof(long))
                 return "[bigint]";

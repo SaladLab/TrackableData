@@ -68,6 +68,7 @@
     <Compile Include="Database.cs" />
     <Compile Include="Person.cs" />
     <Compile Include="Properties\TrackableData.CodeGen.cs" />
+    <Compile Include="TrackableDictionaryTest.cs" />
     <Compile Include="TrackablePocoTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
