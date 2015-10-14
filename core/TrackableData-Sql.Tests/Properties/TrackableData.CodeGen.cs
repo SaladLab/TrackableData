@@ -54,10 +54,6 @@ namespace TrackableData.Sql.Tests
         {
             switch ((string)name)
             {
-                case "LeftHand":
-                    return LeftHand as ITrackable;
-                case "RightHand":
-                    return RightHand as ITrackable;
                 default:
                     return null;
             }
@@ -65,20 +61,30 @@ namespace TrackableData.Sql.Tests
 
         public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
         {
-            var trackableLeftHand = LeftHand as ITrackable;
-            if (trackableLeftHand != null && (changedOnly == false || trackableLeftHand.Changed))
-                yield return new KeyValuePair<object, ITrackable>("LeftHand", trackableLeftHand);
-            var trackableRightHand = RightHand as ITrackable;
-            if (trackableRightHand != null && (changedOnly == false || trackableRightHand.Changed))
-                yield return new KeyValuePair<object, ITrackable>("RightHand", trackableRightHand);
+            yield break;
         }
 
         public static class PropertyTable
         {
+            public static readonly PropertyInfo Id = typeof(IPerson).GetProperty("Id");
             public static readonly PropertyInfo Name = typeof(IPerson).GetProperty("Name");
             public static readonly PropertyInfo Age = typeof(IPerson).GetProperty("Age");
-            public static readonly PropertyInfo LeftHand = typeof(IPerson).GetProperty("LeftHand");
-            public static readonly PropertyInfo RightHand = typeof(IPerson).GetProperty("RightHand");
+        }
+
+        private int _Id;
+
+        public int Id
+        {
+            get
+            {
+                return _Id;
+            }
+            set
+            {
+                if (Tracker != null && Id != value)
+                    Tracker.TrackSet(PropertyTable.Id, _Id, value);
+                _Id = value;
+            }
         }
 
         private string _Name;
@@ -110,233 +116,6 @@ namespace TrackableData.Sql.Tests
                 if (Tracker != null && Age != value)
                     Tracker.TrackSet(PropertyTable.Age, _Age, value);
                 _Age = value;
-            }
-        }
-
-        private TrackableHand _LeftHand;
-
-        public TrackableHand LeftHand
-        {
-            get
-            {
-                return _LeftHand;
-            }
-            set
-            {
-                if (Tracker != null && LeftHand != value)
-                    Tracker.TrackSet(PropertyTable.LeftHand, _LeftHand, value);
-                _LeftHand = value;
-            }
-        }
-
-        private TrackableHand _RightHand;
-
-        public TrackableHand RightHand
-        {
-            get
-            {
-                return _RightHand;
-            }
-            set
-            {
-                if (Tracker != null && RightHand != value)
-                    Tracker.TrackSet(PropertyTable.RightHand, _RightHand, value);
-                _RightHand = value;
-            }
-        }
-    }
-}
-
-#endregion
-
-#region IHand
-
-namespace TrackableData.Sql.Tests
-{
-    public class TrackableHand : IHand, ITrackable<IHand>
-    {
-        [IgnoreDataMember]
-        public TrackablePocoTracker<IHand> Tracker { get; set; }
-
-        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
-
-        ITracker ITrackable.Tracker
-        {
-            get
-            {
-                return Tracker;
-            }
-            set
-            {
-                var t = (TrackablePocoTracker<IHand>)value;
-                Tracker = t;
-            }
-        }
-
-        ITracker<IHand> ITrackable<IHand>.Tracker
-        {
-            get
-            {
-                return Tracker;
-            }
-            set
-            {
-                var t = (TrackablePocoTracker<IHand>)value;
-                Tracker = t;
-            }
-        }
-
-        public ITrackable GetChildTrackable(object name)
-        {
-            switch ((string)name)
-            {
-                case "MainRing":
-                    return MainRing as ITrackable;
-                case "SubRing":
-                    return SubRing as ITrackable;
-                default:
-                    return null;
-            }
-        }
-
-        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
-        {
-            var trackableMainRing = MainRing as ITrackable;
-            if (trackableMainRing != null && (changedOnly == false || trackableMainRing.Changed))
-                yield return new KeyValuePair<object, ITrackable>("MainRing", trackableMainRing);
-            var trackableSubRing = SubRing as ITrackable;
-            if (trackableSubRing != null && (changedOnly == false || trackableSubRing.Changed))
-                yield return new KeyValuePair<object, ITrackable>("SubRing", trackableSubRing);
-        }
-
-        public static class PropertyTable
-        {
-            public static readonly PropertyInfo MainRing = typeof(IHand).GetProperty("MainRing");
-            public static readonly PropertyInfo SubRing = typeof(IHand).GetProperty("SubRing");
-        }
-
-        private TrackableRing _MainRing;
-
-        public TrackableRing MainRing
-        {
-            get
-            {
-                return _MainRing;
-            }
-            set
-            {
-                if (Tracker != null && MainRing != value)
-                    Tracker.TrackSet(PropertyTable.MainRing, _MainRing, value);
-                _MainRing = value;
-            }
-        }
-
-        private TrackableRing _SubRing;
-
-        public TrackableRing SubRing
-        {
-            get
-            {
-                return _SubRing;
-            }
-            set
-            {
-                if (Tracker != null && SubRing != value)
-                    Tracker.TrackSet(PropertyTable.SubRing, _SubRing, value);
-                _SubRing = value;
-            }
-        }
-    }
-}
-
-#endregion
-
-#region IRing
-
-namespace TrackableData.Sql.Tests
-{
-    public class TrackableRing : IRing, ITrackable<IRing>
-    {
-        [IgnoreDataMember]
-        public TrackablePocoTracker<IRing> Tracker { get; set; }
-
-        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
-
-        ITracker ITrackable.Tracker
-        {
-            get
-            {
-                return Tracker;
-            }
-            set
-            {
-                var t = (TrackablePocoTracker<IRing>)value;
-                Tracker = t;
-            }
-        }
-
-        ITracker<IRing> ITrackable<IRing>.Tracker
-        {
-            get
-            {
-                return Tracker;
-            }
-            set
-            {
-                var t = (TrackablePocoTracker<IRing>)value;
-                Tracker = t;
-            }
-        }
-
-        public ITrackable GetChildTrackable(object name)
-        {
-            switch ((string)name)
-            {
-                default:
-                    return null;
-            }
-        }
-
-        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
-        {
-            yield break;
-        }
-
-        public static class PropertyTable
-        {
-            public static readonly PropertyInfo Name = typeof(IRing).GetProperty("Name");
-            public static readonly PropertyInfo Power = typeof(IRing).GetProperty("Power");
-        }
-
-        private string _Name;
-
-        public string Name
-        {
-            get
-            {
-                return _Name;
-            }
-            set
-            {
-                if (Tracker != null && Name != value)
-                    Tracker.TrackSet(PropertyTable.Name, _Name, value);
-                _Name = value;
-            }
-        }
-
-        private int _Power;
-
-        public int Power
-        {
-            get
-            {
-                return _Power;
-            }
-            set
-            {
-                if (Tracker != null && Power != value)
-                    Tracker.TrackSet(PropertyTable.Power, _Power, value);
-                _Power = value;
             }
         }
     }

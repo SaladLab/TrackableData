@@ -1,19 +1,33 @@
 ﻿using System;
+using System.Linq;
 
 namespace TrackableData
 {
     public sealed class TrackableFieldAttribute : Attribute
     {
-        public string ColumnName;
+        public string[] Parameters;
 
-        public TrackableFieldAttribute(string columnName = null)
+        public TrackableFieldAttribute(params string[] parameters)
         {
-            ColumnName = columnName;
+            Parameters = parameters;
         }
 
-        public bool IsColumnIgnored
+        public string this[string parameter]
         {
-            get { return ColumnName == "^"; }
+            get
+            {
+                if (parameter.EndsWith(":"))
+                {
+                    // as property
+                    var p = Parameters.FirstOrDefault(x => x.StartsWith(parameter));
+                    return p?.Substring(parameter.Length);
+                }
+                else
+                {
+                    // as flag
+                    return Parameters.Any(p => p == parameter) ? "true" : null;
+                }
+            }
         }
     }
 }
