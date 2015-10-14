@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TrackableData.Tests.Data
+namespace TrackableData.Tests
 {
     public interface IDataContainer : ITrackableContainer
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrackableData.Json.Tests.Data
+namespace TrackableData.Json.Tests
 {
     public interface IPerson : ITrackablePoco
     {

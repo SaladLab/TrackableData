@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using ProtoBuf;
 
-namespace TrackableData.Protobuf.Tests.Data
+namespace TrackableData.Protobuf.Tests
 {
     [ProtoContract]
     public interface IDataContainer : ITrackableContainer

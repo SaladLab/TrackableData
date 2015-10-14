@@ -17,7 +17,7 @@ using System.ComponentModel;
 
 #region IPerson
 
-namespace TrackableData.Protobuf.Tests.Data
+namespace TrackableData.Protobuf.Tests
 {
     [ProtoContract]
     public class TrackablePerson : IPerson, ITrackable<IPerson>
@@ -208,7 +208,7 @@ namespace TrackableData.Protobuf.Tests.Data
 
 #region IHand
 
-namespace TrackableData.Protobuf.Tests.Data
+namespace TrackableData.Protobuf.Tests
 {
     [ProtoContract]
     public class TrackableHand : IHand, ITrackable<IHand>
@@ -353,7 +353,7 @@ namespace TrackableData.Protobuf.Tests.Data
 
 #region IRing
 
-namespace TrackableData.Protobuf.Tests.Data
+namespace TrackableData.Protobuf.Tests
 {
     [ProtoContract]
     public class TrackableRing : IRing, ITrackable<IRing>
@@ -489,7 +489,7 @@ namespace TrackableData.Protobuf.Tests.Data
 
 #region IDataContainer
 
-namespace TrackableData.Protobuf.Tests.Data
+namespace TrackableData.Protobuf.Tests
 {
     [ProtoContract]
     public class TrackableDataContainer : IDataContainer, ITrackable<IDataContainer>

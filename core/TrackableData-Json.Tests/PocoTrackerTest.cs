@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using TrackableData.Json.Tests.Data;
+using TrackableData.Json.Tests;
 using Xunit;
 
 namespace TrackableData.Json.Tests

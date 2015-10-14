@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using TrackableData.Tests.Data;
+using TrackableData.Tests;
 using Xunit;
 
 namespace TrackableData.Tests

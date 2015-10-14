@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrackableData.Tests.Data
+namespace TrackableData.Tests
 {
     public interface IPerson : ITrackablePoco
     {

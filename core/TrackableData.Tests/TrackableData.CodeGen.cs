@@ -15,7 +15,7 @@ using TrackableData;
 
 #region IPerson
 
-namespace TrackableData.Tests.Data
+namespace TrackableData.Tests
 {
     public class TrackablePerson : IPerson, ITrackable<IPerson>
     {
@@ -151,7 +151,7 @@ namespace TrackableData.Tests.Data
 
 #region IHand
 
-namespace TrackableData.Tests.Data
+namespace TrackableData.Tests
 {
     public class TrackableHand : IHand, ITrackable<IHand>
     {
@@ -253,7 +253,7 @@ namespace TrackableData.Tests.Data
 
 #region IRing
 
-namespace TrackableData.Tests.Data
+namespace TrackableData.Tests
 {
     public class TrackableRing : IRing, ITrackable<IRing>
     {
@@ -346,7 +346,7 @@ namespace TrackableData.Tests.Data
 
 #region IDataContainer
 
-namespace TrackableData.Tests.Data
+namespace TrackableData.Tests
 {
     public class TrackableDataContainer : IDataContainer, ITrackable<IDataContainer>
     {
