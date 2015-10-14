@@ -39,11 +39,12 @@ namespace TrackableData.Tests
             var person = CreateTestPersonWithTracker();
             person.Name = "Bob";
 
+            var changeMap = ((TrackablePocoTracker<IPerson>)person.Tracker).ChangeMap;
             Assert.Equal(true, person.Tracker.HasChange);
-            Assert.Equal(1, person.Tracker.ChangeMap.Count);
-            Assert.Equal("Name", person.Tracker.ChangeMap.Keys.First().Name);
-            Assert.Equal("Bob", person.Tracker.ChangeMap.Values.First().NewValue);
-            Assert.Equal("Alice", person.Tracker.ChangeMap.Values.First().OldValue);
+            Assert.Equal(1, changeMap.Count);
+            Assert.Equal("Name", changeMap.Keys.First().Name);
+            Assert.Equal("Bob", changeMap.Values.First().NewValue);
+            Assert.Equal("Alice", changeMap.Values.First().OldValue);
         }
 
         [Fact]
@@ -53,11 +54,12 @@ namespace TrackableData.Tests
             person.Name = "Bob";
             person.Name = "Cindy";
 
+            var changeMap = ((TrackablePocoTracker<IPerson>)person.Tracker).ChangeMap;
             Assert.Equal(true, person.Tracker.HasChange);
-            Assert.Equal(1, person.Tracker.ChangeMap.Count);
-            Assert.Equal("Name", person.Tracker.ChangeMap.Keys.First().Name);
-            Assert.Equal("Cindy", person.Tracker.ChangeMap.Values.First().NewValue);
-            Assert.Equal("Alice", person.Tracker.ChangeMap.Values.First().OldValue);
+            Assert.Equal(1, changeMap.Count);
+            Assert.Equal("Name", changeMap.Keys.First().Name);
+            Assert.Equal("Cindy", changeMap.Values.First().NewValue);
+            Assert.Equal("Alice", changeMap.Values.First().OldValue);
         }
 
         [Fact]

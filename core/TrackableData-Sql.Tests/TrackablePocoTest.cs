@@ -53,7 +53,8 @@ namespace TrackableData.Sql.Tests
                 poco.SetDefaultTracker();
                 poco.Age += 1;
 
-                await a.SaveAsync(connection, poco.Tracker, 1);
+                var tracker = (TrackablePocoTracker<IPerson>)poco.Tracker;
+                await a.SaveAsync(connection, tracker, 1);
             }
 
             /*

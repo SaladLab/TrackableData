@@ -30,21 +30,22 @@ namespace TrackableData.Tests
             list.RemoveAt(1);
             list.Insert(1, "TwoInserted");
 
-            Assert.Equal(3, list.Tracker.ChangeList.Count);
+            var changeList = ((TrackableListTracker<string>)list.Tracker).ChangeList;
+            Assert.Equal(3, changeList.Count);
 
-            var change0 = list.Tracker.ChangeList[0];
+            var change0 = changeList[0];
             Assert.Equal(TrackableListOperation.Modify, change0.Operation);
             Assert.Equal(0, change0.Index);
             Assert.Equal("One", change0.OldValue);
             Assert.Equal("OneModified", change0.NewValue);
 
-            var change1 = list.Tracker.ChangeList[1];
+            var change1 = changeList[1];
             Assert.Equal(TrackableListOperation.Remove, change1.Operation);
             Assert.Equal(1, change1.Index);
             Assert.Equal("Two", change1.OldValue);
             Assert.Equal(null, change1.NewValue);
 
-            var change2 = list.Tracker.ChangeList[2];
+            var change2 = changeList[2];
             Assert.Equal(TrackableListOperation.Insert, change2.Operation);
             Assert.Equal(1, change2.Index);
             Assert.Equal(null, change2.OldValue);
