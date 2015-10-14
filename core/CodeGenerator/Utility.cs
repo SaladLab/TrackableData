@@ -1,73 +1,45 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeGen
 {
     public static class Utility
     {
-        public static string GetTypeName(Type type)
+        public static PropertyDeclarationSyntax[] GetTrackableProperties(PropertyDeclarationSyntax[] properties)
         {
-            if (type.IsGenericType)
+            // NOTE: it's naive approach because we don't know semantic type information here.
+            return properties.Where(p =>
             {
-                var genericParams = String.Join(", ", type.GenericTypeArguments.Select(t => GetTypeFullName(t)));
-                var delimiterPos = type.Name.IndexOf('`');
-                return type.Name.Substring(0, delimiterPos) + "<" + genericParams + ">";
-            }
-            else
-            {
-                return type.Name;
-            }
+                var parts = p.Type.ToString().Split('.');
+                var typeName = parts[parts.Length - 1];
+                return typeName.StartsWith("Trackable");
+            }).ToArray();
         }
 
-        public static string GetTypeFullName(Type type)
+        public static string GetTrackerClassName(TypeSyntax type)
         {
-            return type.Namespace + "." + GetTypeName(type);
-        }
-
-        public static bool IsTrackable(Type type)
-        {
-            return type.GetInterfaces().Any(i => i.FullName.StartsWith("TrackableData.ITrackable"));
-        }
-
-        public static bool IsTrackablePoco(Type type)
-        {
-            return type.GetInterfaces().Any(i => i.FullName == "TrackableData.ITrackablePoco");
-        }
-
-        public static bool IsTrackableContainer(Type type)
-        {
-            return type.GetInterfaces().Any(i => i.FullName == "TrackableData.ITrackableContainer");
-        }
-
-        public static string GetTrackableClassName(Type type)
-        {
-            if (Utility.IsTrackablePoco(type))
+            // NOTE: it's naive approach because we don't know semantic type information here.
+            var genericType = type as GenericNameSyntax;
+            if (genericType == null)
             {
-                return $"Trackable{type.Name.Substring(1)}";
+                if (type.ToString().StartsWith("Trackable"))
+                {
+                    return $"TrackablePocoTracker<I{type.ToString().Substring(9)}>";
+                }
             }
-            else
+            else if (CodeAnalaysisExtensions.CompareTypeName(genericType.Identifier.ToString(),
+                "TrackableData.TrackableDictionary"))
             {
-                var genericParams = String.Join(", ", type.GenericTypeArguments.Select(t => GetTypeFullName(t)));
-                var delimiterPos = type.Name.IndexOf('`');
-                return "Trackable" + type.Name.Substring(1, delimiterPos - 1) +
-                       "<" + genericParams + ">";
+                return $"TrackableDictionaryTracker{genericType.TypeArgumentList}";
             }
-        }
+            else if (CodeAnalaysisExtensions.CompareTypeName(genericType.Identifier.ToString(),
+                "TrackableData.TrackableList"))
+            {
+                return $"TrackableListTracker{genericType.TypeArgumentList}";
+            }
 
-        public static string GetTrackerClassName(Type type)
-        {
-            if (Utility.IsTrackablePoco(type))
-            {
-                return $"TrackablePocoTracker<{Utility.GetTypeFullName(type)}>";
-            }
-            else
-            {
-                var genericParams = String.Join(", ", type.GenericTypeArguments.Select(t => GetTypeFullName(t)));
-                var delimiterPos = type.Name.IndexOf('`');
-                return "Trackable" + type.Name.Substring(1, delimiterPos - 1) + "Tracker" +
-                       "<" + genericParams + ">";
-            }
+            throw new Exception("Cannot resolve tracker class of " + type);
         }
     }
 }

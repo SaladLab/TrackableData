@@ -15,149 +15,7 @@ using TrackableData;
 using ProtoBuf;
 using System.ComponentModel;
 
-#region TrackableData.Protobuf.Tests.Data.IHand
-
-namespace TrackableData.Protobuf.Tests.Data
-{
-    [ProtoContract]
-    public class TrackableHand : IHand, ITrackable<IHand>
-    {
-        [IgnoreDataMember]
-        public TrackablePocoTracker<IHand> Tracker { get; set; }
-
-        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
-
-        ITracker ITrackable.Tracker
-        {
-            get
-            {
-                return Tracker;
-            }
-            set
-            {
-                var t = (TrackablePocoTracker<IHand>)value;
-                Tracker = t;
-            }
-        }
-
-        ITracker<IHand> ITrackable<IHand>.Tracker
-        {
-            get
-            {
-                return Tracker;
-            }
-            set
-            {
-                var t = (TrackablePocoTracker<IHand>)value;
-                Tracker = t;
-            }
-        }
-
-        public ITrackable GetChildTrackable(object name)
-        {
-            switch ((string)name)
-            {
-                case "MainRing":
-                    return MainRing as ITrackable;
-                case "SubRing":
-                    return SubRing as ITrackable;
-                default:
-                    return null;
-            }
-        }
-
-        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
-        {
-            var trackableMainRing = MainRing as ITrackable;
-            if (trackableMainRing != null && (changedOnly == false || trackableMainRing.Changed))
-                yield return new KeyValuePair<object, ITrackable>("MainRing", trackableMainRing);
-            var trackableSubRing = SubRing as ITrackable;
-            if (trackableSubRing != null && (changedOnly == false || trackableSubRing.Changed))
-                yield return new KeyValuePair<object, ITrackable>("SubRing", trackableSubRing);
-        }
-
-        public static readonly PropertyInfo MainRingProperty = typeof(IHand).GetProperty("MainRing");
-        public static readonly PropertyInfo SubRingProperty = typeof(IHand).GetProperty("SubRing");
-
-        private TrackableData.Protobuf.Tests.Data.IRing _MainRing;
-
-        [ProtoMember(1)] public TrackableData.Protobuf.Tests.Data.IRing MainRing
-        {
-            get
-            {
-                return _MainRing;
-            }
-            set
-            {
-                if (Tracker != null && MainRing != value)
-                    Tracker.TrackSet(MainRingProperty, _MainRing, value);
-                _MainRing = value;
-            }
-        }
-
-        private TrackableData.Protobuf.Tests.Data.IRing _SubRing;
-
-        [ProtoMember(2)] public TrackableData.Protobuf.Tests.Data.IRing SubRing
-        {
-            get
-            {
-                return _SubRing;
-            }
-            set
-            {
-                if (Tracker != null && SubRing != value)
-                    Tracker.TrackSet(SubRingProperty, _SubRing, value);
-                _SubRing = value;
-            }
-        }
-    }
-
-    [ProtoContract]
-    public class TrackableHandTrackerSurrogate
-    {
-        [ProtoMember(1)] public EnvelopedObject<TrackableData.Protobuf.Tests.Data.IRing> MainRing;
-        [ProtoMember(2)] public EnvelopedObject<TrackableData.Protobuf.Tests.Data.IRing> SubRing;
-
-        public static implicit operator TrackableHandTrackerSurrogate(TrackablePocoTracker<IHand> tracker)
-        {
-            if (tracker == null)
-                return null;
-
-            var surrogate = new TrackableHandTrackerSurrogate();
-            foreach(var changeItem in tracker.ChangeMap)
-            {
-                var tag = changeItem.Key.GetCustomAttribute<ProtoMemberAttribute>().Tag;
-                switch (tag)
-                {
-                    case 1:
-                        surrogate.MainRing = new EnvelopedObject<TrackableData.Protobuf.Tests.Data.IRing> { Value = (TrackableData.Protobuf.Tests.Data.IRing)changeItem.Value.NewValue };
-                        break;
-                    case 2:
-                        surrogate.SubRing = new EnvelopedObject<TrackableData.Protobuf.Tests.Data.IRing> { Value = (TrackableData.Protobuf.Tests.Data.IRing)changeItem.Value.NewValue };
-                        break;
-                }
-            }
-            return surrogate;
-        }
-
-        public static implicit operator TrackablePocoTracker<IHand>(TrackableHandTrackerSurrogate surrogate)
-        {
-            if (surrogate == null)
-                return null;
-
-            var tracker = new TrackablePocoTracker<IHand>();
-            if (surrogate.MainRing != null)
-                tracker.ChangeMap.Add(TrackableHand.MainRingProperty, new TrackablePocoTracker<IHand>.Change { NewValue = surrogate.MainRing.Value });
-            if (surrogate.SubRing != null)
-                tracker.ChangeMap.Add(TrackableHand.SubRingProperty, new TrackablePocoTracker<IHand>.Change { NewValue = surrogate.SubRing.Value });
-            return tracker;
-        }
-    }
-}
-
-#endregion
-
-#region TrackableData.Protobuf.Tests.Data.IPerson
+#region IPerson
 
 namespace TrackableData.Protobuf.Tests.Data
 {
@@ -218,46 +76,17 @@ namespace TrackableData.Protobuf.Tests.Data
                 yield return new KeyValuePair<object, ITrackable>("RightHand", trackableRightHand);
         }
 
-        public static readonly PropertyInfo AgeProperty = typeof(IPerson).GetProperty("Age");
-        public static readonly PropertyInfo LeftHandProperty = typeof(IPerson).GetProperty("LeftHand");
-        public static readonly PropertyInfo NameProperty = typeof(IPerson).GetProperty("Name");
-        public static readonly PropertyInfo RightHandProperty = typeof(IPerson).GetProperty("RightHand");
-
-        private System.Int32 _Age;
-
-        [ProtoMember(2)] public System.Int32 Age
+        public static class PropertyTable
         {
-            get
-            {
-                return _Age;
-            }
-            set
-            {
-                if (Tracker != null && Age != value)
-                    Tracker.TrackSet(AgeProperty, _Age, value);
-                _Age = value;
-            }
+            public static readonly PropertyInfo Name = typeof(IPerson).GetProperty("Name");
+            public static readonly PropertyInfo Age = typeof(IPerson).GetProperty("Age");
+            public static readonly PropertyInfo LeftHand = typeof(IPerson).GetProperty("LeftHand");
+            public static readonly PropertyInfo RightHand = typeof(IPerson).GetProperty("RightHand");
         }
 
-        private TrackableData.Protobuf.Tests.Data.IHand _LeftHand;
+        private string _Name;
 
-        [ProtoMember(3)] public TrackableData.Protobuf.Tests.Data.IHand LeftHand
-        {
-            get
-            {
-                return _LeftHand;
-            }
-            set
-            {
-                if (Tracker != null && LeftHand != value)
-                    Tracker.TrackSet(LeftHandProperty, _LeftHand, value);
-                _LeftHand = value;
-            }
-        }
-
-        private System.String _Name;
-
-        [ProtoMember(1)] public System.String Name
+        [ProtoMember(1)] public string Name
         {
             get
             {
@@ -266,14 +95,46 @@ namespace TrackableData.Protobuf.Tests.Data
             set
             {
                 if (Tracker != null && Name != value)
-                    Tracker.TrackSet(NameProperty, _Name, value);
+                    Tracker.TrackSet(PropertyTable.Name, _Name, value);
                 _Name = value;
             }
         }
 
-        private TrackableData.Protobuf.Tests.Data.IHand _RightHand;
+        private int _Age;
 
-        [ProtoMember(4)] public TrackableData.Protobuf.Tests.Data.IHand RightHand
+        [ProtoMember(2)] public int Age
+        {
+            get
+            {
+                return _Age;
+            }
+            set
+            {
+                if (Tracker != null && Age != value)
+                    Tracker.TrackSet(PropertyTable.Age, _Age, value);
+                _Age = value;
+            }
+        }
+
+        private TrackableHand _LeftHand;
+
+        [ProtoMember(3)] public TrackableHand LeftHand
+        {
+            get
+            {
+                return _LeftHand;
+            }
+            set
+            {
+                if (Tracker != null && LeftHand != value)
+                    Tracker.TrackSet(PropertyTable.LeftHand, _LeftHand, value);
+                _LeftHand = value;
+            }
+        }
+
+        private TrackableHand _RightHand;
+
+        [ProtoMember(4)] public TrackableHand RightHand
         {
             get
             {
@@ -282,7 +143,7 @@ namespace TrackableData.Protobuf.Tests.Data
             set
             {
                 if (Tracker != null && RightHand != value)
-                    Tracker.TrackSet(RightHandProperty, _RightHand, value);
+                    Tracker.TrackSet(PropertyTable.RightHand, _RightHand, value);
                 _RightHand = value;
             }
         }
@@ -291,10 +152,10 @@ namespace TrackableData.Protobuf.Tests.Data
     [ProtoContract]
     public class TrackablePersonTrackerSurrogate
     {
-        [ProtoMember(1)] public EnvelopedObject<System.String> Name;
-        [ProtoMember(2)] public System.Int32? Age;
-        [ProtoMember(3)] public EnvelopedObject<TrackableData.Protobuf.Tests.Data.IHand> LeftHand;
-        [ProtoMember(4)] public EnvelopedObject<TrackableData.Protobuf.Tests.Data.IHand> RightHand;
+        [ProtoMember(1)] public EnvelopedObject<string> Name;
+        [ProtoMember(2)] public EnvelopedObject<int> Age;
+        [ProtoMember(3)] public EnvelopedObject<TrackableHand> LeftHand;
+        [ProtoMember(4)] public EnvelopedObject<TrackableHand> RightHand;
 
         public static implicit operator TrackablePersonTrackerSurrogate(TrackablePocoTracker<IPerson> tracker)
         {
@@ -308,16 +169,16 @@ namespace TrackableData.Protobuf.Tests.Data
                 switch (tag)
                 {
                     case 1:
-                        surrogate.Name = new EnvelopedObject<System.String> { Value = (System.String)changeItem.Value.NewValue };
+                        surrogate.Name = new EnvelopedObject<string> { Value = (string)changeItem.Value.NewValue };
                         break;
                     case 2:
-                        surrogate.Age = (System.Int32)changeItem.Value.NewValue;
+                        surrogate.Age = new EnvelopedObject<int> { Value = (int)changeItem.Value.NewValue };
                         break;
                     case 3:
-                        surrogate.LeftHand = new EnvelopedObject<TrackableData.Protobuf.Tests.Data.IHand> { Value = (TrackableData.Protobuf.Tests.Data.IHand)changeItem.Value.NewValue };
+                        surrogate.LeftHand = new EnvelopedObject<TrackableHand> { Value = (TrackableHand)changeItem.Value.NewValue };
                         break;
                     case 4:
-                        surrogate.RightHand = new EnvelopedObject<TrackableData.Protobuf.Tests.Data.IHand> { Value = (TrackableData.Protobuf.Tests.Data.IHand)changeItem.Value.NewValue };
+                        surrogate.RightHand = new EnvelopedObject<TrackableHand> { Value = (TrackableHand)changeItem.Value.NewValue };
                         break;
                 }
             }
@@ -331,13 +192,13 @@ namespace TrackableData.Protobuf.Tests.Data
 
             var tracker = new TrackablePocoTracker<IPerson>();
             if (surrogate.Name != null)
-                tracker.ChangeMap.Add(TrackablePerson.NameProperty, new TrackablePocoTracker<IPerson>.Change { NewValue = surrogate.Name.Value });
+                tracker.ChangeMap.Add(TrackablePerson.PropertyTable.Name, new TrackablePocoTracker<IPerson>.Change { NewValue = surrogate.Name.Value });
             if (surrogate.Age != null)
-                tracker.ChangeMap.Add(TrackablePerson.AgeProperty, new TrackablePocoTracker<IPerson>.Change { NewValue = surrogate.Age.Value });
+                tracker.ChangeMap.Add(TrackablePerson.PropertyTable.Age, new TrackablePocoTracker<IPerson>.Change { NewValue = surrogate.Age.Value });
             if (surrogate.LeftHand != null)
-                tracker.ChangeMap.Add(TrackablePerson.LeftHandProperty, new TrackablePocoTracker<IPerson>.Change { NewValue = surrogate.LeftHand.Value });
+                tracker.ChangeMap.Add(TrackablePerson.PropertyTable.LeftHand, new TrackablePocoTracker<IPerson>.Change { NewValue = surrogate.LeftHand.Value });
             if (surrogate.RightHand != null)
-                tracker.ChangeMap.Add(TrackablePerson.RightHandProperty, new TrackablePocoTracker<IPerson>.Change { NewValue = surrogate.RightHand.Value });
+                tracker.ChangeMap.Add(TrackablePerson.PropertyTable.RightHand, new TrackablePocoTracker<IPerson>.Change { NewValue = surrogate.RightHand.Value });
             return tracker;
         }
     }
@@ -345,7 +206,152 @@ namespace TrackableData.Protobuf.Tests.Data
 
 #endregion
 
-#region TrackableData.Protobuf.Tests.Data.IRing
+#region IHand
+
+namespace TrackableData.Protobuf.Tests.Data
+{
+    [ProtoContract]
+    public class TrackableHand : IHand, ITrackable<IHand>
+    {
+        [IgnoreDataMember]
+        public TrackablePocoTracker<IHand> Tracker { get; set; }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
+
+        ITracker ITrackable.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<IHand>)value;
+                Tracker = t;
+            }
+        }
+
+        ITracker<IHand> ITrackable<IHand>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackablePocoTracker<IHand>)value;
+                Tracker = t;
+            }
+        }
+
+        public ITrackable GetChildTrackable(object name)
+        {
+            switch ((string)name)
+            {
+                case "MainRing":
+                    return MainRing as ITrackable;
+                case "SubRing":
+                    return SubRing as ITrackable;
+                default:
+                    return null;
+            }
+        }
+
+        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
+        {
+            var trackableMainRing = MainRing as ITrackable;
+            if (trackableMainRing != null && (changedOnly == false || trackableMainRing.Changed))
+                yield return new KeyValuePair<object, ITrackable>("MainRing", trackableMainRing);
+            var trackableSubRing = SubRing as ITrackable;
+            if (trackableSubRing != null && (changedOnly == false || trackableSubRing.Changed))
+                yield return new KeyValuePair<object, ITrackable>("SubRing", trackableSubRing);
+        }
+
+        public static class PropertyTable
+        {
+            public static readonly PropertyInfo MainRing = typeof(IHand).GetProperty("MainRing");
+            public static readonly PropertyInfo SubRing = typeof(IHand).GetProperty("SubRing");
+        }
+
+        private TrackableRing _MainRing;
+
+        [ProtoMember(1)] public TrackableRing MainRing
+        {
+            get
+            {
+                return _MainRing;
+            }
+            set
+            {
+                if (Tracker != null && MainRing != value)
+                    Tracker.TrackSet(PropertyTable.MainRing, _MainRing, value);
+                _MainRing = value;
+            }
+        }
+
+        private TrackableRing _SubRing;
+
+        [ProtoMember(2)] public TrackableRing SubRing
+        {
+            get
+            {
+                return _SubRing;
+            }
+            set
+            {
+                if (Tracker != null && SubRing != value)
+                    Tracker.TrackSet(PropertyTable.SubRing, _SubRing, value);
+                _SubRing = value;
+            }
+        }
+    }
+
+    [ProtoContract]
+    public class TrackableHandTrackerSurrogate
+    {
+        [ProtoMember(1)] public EnvelopedObject<TrackableRing> MainRing;
+        [ProtoMember(2)] public EnvelopedObject<TrackableRing> SubRing;
+
+        public static implicit operator TrackableHandTrackerSurrogate(TrackablePocoTracker<IHand> tracker)
+        {
+            if (tracker == null)
+                return null;
+
+            var surrogate = new TrackableHandTrackerSurrogate();
+            foreach(var changeItem in tracker.ChangeMap)
+            {
+                var tag = changeItem.Key.GetCustomAttribute<ProtoMemberAttribute>().Tag;
+                switch (tag)
+                {
+                    case 1:
+                        surrogate.MainRing = new EnvelopedObject<TrackableRing> { Value = (TrackableRing)changeItem.Value.NewValue };
+                        break;
+                    case 2:
+                        surrogate.SubRing = new EnvelopedObject<TrackableRing> { Value = (TrackableRing)changeItem.Value.NewValue };
+                        break;
+                }
+            }
+            return surrogate;
+        }
+
+        public static implicit operator TrackablePocoTracker<IHand>(TrackableHandTrackerSurrogate surrogate)
+        {
+            if (surrogate == null)
+                return null;
+
+            var tracker = new TrackablePocoTracker<IHand>();
+            if (surrogate.MainRing != null)
+                tracker.ChangeMap.Add(TrackableHand.PropertyTable.MainRing, new TrackablePocoTracker<IHand>.Change { NewValue = surrogate.MainRing.Value });
+            if (surrogate.SubRing != null)
+                tracker.ChangeMap.Add(TrackableHand.PropertyTable.SubRing, new TrackablePocoTracker<IHand>.Change { NewValue = surrogate.SubRing.Value });
+            return tracker;
+        }
+    }
+}
+
+#endregion
+
+#region IRing
 
 namespace TrackableData.Protobuf.Tests.Data
 {
@@ -397,12 +403,15 @@ namespace TrackableData.Protobuf.Tests.Data
             yield break;
         }
 
-        public static readonly PropertyInfo NameProperty = typeof(IRing).GetProperty("Name");
-        public static readonly PropertyInfo PowerProperty = typeof(IRing).GetProperty("Power");
+        public static class PropertyTable
+        {
+            public static readonly PropertyInfo Name = typeof(IRing).GetProperty("Name");
+            public static readonly PropertyInfo Power = typeof(IRing).GetProperty("Power");
+        }
 
-        private System.String _Name;
+        private string _Name;
 
-        [ProtoMember(1)] public System.String Name
+        [ProtoMember(1)] public string Name
         {
             get
             {
@@ -411,14 +420,14 @@ namespace TrackableData.Protobuf.Tests.Data
             set
             {
                 if (Tracker != null && Name != value)
-                    Tracker.TrackSet(NameProperty, _Name, value);
+                    Tracker.TrackSet(PropertyTable.Name, _Name, value);
                 _Name = value;
             }
         }
 
-        private System.Int32 _Power;
+        private int _Power;
 
-        [ProtoMember(2)] public System.Int32 Power
+        [ProtoMember(2)] public int Power
         {
             get
             {
@@ -427,7 +436,7 @@ namespace TrackableData.Protobuf.Tests.Data
             set
             {
                 if (Tracker != null && Power != value)
-                    Tracker.TrackSet(PowerProperty, _Power, value);
+                    Tracker.TrackSet(PropertyTable.Power, _Power, value);
                 _Power = value;
             }
         }
@@ -436,8 +445,8 @@ namespace TrackableData.Protobuf.Tests.Data
     [ProtoContract]
     public class TrackableRingTrackerSurrogate
     {
-        [ProtoMember(1)] public EnvelopedObject<System.String> Name;
-        [ProtoMember(2)] public System.Int32? Power;
+        [ProtoMember(1)] public EnvelopedObject<string> Name;
+        [ProtoMember(2)] public EnvelopedObject<int> Power;
 
         public static implicit operator TrackableRingTrackerSurrogate(TrackablePocoTracker<IRing> tracker)
         {
@@ -451,10 +460,10 @@ namespace TrackableData.Protobuf.Tests.Data
                 switch (tag)
                 {
                     case 1:
-                        surrogate.Name = new EnvelopedObject<System.String> { Value = (System.String)changeItem.Value.NewValue };
+                        surrogate.Name = new EnvelopedObject<string> { Value = (string)changeItem.Value.NewValue };
                         break;
                     case 2:
-                        surrogate.Power = (System.Int32)changeItem.Value.NewValue;
+                        surrogate.Power = new EnvelopedObject<int> { Value = (int)changeItem.Value.NewValue };
                         break;
                 }
             }
@@ -468,9 +477,9 @@ namespace TrackableData.Protobuf.Tests.Data
 
             var tracker = new TrackablePocoTracker<IRing>();
             if (surrogate.Name != null)
-                tracker.ChangeMap.Add(TrackableRing.NameProperty, new TrackablePocoTracker<IRing>.Change { NewValue = surrogate.Name.Value });
+                tracker.ChangeMap.Add(TrackableRing.PropertyTable.Name, new TrackablePocoTracker<IRing>.Change { NewValue = surrogate.Name.Value });
             if (surrogate.Power != null)
-                tracker.ChangeMap.Add(TrackableRing.PowerProperty, new TrackablePocoTracker<IRing>.Change { NewValue = surrogate.Power.Value });
+                tracker.ChangeMap.Add(TrackableRing.PropertyTable.Power, new TrackablePocoTracker<IRing>.Change { NewValue = surrogate.Power.Value });
             return tracker;
         }
     }
@@ -478,7 +487,7 @@ namespace TrackableData.Protobuf.Tests.Data
 
 #endregion
 
-#region TrackableData.Protobuf.Tests.Data.IDataContainer
+#region IDataContainer
 
 namespace TrackableData.Protobuf.Tests.Data
 {
@@ -498,9 +507,9 @@ namespace TrackableData.Protobuf.Tests.Data
             set
             {
                 _tracker = value;
-                ((ITrackable)Dictionary).Tracker = value?.DictionaryTracker;
-                ((ITrackable)List).Tracker = value?.ListTracker;
-                ((ITrackable)Person).Tracker = value?.PersonTracker;
+                Person.Tracker = value?.PersonTracker;
+                Dictionary.Tracker = value?.DictionaryTracker;
+                List.Tracker = value?.ListTracker;
             }
         }
 
@@ -536,12 +545,12 @@ namespace TrackableData.Protobuf.Tests.Data
         {
             switch ((string)name)
             {
+                case "Person":
+                    return Person as ITrackable;
                 case "Dictionary":
                     return Dictionary as ITrackable;
                 case "List":
                     return List as ITrackable;
-                case "Person":
-                    return Person as ITrackable;
                 default:
                     return null;
             }
@@ -549,63 +558,15 @@ namespace TrackableData.Protobuf.Tests.Data
 
         public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
         {
+            var trackablePerson = Person as ITrackable;
+            if (trackablePerson != null && (changedOnly == false || trackablePerson.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Person", trackablePerson);
             var trackableDictionary = Dictionary as ITrackable;
             if (trackableDictionary != null && (changedOnly == false || trackableDictionary.Changed))
                 yield return new KeyValuePair<object, ITrackable>("Dictionary", trackableDictionary);
             var trackableList = List as ITrackable;
             if (trackableList != null && (changedOnly == false || trackableList.Changed))
                 yield return new KeyValuePair<object, ITrackable>("List", trackableList);
-            var trackablePerson = Person as ITrackable;
-            if (trackablePerson != null && (changedOnly == false || trackablePerson.Changed))
-                yield return new KeyValuePair<object, ITrackable>("Person", trackablePerson);
-        }
-
-        private TrackableDictionary<System.Int32, System.String> _Dictionary;
-
-        [ProtoMember(2)] public TrackableDictionary<System.Int32, System.String> Dictionary
-        {
-            get
-            {
-                return _Dictionary;
-            }
-            set
-            {
-                if (_Dictionary != null)
-                    _Dictionary.Tracker = null;
-                if (value != null)
-                    value.Tracker = Tracker?.DictionaryTracker;
-                _Dictionary = value;
-            }
-        }
-
-        System.Collections.Generic.IDictionary<System.Int32, System.String> IDataContainer.Dictionary
-        {
-            get { return _Dictionary; }
-            set { _Dictionary = (TrackableDictionary<System.Int32, System.String>)value; }
-        }
-
-        private TrackableList<System.String> _List;
-
-        [ProtoMember(3)] public TrackableList<System.String> List
-        {
-            get
-            {
-                return _List;
-            }
-            set
-            {
-                if (_List != null)
-                    _List.Tracker = null;
-                if (value != null)
-                    value.Tracker = Tracker?.ListTracker;
-                _List = value;
-            }
-        }
-
-        System.Collections.Generic.IList<System.String> IDataContainer.List
-        {
-            get { return _List; }
-            set { _List = (TrackableList<System.String>)value; }
         }
 
         private TrackablePerson _Person;
@@ -626,37 +587,85 @@ namespace TrackableData.Protobuf.Tests.Data
             }
         }
 
-        TrackableData.Protobuf.Tests.Data.IPerson IDataContainer.Person
+        TrackablePerson IDataContainer.Person
         {
             get { return _Person; }
             set { _Person = (TrackablePerson)value; }
+        }
+
+        private TrackableDictionary<int, string> _Dictionary;
+
+        [ProtoMember(2)] public TrackableDictionary<int, string> Dictionary
+        {
+            get
+            {
+                return _Dictionary;
+            }
+            set
+            {
+                if (_Dictionary != null)
+                    _Dictionary.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.DictionaryTracker;
+                _Dictionary = value;
+            }
+        }
+
+        TrackableDictionary<int, string> IDataContainer.Dictionary
+        {
+            get { return _Dictionary; }
+            set { _Dictionary = (TrackableDictionary<int, string>)value; }
+        }
+
+        private TrackableList<string> _List;
+
+        [ProtoMember(3)] public TrackableList<string> List
+        {
+            get
+            {
+                return _List;
+            }
+            set
+            {
+                if (_List != null)
+                    _List.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.ListTracker;
+                _List = value;
+            }
+        }
+
+        TrackableList<string> IDataContainer.List
+        {
+            get { return _List; }
+            set { _List = (TrackableList<string>)value; }
         }
     }
 
     [ProtoContract]
     public class TrackableDataContainerTracker : IContainerTracker<IDataContainer>
     {
-        [ProtoMember(2)] public TrackableDictionaryTracker<System.Int32, System.String> DictionaryTracker = new TrackableDictionaryTracker<System.Int32, System.String>();
-        [ProtoMember(3)] public TrackableListTracker<System.String> ListTracker = new TrackableListTracker<System.String>();
-        [ProtoMember(1)] public TrackablePocoTracker<TrackableData.Protobuf.Tests.Data.IPerson> PersonTracker = new TrackablePocoTracker<TrackableData.Protobuf.Tests.Data.IPerson>();
+        [ProtoMember(1)] public TrackablePocoTracker<IPerson> PersonTracker = new TrackablePocoTracker<IPerson>();
+        [ProtoMember(2)] public TrackableDictionaryTracker<int, string> DictionaryTracker = new TrackableDictionaryTracker<int, string>();
+        [ProtoMember(3)] public TrackableListTracker<string> ListTracker = new TrackableListTracker<string>();
 
         public bool HasChange
         {
             get
             {
                 return
+                    PersonTracker.HasChange ||
                     DictionaryTracker.HasChange ||
                     ListTracker.HasChange ||
-                    PersonTracker.HasChange ||
                     false;
             }
         }
 
         public void Clear()
         {
+            PersonTracker.Clear();
             DictionaryTracker.Clear();
             ListTracker.Clear();
-            PersonTracker.Clear();
         }
 
         public void ApplyTo(object trackable)
@@ -666,9 +675,9 @@ namespace TrackableData.Protobuf.Tests.Data
 
         public void ApplyTo(IDataContainer trackable)
         {
+            PersonTracker.ApplyTo(trackable.Person);
             DictionaryTracker.ApplyTo(trackable.Dictionary);
             ListTracker.ApplyTo(trackable.List);
-            PersonTracker.ApplyTo(trackable.Person);
         }
 
         public void ApplyTo(ITracker tracker)
@@ -683,9 +692,9 @@ namespace TrackableData.Protobuf.Tests.Data
 
         public void ApplyTo(TrackableDataContainerTracker tracker)
         {
+            PersonTracker.ApplyTo(tracker.PersonTracker);
             DictionaryTracker.ApplyTo(tracker.DictionaryTracker);
             ListTracker.ApplyTo(tracker.ListTracker);
-            PersonTracker.ApplyTo(tracker.PersonTracker);
         }
 
         public void RollbackTo(object trackable)
@@ -695,9 +704,9 @@ namespace TrackableData.Protobuf.Tests.Data
 
         public void RollbackTo(IDataContainer trackable)
         {
+            PersonTracker.RollbackTo(trackable.Person);
             DictionaryTracker.RollbackTo(trackable.Dictionary);
             ListTracker.RollbackTo(trackable.List);
-            PersonTracker.RollbackTo(trackable.Person);
         }
 
         public void RollbackTo(ITracker tracker)
@@ -712,9 +721,9 @@ namespace TrackableData.Protobuf.Tests.Data
 
         public void RollbackTo(TrackableDataContainerTracker tracker)
         {
+            PersonTracker.RollbackTo(tracker.PersonTracker);
             DictionaryTracker.RollbackTo(tracker.DictionaryTracker);
             ListTracker.RollbackTo(tracker.ListTracker);
-            PersonTracker.RollbackTo(tracker.PersonTracker);
         }
     }
 }

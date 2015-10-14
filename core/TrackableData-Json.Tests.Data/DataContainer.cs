@@ -5,8 +5,8 @@ namespace TrackableData.Json.Tests.Data
 {
     public interface IDataContainer : ITrackableContainer
     {
-        IPerson Person { get; set; }
-        IDictionary<int, string> Dictionary { get; set; }
-        IList<string> List { get; set; }
+        TrackablePerson Person { get; set; }
+        TrackableDictionary<int, string> Dictionary { get; set; }
+        TrackableList<string> List { get; set; }
     }
 }

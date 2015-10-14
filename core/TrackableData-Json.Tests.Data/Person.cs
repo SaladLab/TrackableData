@@ -10,14 +10,14 @@ namespace TrackableData.Json.Tests.Data
     {
         string Name { get; set; }
         int Age { get; set; }
-        IHand LeftHand { get; set; }
-        IHand RightHand { get; set; }
+        TrackableHand LeftHand { get; set; }
+        TrackableHand RightHand { get; set; }
     }
 
     public interface IHand : ITrackablePoco
     {
-        IRing MainRing { get; set; }
-        IRing SubRing { get; set; }
+        TrackableRing MainRing { get; set; }
+        TrackableRing SubRing { get; set; }
     }
 
     public interface IRing : ITrackablePoco
