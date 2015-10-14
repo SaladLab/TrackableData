@@ -20,7 +20,7 @@ namespace TrackableData.Json.Tests.Data
     public class TrackableHand : IHand, ITrackable<IHand>
     {
         [IgnoreDataMember]
-        public IPocoTracker<IHand> Tracker { get; set; }
+        public TrackablePocoTracker<IHand> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -32,7 +32,7 @@ namespace TrackableData.Json.Tests.Data
             }
             set
             {
-                var t = (IPocoTracker<IHand>)value;
+                var t = (TrackablePocoTracker<IHand>)value;
                 Tracker = t;
             }
         }
@@ -45,7 +45,7 @@ namespace TrackableData.Json.Tests.Data
             }
             set
             {
-                var t = (IPocoTracker<IHand>)value;
+                var t = (TrackablePocoTracker<IHand>)value;
                 Tracker = t;
             }
         }
@@ -119,7 +119,7 @@ namespace TrackableData.Json.Tests.Data
     public class TrackablePerson : IPerson, ITrackable<IPerson>
     {
         [IgnoreDataMember]
-        public IPocoTracker<IPerson> Tracker { get; set; }
+        public TrackablePocoTracker<IPerson> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -131,7 +131,7 @@ namespace TrackableData.Json.Tests.Data
             }
             set
             {
-                var t = (IPocoTracker<IPerson>)value;
+                var t = (TrackablePocoTracker<IPerson>)value;
                 Tracker = t;
             }
         }
@@ -144,7 +144,7 @@ namespace TrackableData.Json.Tests.Data
             }
             set
             {
-                var t = (IPocoTracker<IPerson>)value;
+                var t = (TrackablePocoTracker<IPerson>)value;
                 Tracker = t;
             }
         }
@@ -252,7 +252,7 @@ namespace TrackableData.Json.Tests.Data
     public class TrackableRing : IRing, ITrackable<IRing>
     {
         [IgnoreDataMember]
-        public IPocoTracker<IRing> Tracker { get; set; }
+        public TrackablePocoTracker<IRing> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -264,7 +264,7 @@ namespace TrackableData.Json.Tests.Data
             }
             set
             {
-                var t = (IPocoTracker<IRing>)value;
+                var t = (TrackablePocoTracker<IRing>)value;
                 Tracker = t;
             }
         }
@@ -277,7 +277,7 @@ namespace TrackableData.Json.Tests.Data
             }
             set
             {
-                var t = (IPocoTracker<IRing>)value;
+                var t = (TrackablePocoTracker<IRing>)value;
                 Tracker = t;
             }
         }
@@ -354,9 +354,9 @@ namespace TrackableData.Json.Tests.Data
             set
             {
                 _tracker = value;
-                Dictionary.Tracker = value?.DictionaryTracker;
-                List.Tracker = value?.ListTracker;
-                Person.Tracker = value?.PersonTracker;
+                ((ITrackable)Dictionary).Tracker = value?.DictionaryTracker;
+                ((ITrackable)List).Tracker = value?.ListTracker;
+                ((ITrackable)Person).Tracker = value?.PersonTracker;
             }
         }
 
