@@ -44,7 +44,7 @@ namespace CodeGen
             // Tracker
 
             sb.AppendLine("\t[IgnoreDataMember]");
-            sb.AppendFormat("\tpublic TrackablePocoTracker<{0}> Tracker {{ get; set; }}\n", typeName);
+            sb.AppendFormat("\tpublic IPocoTracker<{0}> Tracker {{ get; set; }}\n", typeName);
             sb.AppendLine("");
 
             // ITrackable.Changed
@@ -62,7 +62,7 @@ namespace CodeGen
             sb.AppendLine("\t\t}");
             sb.AppendLine("\t\tset");
             sb.AppendLine("\t\t{");
-            sb.AppendFormat("\t\t\tvar t = (TrackablePocoTracker<{0}>)value;\n", typeName);
+            sb.AppendFormat("\t\t\tvar t = (IPocoTracker<{0}>)value;\n", typeName);
             sb.AppendLine("\t\t\tTracker = t;");
             sb.AppendLine("\t\t}");
             sb.AppendLine("\t}");
@@ -78,7 +78,7 @@ namespace CodeGen
             sb.AppendLine("\t\t}");
             sb.AppendLine("\t\tset");
             sb.AppendLine("\t\t{");
-            sb.AppendFormat("\t\t\tvar t = (TrackablePocoTracker<{0}>)value;\n", typeName);
+            sb.AppendFormat("\t\t\tvar t = (IPocoTracker<{0}>)value;\n", typeName);
             sb.AppendLine("\t\t\tTracker = t;");
             sb.AppendLine("\t\t}");
             sb.AppendLine("\t}");

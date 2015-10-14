@@ -20,7 +20,7 @@ namespace Basic.Data
     public class TrackableUserData : IUserData, ITrackable<IUserData>
     {
         [IgnoreDataMember]
-        public TrackablePocoTracker<IUserData> Tracker { get; set; }
+        public IPocoTracker<IUserData> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -32,7 +32,7 @@ namespace Basic.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<IUserData>)value;
+                var t = (IPocoTracker<IUserData>)value;
                 Tracker = t;
             }
         }
@@ -45,7 +45,7 @@ namespace Basic.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<IUserData>)value;
+                var t = (IPocoTracker<IUserData>)value;
                 Tracker = t;
             }
         }
@@ -164,7 +164,7 @@ namespace Basic.Data
     public class TrackableUserHandData : IUserHandData, ITrackable<IUserHandData>
     {
         [IgnoreDataMember]
-        public TrackablePocoTracker<IUserHandData> Tracker { get; set; }
+        public IPocoTracker<IUserHandData> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -176,7 +176,7 @@ namespace Basic.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<IUserHandData>)value;
+                var t = (IPocoTracker<IUserHandData>)value;
                 Tracker = t;
             }
         }
@@ -189,7 +189,7 @@ namespace Basic.Data
             }
             set
             {
-                var t = (TrackablePocoTracker<IUserHandData>)value;
+                var t = (IPocoTracker<IUserHandData>)value;
                 Tracker = t;
             }
         }

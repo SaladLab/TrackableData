@@ -23,7 +23,7 @@ namespace TrackableData.Protobuf.Tests
     public class TrackablePerson : IPerson, ITrackable<IPerson>
     {
         [IgnoreDataMember]
-        public TrackablePocoTracker<IPerson> Tracker { get; set; }
+        public IPocoTracker<IPerson> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -35,7 +35,7 @@ namespace TrackableData.Protobuf.Tests
             }
             set
             {
-                var t = (TrackablePocoTracker<IPerson>)value;
+                var t = (IPocoTracker<IPerson>)value;
                 Tracker = t;
             }
         }
@@ -48,7 +48,7 @@ namespace TrackableData.Protobuf.Tests
             }
             set
             {
-                var t = (TrackablePocoTracker<IPerson>)value;
+                var t = (IPocoTracker<IPerson>)value;
                 Tracker = t;
             }
         }
@@ -214,7 +214,7 @@ namespace TrackableData.Protobuf.Tests
     public class TrackableHand : IHand, ITrackable<IHand>
     {
         [IgnoreDataMember]
-        public TrackablePocoTracker<IHand> Tracker { get; set; }
+        public IPocoTracker<IHand> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -226,7 +226,7 @@ namespace TrackableData.Protobuf.Tests
             }
             set
             {
-                var t = (TrackablePocoTracker<IHand>)value;
+                var t = (IPocoTracker<IHand>)value;
                 Tracker = t;
             }
         }
@@ -239,7 +239,7 @@ namespace TrackableData.Protobuf.Tests
             }
             set
             {
-                var t = (TrackablePocoTracker<IHand>)value;
+                var t = (IPocoTracker<IHand>)value;
                 Tracker = t;
             }
         }
@@ -359,7 +359,7 @@ namespace TrackableData.Protobuf.Tests
     public class TrackableRing : IRing, ITrackable<IRing>
     {
         [IgnoreDataMember]
-        public TrackablePocoTracker<IRing> Tracker { get; set; }
+        public IPocoTracker<IRing> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -371,7 +371,7 @@ namespace TrackableData.Protobuf.Tests
             }
             set
             {
-                var t = (TrackablePocoTracker<IRing>)value;
+                var t = (IPocoTracker<IRing>)value;
                 Tracker = t;
             }
         }
@@ -384,7 +384,7 @@ namespace TrackableData.Protobuf.Tests
             }
             set
             {
-                var t = (TrackablePocoTracker<IRing>)value;
+                var t = (IPocoTracker<IRing>)value;
                 Tracker = t;
             }
         }

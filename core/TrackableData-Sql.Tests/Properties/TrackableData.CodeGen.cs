@@ -20,7 +20,7 @@ namespace TrackableData.Sql.Tests
     public class TrackablePerson : IPerson, ITrackable<IPerson>
     {
         [IgnoreDataMember]
-        public TrackablePocoTracker<IPerson> Tracker { get; set; }
+        public IPocoTracker<IPerson> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -32,7 +32,7 @@ namespace TrackableData.Sql.Tests
             }
             set
             {
-                var t = (TrackablePocoTracker<IPerson>)value;
+                var t = (IPocoTracker<IPerson>)value;
                 Tracker = t;
             }
         }
@@ -45,7 +45,7 @@ namespace TrackableData.Sql.Tests
             }
             set
             {
-                var t = (TrackablePocoTracker<IPerson>)value;
+                var t = (IPocoTracker<IPerson>)value;
                 Tracker = t;
             }
         }

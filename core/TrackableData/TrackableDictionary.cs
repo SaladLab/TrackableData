@@ -10,7 +10,7 @@ namespace TrackableData
 
         // Specific tracker
 
-        public TrackableDictionaryTracker<TKey, TValue> Tracker { get; set; }
+        public IDictionaryTracker<TKey, TValue> Tracker { get; set; }
 
         // ITrackable
 
@@ -31,7 +31,7 @@ namespace TrackableData
 
             set
             {
-                var tracker = (TrackableDictionaryTracker<TKey, TValue>)value;
+                var tracker = (IDictionaryTracker<TKey, TValue>)value;
                 Tracker = tracker;
             }
         }
@@ -45,7 +45,7 @@ namespace TrackableData
 
             set
             {
-                var tracker = (TrackableDictionaryTracker<TKey, TValue>)value;
+                var tracker = (IDictionaryTracker<TKey, TValue>)value;
                 Tracker = tracker;
             }
         }

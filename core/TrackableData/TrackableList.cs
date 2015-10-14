@@ -10,7 +10,7 @@ namespace TrackableData
 
         // Specific tracker
 
-        public TrackableListTracker<T> Tracker { get; set; }
+        public IListTracker<T> Tracker { get; set; }
 
         // ITrackable
 
@@ -31,7 +31,7 @@ namespace TrackableData
 
             set
             {
-                var tracker = (TrackableListTracker<T>)value;
+                var tracker = (IListTracker<T>)value;
                 Tracker = tracker;
             }
         }
@@ -45,7 +45,7 @@ namespace TrackableData
 
             set
             {
-                var tracker = (TrackableListTracker<T>)value;
+                var tracker = (IListTracker<T>)value;
                 Tracker = tracker;
             }
         }
