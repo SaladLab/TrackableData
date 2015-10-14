@@ -12,10 +12,11 @@ namespace TrackableData
     public class TrackablePocoSqlMapper<T>
         where T : ITrackablePoco
     {
-        private struct Column
+        private class Column
         {
             public string Name;
             public Type Type;
+            public bool IsIdentity;
             public PropertyInfo PropertyInfo;
             public Func<object, string> ConvertToSqlValue;
         }
@@ -27,7 +28,8 @@ namespace TrackableData
         private readonly Column[] _valueColumns;
         private readonly Dictionary<PropertyInfo, Column> _valueColumnMap;
         private readonly int _headKeyCount;
-        private readonly string _allColumnString;
+        private readonly Column _identityColumn;
+        private readonly string _allColumnStringExceptIdentity;
         private readonly string _allColumnStringExceptHead;
 
         public TrackablePocoSqlMapper(string tableName)
@@ -68,6 +70,7 @@ namespace TrackableData
             {
                 var columnName = property.Name;
                 var primaryKey = false;
+                var isIdentity = false;
 
                 var attr = property.GetCustomAttribute<TrackableFieldAttribute>();
                 if (attr != null)
@@ -76,12 +79,14 @@ namespace TrackableData
                         continue;
                     columnName = attr["sql.column:"] ?? columnName;
                     primaryKey = attr["sql.primary-key"] != null;
+                    isIdentity = attr["sql.identity"] != null;
                 }
 
                 var column = new Column
                 {
                     Name = SqlMapperHelper.GetEscapedName(columnName),
                     Type = property.PropertyType,
+                    IsIdentity = isIdentity,
                     PropertyInfo = property,
                     ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(property.PropertyType)
                 };
@@ -91,13 +96,16 @@ namespace TrackableData
 
                 valueColumns.Add(column);
                 allColumns.Add(column);
+
+                if (isIdentity)
+                    _identityColumn = column;
             }
 
             _allColumns = allColumns.ToArray();
             _primaryKeyColumns = primaryKeyColumns.ToArray();
             _valueColumns = valueColumns.ToArray();
             _valueColumnMap = _valueColumns.ToDictionary(x => x.PropertyInfo, y => y);
-            _allColumnString = string.Join(",", _allColumns);
+            _allColumnStringExceptIdentity = string.Join(",", _allColumns.Where(c => c.IsIdentity == false).Select(c => c.Name));
             _allColumnStringExceptHead = string.Join(",", _valueColumns.Select(c => c.Name));
         }
 
@@ -114,12 +122,16 @@ namespace TrackableData
                 keyValues.Zip(_primaryKeyColumns, (v, c) => $"{c.Name} = {c.ConvertToSqlValue(v)}")));
         }
 
-        public string GenerateCreateTableSql()
+        public string GenerateCreateTableSql(bool includeDropIfExists = false)
         {
             var columnDef = string.Join(
                 ",\n",
                 _allColumns.Select(c =>
-                    $"{c.Name} {SqlMapperHelper.GetSqlType(c.Type)} NOT NULL"));
+                {
+                    var identity = c.IsIdentity ? "IDENTITY(1,1)" : "";
+                    var notnull = c.Type.IsValueType ? "NOT NULL" : "";
+                    return $"{c.Name} {SqlMapperHelper.GetSqlType(c.Type)} {identity} {notnull}";
+                }));
 
             var primaryKeyDef = string.Join(
                 ",",
@@ -127,6 +139,11 @@ namespace TrackableData
                     $"{c.Name} ASC"));
 
             var sb = new StringBuilder();
+            if (includeDropIfExists)
+            {
+                sb.AppendLine($"IF OBJECT_ID('dbo.{_tableName}', 'U') IS NOT NULL");
+                sb.AppendLine($"  DROP TABLE dbo.{_tableName}");
+            }
             sb.AppendLine($"CREATE TABLE [dbo].[{_tableName}] (");
             sb.AppendLine(columnDef);
             sb.AppendLine($"  CONSTRAINT[PK_{_tableName}] PRIMARY KEY CLUSTERED({primaryKeyDef}) WITH (");
@@ -141,13 +158,17 @@ namespace TrackableData
             if (keyValues.Length != _headKeyCount)
                 throw new ArgumentException("Head key value required");
 
+            var outputClause = _identityColumn != null ? "OUTPUT Inserted." + _identityColumn.Name : "";
             var sb = new StringBuilder();
-            sb.Append($"INSERT INTO {_tableName} ({_allColumnString}) VALUES (");
+            sb.Append($"INSERT INTO {_tableName} ({_allColumnStringExceptIdentity}) {outputClause} VALUES (");
 
             var concating = false;
             var keyIndex = 0;
             foreach (var column in _allColumns)
             {
+                if (column.IsIdentity)
+                    continue;
+
                 if (concating == false)
                     concating = true;
                 else
@@ -219,16 +240,40 @@ namespace TrackableData
 
         // POCO Friendly Methods
 
-        public async Task<int> CreateAsync(SqlConnection connection, T value, params object[] keyValues)
+        public async Task<int> ResetTableAsync(SqlConnection connection)
         {
-            var sql = GenerateInsertSql(value, keyValues);
+            var sql = GenerateCreateTableSql(true);
             using (var command = new SqlCommand(sql, connection))
             {
                 return await command.ExecuteNonQueryAsync();
             }
         }
 
-        public async Task<int> RemoveAsync(SqlConnection connection, T value, params object[] keyValues)
+        public async Task<int> CreateAsync(SqlConnection connection, T value, params object[] keyValues)
+        {
+            var sql = GenerateInsertSql(value, keyValues);
+            using (var command = new SqlCommand(sql, connection))
+            {
+                if (_identityColumn != null)
+                {
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            _identityColumn.PropertyInfo.SetValue(value, reader.GetValue(0));
+                            return 1;
+                        }
+                    }
+                    return 0;
+                }
+                else
+                {
+                    return await command.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
+        public async Task<int> RemoveAsync(SqlConnection connection, params object[] keyValues)
         {
             var sql = GenerateDeleteSql(keyValues);
             using (var command = new SqlCommand(sql, connection))
@@ -280,6 +325,11 @@ namespace TrackableData
                     SqlMapperHelper.GetNetValue(record.GetValue(i), _valueColumns[i].Type));
             }
             return value;
+        }
+
+        public Task<int> SaveAsync(SqlConnection connection, IPocoTracker<T> tracker, params object[] keyValues)
+        {
+            return SaveAsync(connection, (TrackablePocoTracker<T>)tracker, keyValues);
         }
 
         public async Task<int> SaveAsync(SqlConnection connection, TrackablePocoTracker<T> tracker, params object[] keyValues)

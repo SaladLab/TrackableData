@@ -29,7 +29,7 @@ namespace TrackableData
             }
             else if (type == typeof(string))
             {
-                return (o => GetEscapedValue((string)o));
+                return (o => o != null ? GetEscapedValue((string)o) : "NULL");
             }
             else if (type == typeof(bool))
             {

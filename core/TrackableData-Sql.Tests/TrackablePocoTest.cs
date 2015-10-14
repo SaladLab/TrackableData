@@ -15,64 +15,107 @@ namespace TrackableData.Sql.Tests
             _db = db;
         }
 
-        [Fact]
-        public async Task Test_SqlMapper_LoadPoco()
+        private struct Context<T> : IDisposable 
+            where T : ITrackablePoco
         {
-            var a = new TrackablePocoSqlMapper<IPerson>("tblPerson");
+            public TrackablePocoSqlMapper<T> SqlMapper;
+            public SqlConnection Connection;
 
-            // CREATE
-
-            //var sql = a.GenerateCreateTableSql();
-            //using (var connection = _db.Connection)
-            //using (var command = new SqlCommand(sql, connection))
-            //{
-            //    command.ExecuteNonQuery();
-            //}
-
-            // SELECT
-
-            // var sql = a.GenerateSelectSql();
-            //using (var connection = _db.Connection)
-            //using (var command = new SqlCommand(sql, connection))
-            //{
-            //    using (var reader = command.ExecuteReader())
-            //    {
-            //        while (reader.Read())
-            //        {
-            //            var person = a.Fetch(reader);
-            //            Console.WriteLine(person);
-            //        }
-            //    }
-            //}
-
-            // UPDATE
-
-            using (var connection = _db.Connection)
+            public void Dispose()
             {
-                var poco = (TrackablePerson)await a.LoadAsync(connection, 1);
-                poco.SetDefaultTracker();
-                poco.Age += 1;
-
-                var tracker = (TrackablePocoTracker<IPerson>)poco.Tracker;
-                await a.SaveAsync(connection, tracker, 1);
-            }
-
-            /*
-            using (var connection = _db.Connection)
-            using (var command = new SqlCommand("SELECT TOP 2 * FROM tblTest", connection))
-            using (var reader = command.ExecuteReader())
-            {
-                while (reader.Read())
+                if (Connection != null)
                 {
-                    Console.WriteLine("{0} {1} {2}",
-                    reader.GetInt32(0), reader.GetString(1), reader.GetString(2));
+                    Connection.Dispose();
+                    Connection = null;
                 }
-            }*/
+            }
+        }
+
+        private async Task<Context<T>> PrepareAsync<T>()
+            where T : ITrackablePoco
+        {
+            var sqlMapper = new TrackablePocoSqlMapper<T>(typeof(T).Name);
+            var connection = _db.Connection;
+            await sqlMapper.ResetTableAsync(connection);
+            return new Context<T> { SqlMapper = sqlMapper, Connection = connection };
         }
 
         [Fact]
-        public void Test_SqlMapper_UpdateChanges()
+        public async Task Test_SqlMapper_ResetTable()
         {
+            using (var ctx = await PrepareAsync<IPerson>())
+            {
+                var persons = await ctx.SqlMapper.LoadAllAsync(ctx.Connection);
+                Assert.Equal(0, persons.Count);
+            }
+        }
+
+        [Fact]
+        public async Task Test_SqlMapper_CreateAndLoadPoco()
+        {
+            using (var ctx = await PrepareAsync<IPerson>())
+            {
+                var person = new TrackablePerson();
+                person.Id = 1;
+                person.Name = "Testor";
+                person.Age = 10;
+
+                await ctx.SqlMapper.CreateAsync(ctx.Connection, person);
+
+                var person2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
+                Assert.Equal(person.Id, person2.Id);
+                Assert.Equal(person.Name, person2.Name);
+                Assert.Equal(person.Age, person2.Age);
+            }
+        }
+
+        [Fact]
+        public async Task Test_SqlMapper_DeletePoco()
+        {
+            using (var ctx = await PrepareAsync<IPerson>())
+            {
+                var person = new TrackablePerson();
+                await ctx.SqlMapper.CreateAsync(ctx.Connection, person);
+
+                var count = await ctx.SqlMapper.RemoveAsync(ctx.Connection, 1);
+                Assert.Equal(1, count);
+            }
+        }
+
+        [Fact]
+        public async Task Test_SqlMapper_SavePoco()
+        {
+            using (var ctx = await PrepareAsync<IPerson>())
+            {
+                var person = new TrackablePerson();
+                person.Id = 1;
+                person.Name = "";
+                await ctx.SqlMapper.CreateAsync(ctx.Connection, person);
+
+                person.SetDefaultTracker();
+                person.Name = "Testor";
+                person.Age = 10;
+                await ctx.SqlMapper.SaveAsync(ctx.Connection, person.Tracker, person.Id);
+
+                var person2 = await ctx.SqlMapper.LoadAsync(ctx.Connection, person.Id);
+                Assert.Equal(person.Id, person2.Id);
+                Assert.Equal(person.Name, person2.Name);
+                Assert.Equal(person.Age, person2.Age);
+            }
+        }
+
+        [Fact]
+        public async Task Test_SqlMapper_CreateAndLoadPoco_WithIdentity()
+        {
+            using (var ctx = await PrepareAsync<IPersonWithIdentity>())
+            {
+                var person = new TrackablePersonWithIdentity();
+                person.Name = "Testor";
+                person.Age = 10;
+
+                await ctx.SqlMapper.CreateAsync(ctx.Connection, person);
+                Assert.Equal(1, person.Id);
+            }
         }
     }
 }

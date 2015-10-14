@@ -122,3 +122,113 @@ namespace TrackableData.Sql.Tests
 }
 
 #endregion
+
+#region IPersonWithIdentity
+
+namespace TrackableData.Sql.Tests
+{
+    public class TrackablePersonWithIdentity : IPersonWithIdentity, ITrackable<IPersonWithIdentity>
+    {
+        [IgnoreDataMember]
+        public IPocoTracker<IPersonWithIdentity> Tracker { get; set; }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
+
+        ITracker ITrackable.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (IPocoTracker<IPersonWithIdentity>)value;
+                Tracker = t;
+            }
+        }
+
+        ITracker<IPersonWithIdentity> ITrackable<IPersonWithIdentity>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (IPocoTracker<IPersonWithIdentity>)value;
+                Tracker = t;
+            }
+        }
+
+        public ITrackable GetChildTrackable(object name)
+        {
+            switch ((string)name)
+            {
+                default:
+                    return null;
+            }
+        }
+
+        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
+        {
+            yield break;
+        }
+
+        public static class PropertyTable
+        {
+            public static readonly PropertyInfo Id = typeof(IPersonWithIdentity).GetProperty("Id");
+            public static readonly PropertyInfo Name = typeof(IPersonWithIdentity).GetProperty("Name");
+            public static readonly PropertyInfo Age = typeof(IPersonWithIdentity).GetProperty("Age");
+        }
+
+        private int _Id;
+
+        public int Id
+        {
+            get
+            {
+                return _Id;
+            }
+            set
+            {
+                if (Tracker != null && Id != value)
+                    Tracker.TrackSet(PropertyTable.Id, _Id, value);
+                _Id = value;
+            }
+        }
+
+        private string _Name;
+
+        public string Name
+        {
+            get
+            {
+                return _Name;
+            }
+            set
+            {
+                if (Tracker != null && Name != value)
+                    Tracker.TrackSet(PropertyTable.Name, _Name, value);
+                _Name = value;
+            }
+        }
+
+        private int _Age;
+
+        public int Age
+        {
+            get
+            {
+                return _Age;
+            }
+            set
+            {
+                if (Tracker != null && Age != value)
+                    Tracker.TrackSet(PropertyTable.Age, _Age, value);
+                _Age = value;
+            }
+        }
+    }
+}
+
+#endregion

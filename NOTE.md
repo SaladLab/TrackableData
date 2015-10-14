@@ -8,3 +8,6 @@
 
  - Trackable*TrackerJsonConverter 가 Generic 이 아니라 일반 타입으로 하자.
    이래야 T 별로 Converter 를 등록하는 수고를 해결할 수 있음
+
+- TrackableData-MsSql 이 Nullable 을 잘 지원하는지 보자.
+
