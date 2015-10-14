@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using CommandLine;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeGen
 {
@@ -60,13 +62,12 @@ namespace CodeGen
                 var targetDefaultPath = @".\Properties\TrackableData.CodeGen.cs";
                 var targetPath = MakeFullPath(options.TargetFile ?? targetDefaultPath, basePath);
 
-                // Build source and load assembly
+                // Parse sources and extract interfaces
 
-                Console.WriteLine("- Build sources");
+                Console.WriteLine("- Parse sources");
 
-                var assembly = AssemblyLoader.BuildAndLoad(sources, references, options.Defines.ToArray());
-                if (assembly == null)
-                    return 1;
+                var syntaxTrees = sources.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file)).ToArray();
+                var interfaceDeclarations = syntaxTrees.SelectMany(st => st.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>()).ToArray();
 
                 // Generate code
 
@@ -86,21 +87,21 @@ namespace CodeGen
 
                 // TrackablePoco
 
-                var trackablePocoTypes = GetTypesSafely(assembly).OrderBy(t => t.FullName)
-                    .Where(Utility.IsTrackablePoco).ToArray();
-
                 var pocoCodeGen = new TrackablePocoCodeGenerator() { Options = options };
-                foreach (var type in trackablePocoTypes)
-                    pocoCodeGen.GenerateCode(type, writer);
+                foreach (var idecl in interfaceDeclarations)
+                {
+                    if (idecl.HasBase("TrackableData.ITrackablePoco"))
+                        pocoCodeGen.GenerateCode(idecl, writer);
+                }
 
                 // TrackableContainer
 
-                var trackableContainerTypes = GetTypesSafely(assembly).OrderBy(t => t.FullName)
-                    .Where(Utility.IsTrackableContainer).ToArray();
-
                 var containerCodeGen = new TrackableContainerCodeGenerator() { Options = options };
-                foreach (var type in trackableContainerTypes)
-                    containerCodeGen.GenerateCode(type, writer);
+                foreach (var idecl in interfaceDeclarations)
+                {
+                    if (idecl.HasBase("TrackableData.ITrackableContainer"))
+                        containerCodeGen.GenerateCode(idecl, writer);
+                }
 
                 // Save generated code
 

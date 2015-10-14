@@ -9,7 +9,7 @@ using ProtoBuf.Meta;
 namespace TrackableData
 {
     [ProtoContract]
-    public class EnvelopedObject<T> where T : class
+    public class EnvelopedObject<T>
     {
         [ProtoMember(1)] public T Value;
     }

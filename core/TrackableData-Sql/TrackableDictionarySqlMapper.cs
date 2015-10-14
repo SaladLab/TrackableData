@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace TrackableData
 {
@@ -65,23 +64,23 @@ namespace TrackableData
             }
             else
             {
-                var valueColumns = new List<Column>();
-                var valueType = typeof(TValue);
-                foreach (var field in valueType.GetFields())
-                {
-                    var attr = field.GetCustomAttribute<TrackableFieldAttribute>();
-                    if (attr != null && attr.IsColumnIgnored == false)
-                    {
-                        valueColumns.Add(new Column
-                        {
-                            Name = SqlMapperHelper.GetEscapedName(attr.ColumnName ?? field.Name),
-                            Type = field.FieldType,
-                            FieldInfo = field,
-                            ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(field)
-                        });
-                    }
-                }
-                _valueColumns = valueColumns.ToArray();
+                //var valueColumns = new List<Column>();
+                //var valueType = typeof(TValue);
+                //foreach (var field in valueType.GetFields())
+                //{
+                //    var attr = field.GetCustomAttribute<TrackableFieldAttribute>();
+                //    if (attr != null && attr.IsColumnIgnored == false)
+                //    {
+                //        valueColumns.Add(new Column
+                //        {
+                //            Name = SqlMapperHelper.GetEscapedName(attr.ColumnName ?? field.Name),
+                //            Type = field.FieldType,
+                //            FieldInfo = field,
+                //            ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(field)
+                //        });
+                //    }
+                //}
+                // _valueColumns = valueColumns.ToArray();
             }
 
             // 컬럼 문자열 구축

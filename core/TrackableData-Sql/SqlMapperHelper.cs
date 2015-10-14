@@ -68,5 +68,16 @@ namespace TrackableData
                 return Convert.ChangeType(o, t);
             }
         }
+
+        public static string GetSqlType(Type type)
+        {
+            if (type == typeof (int))
+                return "[int]";
+            if (type == typeof(long))
+                return "[bigint]";
+            if (type == typeof(string))
+                return "[nvarchar](MAX)";
+            return "";
+        }
     }
 }

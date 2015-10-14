@@ -13,7 +13,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using TrackableData;
 
-#region Basic.Data.IUserData
+#region IUserData
 
 namespace Basic.Data
 {
@@ -54,10 +54,6 @@ namespace Basic.Data
         {
             switch ((string)name)
             {
-                case "LeftHand":
-                    return LeftHand as ITrackable;
-                case "RightHand":
-                    return RightHand as ITrackable;
                 default:
                     return null;
             }
@@ -65,71 +61,21 @@ namespace Basic.Data
 
         public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
         {
-            var trackableLeftHand = LeftHand as ITrackable;
-            if (trackableLeftHand != null && (changedOnly == false || trackableLeftHand.Changed))
-                yield return new KeyValuePair<object, ITrackable>("LeftHand", trackableLeftHand);
-            var trackableRightHand = RightHand as ITrackable;
-            if (trackableRightHand != null && (changedOnly == false || trackableRightHand.Changed))
-                yield return new KeyValuePair<object, ITrackable>("RightHand", trackableRightHand);
+            yield break;
         }
 
-        public static readonly PropertyInfo GoldProperty = typeof(IUserData).GetProperty("Gold");
-        public static readonly PropertyInfo LeftHandProperty = typeof(IUserData).GetProperty("LeftHand");
-        public static readonly PropertyInfo LevelProperty = typeof(IUserData).GetProperty("Level");
-        public static readonly PropertyInfo NameProperty = typeof(IUserData).GetProperty("Name");
-        public static readonly PropertyInfo RightHandProperty = typeof(IUserData).GetProperty("RightHand");
-
-        private System.Int32 _Gold;
-
-        public System.Int32 Gold
+        public static class PropertyTable
         {
-            get
-            {
-                return _Gold;
-            }
-            set
-            {
-                if (Tracker != null && Gold != value)
-                    Tracker.TrackSet(GoldProperty, _Gold, value);
-                _Gold = value;
-            }
+            public static readonly PropertyInfo Name = typeof(IUserData).GetProperty("Name");
+            public static readonly PropertyInfo Gold = typeof(IUserData).GetProperty("Gold");
+            public static readonly PropertyInfo Level = typeof(IUserData).GetProperty("Level");
+            public static readonly PropertyInfo LeftHand = typeof(IUserData).GetProperty("LeftHand");
+            public static readonly PropertyInfo RightHand = typeof(IUserData).GetProperty("RightHand");
         }
 
-        private Basic.Data.IUserHandData _LeftHand;
+        private string _Name;
 
-        public Basic.Data.IUserHandData LeftHand
-        {
-            get
-            {
-                return _LeftHand;
-            }
-            set
-            {
-                if (Tracker != null && LeftHand != value)
-                    Tracker.TrackSet(LeftHandProperty, _LeftHand, value);
-                _LeftHand = value;
-            }
-        }
-
-        private System.Int32 _Level;
-
-        public System.Int32 Level
-        {
-            get
-            {
-                return _Level;
-            }
-            set
-            {
-                if (Tracker != null && Level != value)
-                    Tracker.TrackSet(LevelProperty, _Level, value);
-                _Level = value;
-            }
-        }
-
-        private System.String _Name;
-
-        public System.String Name
+        public string Name
         {
             get
             {
@@ -138,14 +84,62 @@ namespace Basic.Data
             set
             {
                 if (Tracker != null && Name != value)
-                    Tracker.TrackSet(NameProperty, _Name, value);
+                    Tracker.TrackSet(PropertyTable.Name, _Name, value);
                 _Name = value;
             }
         }
 
-        private Basic.Data.IUserHandData _RightHand;
+        private int _Gold;
 
-        public Basic.Data.IUserHandData RightHand
+        public int Gold
+        {
+            get
+            {
+                return _Gold;
+            }
+            set
+            {
+                if (Tracker != null && Gold != value)
+                    Tracker.TrackSet(PropertyTable.Gold, _Gold, value);
+                _Gold = value;
+            }
+        }
+
+        private int _Level;
+
+        public int Level
+        {
+            get
+            {
+                return _Level;
+            }
+            set
+            {
+                if (Tracker != null && Level != value)
+                    Tracker.TrackSet(PropertyTable.Level, _Level, value);
+                _Level = value;
+            }
+        }
+
+        private IUserHandData _LeftHand;
+
+        public IUserHandData LeftHand
+        {
+            get
+            {
+                return _LeftHand;
+            }
+            set
+            {
+                if (Tracker != null && LeftHand != value)
+                    Tracker.TrackSet(PropertyTable.LeftHand, _LeftHand, value);
+                _LeftHand = value;
+            }
+        }
+
+        private IUserHandData _RightHand;
+
+        public IUserHandData RightHand
         {
             get
             {
@@ -154,7 +148,7 @@ namespace Basic.Data
             set
             {
                 if (Tracker != null && RightHand != value)
-                    Tracker.TrackSet(RightHandProperty, _RightHand, value);
+                    Tracker.TrackSet(PropertyTable.RightHand, _RightHand, value);
                 _RightHand = value;
             }
         }
@@ -163,7 +157,7 @@ namespace Basic.Data
 
 #endregion
 
-#region Basic.Data.IUserHandData
+#region IUserHandData
 
 namespace Basic.Data
 {
@@ -214,28 +208,15 @@ namespace Basic.Data
             yield break;
         }
 
-        public static readonly PropertyInfo DirtyProperty = typeof(IUserHandData).GetProperty("Dirty");
-        public static readonly PropertyInfo FingerCountProperty = typeof(IUserHandData).GetProperty("FingerCount");
-
-        private System.Boolean _Dirty;
-
-        public System.Boolean Dirty
+        public static class PropertyTable
         {
-            get
-            {
-                return _Dirty;
-            }
-            set
-            {
-                if (Tracker != null && Dirty != value)
-                    Tracker.TrackSet(DirtyProperty, _Dirty, value);
-                _Dirty = value;
-            }
+            public static readonly PropertyInfo FingerCount = typeof(IUserHandData).GetProperty("FingerCount");
+            public static readonly PropertyInfo Dirty = typeof(IUserHandData).GetProperty("Dirty");
         }
 
-        private System.Int32 _FingerCount;
+        private int _FingerCount;
 
-        public System.Int32 FingerCount
+        public int FingerCount
         {
             get
             {
@@ -244,8 +225,24 @@ namespace Basic.Data
             set
             {
                 if (Tracker != null && FingerCount != value)
-                    Tracker.TrackSet(FingerCountProperty, _FingerCount, value);
+                    Tracker.TrackSet(PropertyTable.FingerCount, _FingerCount, value);
                 _FingerCount = value;
+            }
+        }
+
+        private bool _Dirty;
+
+        public bool Dirty
+        {
+            get
+            {
+                return _Dirty;
+            }
+            set
+            {
+                if (Tracker != null && Dirty != value)
+                    Tracker.TrackSet(PropertyTable.Dirty, _Dirty, value);
+                _Dirty = value;
             }
         }
     }
