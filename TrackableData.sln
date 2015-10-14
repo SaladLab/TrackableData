@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData-Protobuf", "c
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData-Protobuf.Tests", "core\TrackableData-Protobuf.Tests\TrackableData-Protobuf.Tests.csproj", "{6FC26014-DDB1-47B8-9F21-874F18926ABC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData-Sql.Tests", "core\TrackableData-Sql.Tests\TrackableData-Sql.Tests.csproj", "{CE8A572A-1465-4EEE-B828-176F9F44F43A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,6 +84,10 @@ Global
 		{6FC26014-DDB1-47B8-9F21-874F18926ABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FC26014-DDB1-47B8-9F21-874F18926ABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6FC26014-DDB1-47B8-9F21-874F18926ABC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE8A572A-1465-4EEE-B828-176F9F44F43A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE8A572A-1465-4EEE-B828-176F9F44F43A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE8A572A-1465-4EEE-B828-176F9F44F43A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE8A572A-1465-4EEE-B828-176F9F44F43A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,5 +103,6 @@ Global
 		{34645A27-2FCF-42E0-B93D-0E5A6685FE3D} = {4E8FE3E2-E85F-4503-8C2C-B2461553AE7B}
 		{182F783A-ED38-4245-89D1-20086C98A372} = {4E8FE3E2-E85F-4503-8C2C-B2461553AE7B}
 		{6FC26014-DDB1-47B8-9F21-874F18926ABC} = {4E8FE3E2-E85F-4503-8C2C-B2461553AE7B}
+		{CE8A572A-1465-4EEE-B828-176F9F44F43A} = {4E8FE3E2-E85F-4503-8C2C-B2461553AE7B}
 	EndGlobalSection
 EndGlobal
