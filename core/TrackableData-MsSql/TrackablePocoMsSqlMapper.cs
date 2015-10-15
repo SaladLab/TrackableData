@@ -16,6 +16,7 @@ namespace TrackableData
         {
             public string Name;
             public Type Type;
+            public int Length;
             public bool IsIdentity;
             public PropertyInfo PropertyInfo;
             public Func<object, string> ConvertToSqlValue;
@@ -24,20 +25,15 @@ namespace TrackableData
         private readonly Type _trackableType;
         private readonly string _tableName;
         private readonly Column[] _allColumns;
+        private readonly Column[] _headKeyColumns;
         private readonly Column[] _primaryKeyColumns;
         private readonly Column[] _valueColumns;
         private readonly Dictionary<PropertyInfo, Column> _valueColumnMap;
-        private readonly int _headKeyCount;
         private readonly Column _identityColumn;
         private readonly string _allColumnStringExceptIdentity;
         private readonly string _allColumnStringExceptHead;
 
-        public TrackablePocoMsSqlMapper(string tableName)
-            : this(tableName, null, null)
-        {
-        }
-
-        public TrackablePocoMsSqlMapper(string tableName, string headKeyColumnName, Type headKeyType)
+        public TrackablePocoMsSqlMapper(string tableName, ColumnDefinition[] headKeyColumnDefs = null)
         {
             var trackableTypeName = typeof (T).Namespace + "." + ("Trackable" + typeof (T).Name.Substring(1));
             _trackableType = typeof (T).Assembly.GetType(trackableTypeName);
@@ -45,22 +41,27 @@ namespace TrackableData
             _tableName = tableName;
 
             var allColumns = new List<Column>();
+            var headKeyColumns = new List<Column>();
             var primaryKeyColumns = new List<Column>();
             var valueColumns = new List<Column>();
 
-            // add head key to primary keys
+            // add head key columns
 
-            if (string.IsNullOrEmpty(headKeyColumnName) == false)
+            if (headKeyColumnDefs != null)
             {
-                var column = new Column
+                foreach (var headKeyColumnDef in headKeyColumnDefs)
                 {
-                    Name = SqlMapperHelper.GetEscapedName(headKeyColumnName),
-                    Type = headKeyType,
-                    ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(headKeyType)
-                };
-                primaryKeyColumns.Add(column);
-                allColumns.Add(column);
-                _headKeyCount = 1;
+                    var column = new Column
+                    {
+                        Name = SqlMapperHelper.GetEscapedName(headKeyColumnDef.Name),
+                        Type = headKeyColumnDef.Type,
+                        Length = headKeyColumnDef.Length,
+                        ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(headKeyColumnDef.Type)
+                    };
+                    headKeyColumns.Add(column);
+                    primaryKeyColumns.Add(column);
+                    allColumns.Add(column);
+                }
             }
 
             // while scan properties of T, construct primaryKey, value column information.
@@ -102,6 +103,7 @@ namespace TrackableData
             }
 
             _allColumns = allColumns.ToArray();
+            _headKeyColumns = headKeyColumns.ToArray();
             _primaryKeyColumns = primaryKeyColumns.ToArray();
             _valueColumns = valueColumns.ToArray();
             _valueColumnMap = _valueColumns.ToDictionary(x => x.PropertyInfo, y => y);
@@ -130,7 +132,7 @@ namespace TrackableData
                 {
                     var identity = c.IsIdentity ? "IDENTITY(1,1)" : "";
                     var notnull = c.Type.IsValueType ? "NOT NULL" : "";
-                    return $"{c.Name} {SqlMapperHelper.GetSqlType(c.Type)} {identity} {notnull}";
+                    return $"{c.Name} {SqlMapperHelper.GetSqlType(c.Type, c.Length)} {identity} {notnull}";
                 }));
 
             var primaryKeyDef = string.Join(
@@ -155,7 +157,7 @@ namespace TrackableData
 
         public string GenerateInsertSql(T poco, params object[] keyValues)
         {
-            if (keyValues.Length != _headKeyCount)
+            if (keyValues.Length != _headKeyColumns.Length)
                 throw new ArgumentException("Head key value required");
 
             var outputClause = _identityColumn != null ? "OUTPUT Inserted." + _identityColumn.Name : "";

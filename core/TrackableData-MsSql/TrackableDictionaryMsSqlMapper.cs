@@ -25,7 +25,7 @@ namespace TrackableData
         private readonly Action<StringBuilder, Dictionary<PropertyInfo, Column>, ITracker> _valueTrackerSetClausesBuilder;
         private readonly string _tableName;
         private readonly Column[] _allColumns;
-        private readonly Column[] _headColumns;
+        private readonly Column[] _headKeyColumns;
         private readonly Column[] _primaryKeyColumns;
         private readonly Column _keyColumn;
         private readonly Column[] _valueColumns;
@@ -47,6 +47,8 @@ namespace TrackableData
                                               ColumnDefinition singleValueColumnDef,
                                               ColumnDefinition[] headKeyColumnDefs)
         {
+            // Resolve TrackablePoco<T> from TValue
+
             if (typeof (ITrackable).IsAssignableFrom(typeof (TValue)))
             {
                 var trackableT = typeof (TValue).GetInterfaces().FirstOrDefault(
@@ -55,6 +57,8 @@ namespace TrackableData
                 {
                     _trackableInterfaceType = trackableT.GetGenericArguments()[0];
 
+                    // Build SQL Update set clauses builder for tracker of TrackablePoco<T>
+                     
                     var method = typeof (TrackableDictionaryMsSqlMapper<TKey, TValue>).GetMethod(
                         "GenerateUpdateSetClausesFromTrackablePocoTracker",
                         BindingFlags.Static | BindingFlags.NonPublic);
@@ -68,24 +72,24 @@ namespace TrackableData
             _tableName = tableName;
 
             var allColumns = new List<Column>();
-            var headColumns = new List<Column>();
+            var headKeyColumns = new List<Column>();
             var primaryKeyColumns = new List<Column>();
             var valueColumns = new List<Column>();
 
-            // add head column
+            // add head key columns
 
             if (headKeyColumnDefs != null)
             {
-                foreach (var headColumnInfo in headKeyColumnDefs)
+                foreach (var headKeyColumnDef in headKeyColumnDefs)
                 {
                     var column = new Column
                     {
-                        Name = SqlMapperHelper.GetEscapedName(headColumnInfo.Name),
-                        Type = headColumnInfo.Type,
-                        Length = headColumnInfo.Length,
-                        ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(headColumnInfo.Type)
+                        Name = SqlMapperHelper.GetEscapedName(headKeyColumnDef.Name),
+                        Type = headKeyColumnDef.Type,
+                        Length = headKeyColumnDef.Length,
+                        ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(headKeyColumnDef.Type)
                     };
-                    headColumns.Add(column);
+                    headKeyColumns.Add(column);
                     primaryKeyColumns.Add(column);
                     allColumns.Add(column);
                 }
@@ -148,10 +152,10 @@ namespace TrackableData
             }
 
             _allColumns = allColumns.ToArray();
-            _headColumns = headColumns.ToArray();
+            _headKeyColumns = headKeyColumns.ToArray();
             _primaryKeyColumns = primaryKeyColumns.ToArray();
             _valueColumns = valueColumns.ToArray();
-            _valueColumnMap = _valueColumns.ToDictionary(x => x.PropertyInfo, y => y);
+            _valueColumnMap = _valueColumns.Where(x => x.PropertyInfo != null).ToDictionary(x => x.PropertyInfo, y => y);
             _allColumnString = string.Join(",", _allColumns.Select(c => c.Name));
             _allColumnStringExceptHead = _keyColumn.Name + "," +
                                          string.Join(",", _valueColumns.Select(c => c.Name));
@@ -182,7 +186,7 @@ namespace TrackableData
 
             var primaryKeyDef = string.Join(
                 ",",
-                _headColumns.Concat(new[] {_keyColumn}).Select(c =>
+                _headKeyColumns.Concat(new[] {_keyColumn}).Select(c =>
                     $"{c.Name} ASC"));
 
             var sb = new StringBuilder();
@@ -212,7 +216,7 @@ namespace TrackableData
                                         TrackableDictionaryTracker<TKey, TValue> tracker,
                                         params object[] keyValues)
         {
-            if (keyValues.Length != _headColumns.Length)
+            if (keyValues.Length != _headKeyColumns.Length)
                 throw new ArgumentException("Number of keyValues should be same with the number of head columns");
 
             if (tracker.ChangeMap.Any() == false)
@@ -242,9 +246,9 @@ namespace TrackableData
                         }
 
                         sqlAdd.Append(" (");
-                        for (var k = 0; k < _headColumns.Length; k++)
+                        for (var k = 0; k < _headKeyColumns.Length; k++)
                         {
-                            sqlAdd.Append(_headColumns[k].ConvertToSqlValue(keyValues[k]));
+                            sqlAdd.Append(_headKeyColumns[k].ConvertToSqlValue(keyValues[k]));
                             sqlAdd.Append(",");
                         }
                         sqlAdd.Append(_keyColumn.ConvertToSqlValue(i.Key));
@@ -276,10 +280,10 @@ namespace TrackableData
                         }
 
                         sqlModify.Append(" WHERE ");
-                        for (var k = 0; k < _headColumns.Length; k++)
+                        for (var k = 0; k < _headKeyColumns.Length; k++)
                         {
-                            sqlModify.Append(_headColumns[k].Name).Append("=");
-                            sqlModify.Append(_headColumns[k].ConvertToSqlValue(keyValues[k]));
+                            sqlModify.Append(_headKeyColumns[k].Name).Append("=");
+                            sqlModify.Append(_headKeyColumns[k].ConvertToSqlValue(keyValues[k]));
                             sqlModify.Append(" AND ");
                         }
 
@@ -310,10 +314,10 @@ namespace TrackableData
                         _valueTrackerSetClausesBuilder(sqlModify, _valueColumnMap, trackableValue.Tracker);
 
                         sqlModify.Append(" WHERE ");
-                        for (var k = 0; k < _headColumns.Length; k++)
+                        for (var k = 0; k < _headKeyColumns.Length; k++)
                         {
-                            sqlModify.Append(_headColumns[k].Name).Append("=");
-                            sqlModify.Append(_headColumns[k].ConvertToSqlValue(keyValues[k]));
+                            sqlModify.Append(_headKeyColumns[k].Name).Append("=");
+                            sqlModify.Append(_headKeyColumns[k].ConvertToSqlValue(keyValues[k]));
                             sqlModify.Append(" AND ");
                         }
 
@@ -331,10 +335,10 @@ namespace TrackableData
             if (removeIds.Any())
             {
                 sql.Append("DELETE ").Append(_tableName).Append(" WHERE ");
-                for (var k = 0; k < _headColumns.Length; k++)
+                for (var k = 0; k < _headKeyColumns.Length; k++)
                 {
-                    sqlModify.Append(_headColumns[k].Name).Append("=");
-                    sqlModify.Append(_headColumns[k].ConvertToSqlValue(keyValues[k]));
+                    sqlModify.Append(_headKeyColumns[k].Name).Append("=");
+                    sqlModify.Append(_headKeyColumns[k].ConvertToSqlValue(keyValues[k]));
                     sqlModify.Append(" AND ");
                 }
                 sql.Append(_keyColumn.Name).Append(" IN (");

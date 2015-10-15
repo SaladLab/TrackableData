@@ -31,10 +31,10 @@ namespace TrackableData.Sql.Tests
         }
 
         private async Task<Context<TKey, TValue>> PrepareAsync<TKey, TValue>(
-            ColumnDefinition singleValueColumnDef = null, ColumnDefinition[] headColumns = null)
+            ColumnDefinition singleValueColumnDef = null, ColumnDefinition[] headKeyColumnDefs = null)
         {
             var sqlMapper = new TrackableDictionaryMsSqlMapper<TKey, TValue>(
-                typeof (TValue).Name, new ColumnDefinition("Id"), singleValueColumnDef, headColumns);
+                typeof (TValue).Name, new ColumnDefinition("Id"), singleValueColumnDef, headKeyColumnDefs);
             var connection = _db.Connection;
             await sqlMapper.ResetTableAsync(connection);
             return new Context<TKey, TValue> {SqlMapper = sqlMapper, Connection = connection};
