@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using ProtoBuf.Meta;
 using Xunit;
 
@@ -12,7 +10,9 @@ namespace TrackableData.Protobuf.Tests
         {
             return new TrackableList<string>()
             {
-                "One", "Two", "Three"
+                "One",
+                "Two",
+                "Three"
             };
         }
 
@@ -26,8 +26,8 @@ namespace TrackableData.Protobuf.Tests
         private TypeModel CreateTypeModel()
         {
             var model = TypeModel.Create();
-            model.Add(typeof (TrackableListTracker<string>), false)
-                 .SetSurrogate(typeof (TrackableListTrackerSurrogate<string>));
+            model.Add(typeof(TrackableListTracker<string>), false)
+                 .SetSurrogate(typeof(TrackableListTrackerSurrogate<string>));
             return model;
         }
 

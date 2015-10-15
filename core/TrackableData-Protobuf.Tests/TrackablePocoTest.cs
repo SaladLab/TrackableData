@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using ProtoBuf;
-using ProtoBuf.Meta;
-using TrackableData.Protobuf.Tests;
+﻿using ProtoBuf.Meta;
 using Xunit;
 
 namespace TrackableData.Protobuf.Tests

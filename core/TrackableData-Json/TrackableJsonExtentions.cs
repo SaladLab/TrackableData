@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -27,7 +26,8 @@ namespace TrackableData
             ITrackable trackable,
             JsonSerializerSettings jsonSerializerSettings)
         {
-            var pathToChangeMap = JsonConvert.DeserializeObject<Dictionary<string, JObject>>(json, jsonSerializerSettings);
+            var pathToChangeMap = JsonConvert.DeserializeObject<Dictionary<string, JObject>>(
+                json, jsonSerializerSettings);
             pathToChangeMap.ApplyTo(trackable, jsonSerializerSettings);
         }
 

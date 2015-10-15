@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using ProtoBuf.Meta;
 using Xunit;
@@ -28,8 +27,8 @@ namespace TrackableData.Protobuf.Tests
         private TypeModel CreateTypeModel()
         {
             var model = TypeModel.Create();
-            model.Add(typeof (TrackableDictionaryTracker<int, string>), false)
-                 .SetSurrogate(typeof (TrackableDictionaryTrackerSurrogate<int, string>));
+            model.Add(typeof(TrackableDictionaryTracker<int, string>), false)
+                 .SetSurrogate(typeof(TrackableDictionaryTrackerSurrogate<int, string>));
             return model;
         }
 
@@ -42,7 +41,8 @@ namespace TrackableData.Protobuf.Tests
             var dict2 = (TrackableDictionary<int, string>)typeModel.DeepClone(dict);
 
             Assert.Equal(
-                new[] {
+                new[]
+                {
                     new KeyValuePair<int, string>(1, "One"),
                     new KeyValuePair<int, string>(2, "Two"),
                     new KeyValuePair<int, string>(3, "Three")
@@ -65,7 +65,8 @@ namespace TrackableData.Protobuf.Tests
             tracker2.ApplyTo(dict2);
 
             Assert.Equal(
-                new[] {
+                new[]
+                {
                     new KeyValuePair<int, string>(1, "OneModified"),
                     new KeyValuePair<int, string>(3, "Three"),
                     new KeyValuePair<int, string>(4, "FourAdded")

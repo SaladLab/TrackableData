@@ -32,7 +32,7 @@ namespace TrackableData
             foreach (var child in trackable.GetChildTrackables())
             {
                 var subPath = parentPath != null ? (parentPath + "/" + child.Key) : child.Key.ToString();
-                foreach (var subResult in child.Value.GetChangedTrackablesWithPath(subPath)) 
+                foreach (var subResult in child.Value.GetChangedTrackablesWithPath(subPath))
                     yield return subResult;
             }
         }

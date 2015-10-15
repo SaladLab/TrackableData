@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TrackableData.Json.Tests
+﻿namespace TrackableData.Json.Tests
 {
     public interface IDataContainer : ITrackableContainer
     {

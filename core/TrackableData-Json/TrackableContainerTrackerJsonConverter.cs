@@ -44,7 +44,7 @@ namespace TrackableData
 
             foreach (var fieldType in value.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
             {
-                if (typeof (ITracker).IsAssignableFrom(fieldType.FieldType) == false)
+                if (typeof(ITracker).IsAssignableFrom(fieldType.FieldType) == false)
                     continue;
 
                 var subTracker = (ITracker)fieldType.GetValue(value);

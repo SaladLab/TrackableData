@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace TrackableData
 {
-    public class TrackableDictionaryMsSqlMapper<TKey, TValue> 
+    public class TrackableDictionaryMsSqlMapper<TKey, TValue>
     {
         private class Column
         {
@@ -21,8 +21,11 @@ namespace TrackableData
             public Func<object, string> ExtractToSqlValue;
         }
 
+        private delegate void UpdateSetBuilder(
+            StringBuilder sb, Dictionary<PropertyInfo, Column> valueColumnMap, ITracker tracker);
+
         private readonly Type _trackableInterfaceType;
-        private readonly Action<StringBuilder, Dictionary<PropertyInfo, Column>, ITracker> _valueTrackerSetClausesBuilder;
+        private readonly UpdateSetBuilder _valueTrackerSetClausesBuilder;
         private readonly string _tableName;
         private readonly Column[] _allColumns;
         private readonly Column[] _headKeyColumns;
@@ -36,8 +39,8 @@ namespace TrackableData
         private bool IsSingleValueType => _valueColumns.Length == 1 && _valueColumns[0].PropertyInfo == null;
 
         public TrackableDictionaryMsSqlMapper(string tableName,
-            ColumnDefinition keyColumnDef,
-            ColumnDefinition[] headKeyColumnDefs = null)
+                                              ColumnDefinition keyColumnDef,
+                                              ColumnDefinition[] headKeyColumnDefs = null)
             : this(tableName, keyColumnDef, null, headKeyColumnDefs)
         {
         }
@@ -49,23 +52,23 @@ namespace TrackableData
         {
             // Resolve TrackablePoco<T> from TValue
 
-            if (typeof (ITrackable).IsAssignableFrom(typeof (TValue)))
+            if (typeof(ITrackable).IsAssignableFrom(typeof(TValue)))
             {
-                var trackableT = typeof (TValue).GetInterfaces().FirstOrDefault(
-                    t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (ITrackable<>));
+                var trackableT = typeof(TValue).GetInterfaces().FirstOrDefault(
+                    t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ITrackable<>));
                 if (trackableT != null)
                 {
                     _trackableInterfaceType = trackableT.GetGenericArguments()[0];
 
                     // Build SQL Update set clauses builder for tracker of TrackablePoco<T>
-                     
-                    var method = typeof (TrackableDictionaryMsSqlMapper<TKey, TValue>).GetMethod(
+
+                    var method = typeof(TrackableDictionaryMsSqlMapper<TKey, TValue>).GetMethod(
                         "GenerateUpdateSetClausesFromTrackablePocoTracker",
                         BindingFlags.Static | BindingFlags.NonPublic);
 
-                    _valueTrackerSetClausesBuilder = (Action<StringBuilder, Dictionary<PropertyInfo, Column>, ITracker>)
-                        method.MakeGenericMethod(_trackableInterfaceType)
-                            .CreateDelegate(typeof (Action<StringBuilder, Dictionary<PropertyInfo, Column>, ITracker>));
+                    _valueTrackerSetClausesBuilder = (UpdateSetBuilder)
+                                                     method.MakeGenericMethod(_trackableInterfaceType)
+                                                           .CreateDelegate(typeof(UpdateSetBuilder));
                 }
             }
 
@@ -114,17 +117,17 @@ namespace TrackableData
                 var column = new Column
                 {
                     Name = SqlMapperHelper.GetEscapedName(singleValueColumnDef.Name),
-                    Type = typeof (TValue),
+                    Type = typeof(TValue),
                     Length = singleValueColumnDef.Length,
-                    ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(typeof (TValue)),
-                    ExtractToSqlValue = SqlMapperHelper.GetSqlValueFunc(typeof (TValue))
+                    ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(typeof(TValue)),
+                    ExtractToSqlValue = SqlMapperHelper.GetSqlValueFunc(typeof(TValue))
                 };
                 valueColumns.Add(column);
                 allColumns.Add(column);
             }
             else
             {
-                var valueType = _trackableInterfaceType ?? typeof (TValue);
+                var valueType = _trackableInterfaceType ?? typeof(TValue);
                 foreach (var property in valueType.GetProperties())
                 {
                     var columnName = property.Name;
@@ -186,8 +189,8 @@ namespace TrackableData
 
             var primaryKeyDef = string.Join(
                 ",",
-                _headKeyColumns.Concat(new[] {_keyColumn}).Select(c =>
-                    $"{c.Name} ASC"));
+                _headKeyColumns.Concat(new[] { _keyColumn }).Select(c =>
+                                                                    $"{c.Name} ASC"));
 
             var sb = new StringBuilder();
             if (includeDropIfExists)
@@ -198,7 +201,8 @@ namespace TrackableData
             sb.AppendLine($"CREATE TABLE [dbo].[{_tableName}] (");
             sb.AppendLine(columnDef);
             sb.AppendLine($"  CONSTRAINT[PK_{_tableName}] PRIMARY KEY CLUSTERED({primaryKeyDef}) WITH (");
-            sb.AppendLine("  PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON");
+            sb.AppendLine("  PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF,");
+            sb.AppendLine("  IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON");
             sb.AppendLine("  ) ON[PRIMARY]");
             sb.AppendLine(") ON[PRIMARY]");
             return sb.ToString();
@@ -357,7 +361,7 @@ namespace TrackableData
             return sql.ToString();
         }
 
-        static private void GenerateUpdateSetClausesFromTrackablePocoTracker<T>(
+        private static void GenerateUpdateSetClausesFromTrackablePocoTracker<T>(
             StringBuilder sb, Dictionary<PropertyInfo, Column> valueColumnMap, ITracker tracker)
         {
             var pocoTracker = (TrackablePocoTracker<T>)tracker;
@@ -431,16 +435,19 @@ namespace TrackableData
             return new KeyValuePair<TKey, TValue>(key, value);
         }
 
-        public async Task<int> SaveAsync(SqlConnection connection, TrackableDictionary<TKey, TValue> trackable, params object[] keyValues)
+        public async Task<int> SaveAsync(SqlConnection connection, TrackableDictionary<TKey, TValue> trackable,
+                                         params object[] keyValues)
         {
-            var sql = GenerateUpdateSql(trackable, (TrackableDictionaryTracker<TKey, TValue>)trackable.Tracker, keyValues);
+            var sql = GenerateUpdateSql(trackable, (TrackableDictionaryTracker<TKey, TValue>)trackable.Tracker,
+                                        keyValues);
             using (var command = new SqlCommand(sql, connection))
             {
                 return await command.ExecuteNonQueryAsync();
             }
         }
 
-        public async Task<int> SaveAsync(SqlConnection connection, TrackableDictionaryTracker<TKey, TValue> tracker, params object[] keyValues)
+        public async Task<int> SaveAsync(SqlConnection connection, TrackableDictionaryTracker<TKey, TValue> tracker,
+                                         params object[] keyValues)
         {
             if (tracker.HasChange == false)
                 return 0;

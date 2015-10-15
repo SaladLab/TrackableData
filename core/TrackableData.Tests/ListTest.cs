@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using TrackableData.Tests;
-using Xunit;
+﻿using Xunit;
 
 namespace TrackableData.Tests
 {
@@ -11,7 +8,9 @@ namespace TrackableData.Tests
         {
             return new TrackableList<string>()
             {
-                "One", "Two", "Three"
+                "One",
+                "Two",
+                "Three"
             };
         }
 

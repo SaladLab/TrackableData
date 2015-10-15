@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using CommandLine;
+﻿using System.Linq;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeGen
 {
-    static class CodeAnalaysisExtensions
+    internal static class CodeAnalaysisExtensions
     {
         public static string GetTypeName(this InterfaceDeclarationSyntax node)
         {
@@ -27,7 +21,8 @@ namespace CodeGen
 
         public static string GetNamespaceScope(this SyntaxNode node)
         {
-            if (node == null) return "";
+            if (node == null)
+                return "";
             var namespaceDecl = node as NamespaceDeclarationSyntax;
             var current = (namespaceDecl != null) ? namespaceDecl.Name.ToString() : "";
             var parent = GetNamespaceScope(node.Parent);

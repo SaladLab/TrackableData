@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -15,7 +14,7 @@ namespace TrackableData.Sql.Tests
             _db = db;
         }
 
-        private struct Context<T> : IDisposable 
+        private struct Context<T> : IDisposable
             where T : ITrackablePoco
         {
             public TrackablePocoMsSqlMapper<T> SqlMapper;
@@ -128,8 +127,8 @@ namespace TrackableData.Sql.Tests
 
         private static readonly ColumnDefinition[] HeadKeyColumnDefs =
         {
-            new ColumnDefinition("Head1", typeof (int)),
-            new ColumnDefinition("Head2", typeof (string), 100)
+            new ColumnDefinition("Head1", typeof(int)),
+            new ColumnDefinition("Head2", typeof(string), 100)
         };
 
         [Fact]

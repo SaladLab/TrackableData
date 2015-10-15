@@ -3,22 +3,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeGen
 {
-    static class AssemblyLoader
+    internal static class AssemblyLoader
     {
         private static ResolveEventHandler _lastResolveHandler;
 
         public static Assembly BuildAndLoad(string[] sourcePaths, string[] referencePaths, string[] defines)
         {
             var assemblyName = Path.GetRandomFileName();
-            var syntaxTrees = sourcePaths.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file)).ToArray();
+            var syntaxTrees =
+                sourcePaths.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file)).ToArray();
             var references = referencePaths.Select(file => MetadataReference.CreateFromFile(file)).ToArray();
 
             // TODO: how to handle defines option?
@@ -36,17 +34,18 @@ namespace CodeGen
                 if (!result.Success)
                 {
                     IEnumerable<Diagnostic> failures = result.Diagnostics.Where(diagnostic =>
-                        diagnostic.IsWarningAsError ||
-                        diagnostic.Severity == DiagnosticSeverity.Error);
+                                                                                diagnostic.IsWarningAsError ||
+                                                                                diagnostic.Severity ==
+                                                                                DiagnosticSeverity.Error);
 
                     foreach (Diagnostic diagnostic in failures)
                     {
                         var line = diagnostic.Location.GetLineSpan();
-                        Console.Error.WriteLine("{0}({1}): {2} {3}", 
-                            line.Path, 
-                            line.StartLinePosition.Line + 1,
-                            diagnostic.Id,
-                            diagnostic.GetMessage());
+                        Console.Error.WriteLine("{0}({1}): {2} {3}",
+                                                line.Path,
+                                                line.StartLinePosition.Line + 1,
+                                                diagnostic.Id,
+                                                diagnostic.GetMessage());
                     }
                     return null;
                 }

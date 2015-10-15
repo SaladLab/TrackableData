@@ -16,18 +16,12 @@ namespace TrackableData
 
         public bool Changed
         {
-            get
-            {
-                return Tracker != null && Tracker.HasChange;
-            }
+            get { return Tracker != null && Tracker.HasChange; }
         }
 
         ITracker ITrackable.Tracker
         {
-            get
-            {
-                return Tracker;
-            }
+            get { return Tracker; }
 
             set
             {
@@ -38,10 +32,7 @@ namespace TrackableData
 
         ITracker<IList<T>> ITrackable<IList<T>>.Tracker
         {
-            get
-            {
-                return Tracker;
-            }
+            get { return Tracker; }
 
             set
             {
@@ -53,12 +44,12 @@ namespace TrackableData
         public ITrackable GetChildTrackable(object name)
         {
             int index = (name.GetType() == typeof(int))
-                ? (int)name
-                : (int)Convert.ChangeType(name, typeof(int));
+                            ? (int)name
+                            : (int)Convert.ChangeType(name, typeof(int));
 
             return index >= 0 && index < _list.Count
-                ? (ITrackable)_list[index]
-                : null;
+                       ? (ITrackable)_list[index]
+                       : null;
         }
 
         public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
@@ -79,10 +70,7 @@ namespace TrackableData
 
         public T this[int index]
         {
-            get
-            {
-                return _list[index];
-            }
+            get { return _list[index]; }
             set
             {
                 if (Tracker != null)
@@ -161,7 +149,7 @@ namespace TrackableData
 
         public int Count
         {
-            get { return _list.Count;  }
+            get { return _list.Count; }
         }
 
         public bool IsReadOnly

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -34,10 +33,10 @@ namespace TrackableData.Sql.Tests
             ColumnDefinition singleValueColumnDef = null, ColumnDefinition[] headKeyColumnDefs = null)
         {
             var sqlMapper = new TrackableDictionaryMsSqlMapper<TKey, TValue>(
-                typeof (TValue).Name, new ColumnDefinition("Id"), singleValueColumnDef, headKeyColumnDefs);
+                typeof(TValue).Name, new ColumnDefinition("Id"), singleValueColumnDef, headKeyColumnDefs);
             var connection = _db.Connection;
             await sqlMapper.ResetTableAsync(connection);
-            return new Context<TKey, TValue> {SqlMapper = sqlMapper, Connection = connection};
+            return new Context<TKey, TValue> { SqlMapper = sqlMapper, Connection = connection };
         }
 
         private TrackableDictionary<int, ItemData> CreateTestInventory(bool withTracker)
@@ -75,10 +74,10 @@ namespace TrackableData.Sql.Tests
 
                 case ModificationWayType.SetNew:
                     var item = dict[2];
-                    dict[2] = new ItemData {Kind = item.Kind, Count = item.Count - 1, Note = "Destroyed"};
+                    dict[2] = new ItemData { Kind = item.Kind, Count = item.Count - 1, Note = "Destroyed" };
                     break;
             }
-            dict.Add(3, new ItemData {Kind = 103, Count = 3, Note = "Just Arrived"});
+            dict.Add(3, new ItemData { Kind = 103, Count = 3, Note = "Just Arrived" });
         }
 
         // Regular Test
@@ -141,8 +140,8 @@ namespace TrackableData.Sql.Tests
 
         private static readonly ColumnDefinition[] HeadKeyColumnDefs =
         {
-            new ColumnDefinition("Head1", typeof (int)),
-            new ColumnDefinition("Head2", typeof (string), 100)
+            new ColumnDefinition("Head1", typeof(int)),
+            new ColumnDefinition("Head2", typeof(string), 100)
         };
 
         [Fact]
@@ -162,7 +161,9 @@ namespace TrackableData.Sql.Tests
             {
                 var dict = CreateTestInventory(true);
 
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, ItemData>)dict.Tracker, 1, "One");
+                await
+                    ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, ItemData>)dict.Tracker, 1,
+                                            "One");
 
                 var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection, 1, "One");
                 Assert.Equal(dict.Count, dict2.Count);
@@ -183,12 +184,14 @@ namespace TrackableData.Sql.Tests
                 var dict = CreateTestInventory(true);
 
                 await
-                    ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, ItemData>)dict.Tracker, 1, "One");
+                    ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, ItemData>)dict.Tracker, 1,
+                                            "One");
                 dict.Tracker.Clear();
 
                 ModifyTestInventory(dict, ModificationWayType.SetNew);
                 await
-                    ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, ItemData>)dict.Tracker, 1, "One");
+                    ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, ItemData>)dict.Tracker, 1,
+                                            "One");
 
                 var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection, 1, "One");
                 Assert.Equal(dict.Count, dict2.Count);
@@ -225,7 +228,8 @@ namespace TrackableData.Sql.Tests
                 dict.Add(2, new TrackableItem { Kind = 102, Count = 3, Note = "Lord of Ring" });
                 dict[2].SetDefaultTracker();
 
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, TrackableItem>)dict.Tracker);
+                await
+                    ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, TrackableItem>)dict.Tracker);
 
                 var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
                 Assert.Equal(dict.Count, dict2.Count);
@@ -272,10 +276,9 @@ namespace TrackableData.Sql.Tests
             }
         }
 
-
         // With Value
 
-        private static readonly ColumnDefinition SingleValueColumnDef = new ColumnDefinition("Value", typeof (string));
+        private static readonly ColumnDefinition SingleValueColumnDef = new ColumnDefinition("Value", typeof(string));
 
         [Fact]
         public async Task Test_SqlMapperWithValue_ResetTable()

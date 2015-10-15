@@ -90,7 +90,7 @@ namespace TrackableData
                 setter.Invoke(trackable, new[] { item.Value.OldValue });
             }
         }
-     
+
         public void RollbackTo(ITracker tracker)
         {
             RollbackTo((TrackablePocoTracker<T>)tracker);

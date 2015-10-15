@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -63,7 +62,8 @@ namespace TrackableData.Tests
             dict.Tracker.ApplyTo(dict2);
 
             Assert.Equal(
-                new KeyValuePair<int, string>[] {
+                new KeyValuePair<int, string>[]
+                {
                     new KeyValuePair<int, string>(1, "OneModified"),
                     new KeyValuePair<int, string>(3, "Three"),
                     new KeyValuePair<int, string>(4, "FourAdded")
@@ -86,7 +86,8 @@ namespace TrackableData.Tests
             tracker2.ApplyTo(dict2);
 
             Assert.Equal(
-                new KeyValuePair<int, string>[] {
+                new KeyValuePair<int, string>[]
+                {
                     new KeyValuePair<int, string>(1, "OneModified"),
                     new KeyValuePair<int, string>(3, "Three"),
                     new KeyValuePair<int, string>(4, "FourAdded")
@@ -107,7 +108,8 @@ namespace TrackableData.Tests
             dict.Tracker.RollbackTo(dict2);
 
             Assert.Equal(
-                new KeyValuePair<int, string>[] {
+                new KeyValuePair<int, string>[]
+                {
                     new KeyValuePair<int, string>(1, "One"),
                     new KeyValuePair<int, string>(2, "Two"),
                     new KeyValuePair<int, string>(3, "Three")
@@ -131,7 +133,8 @@ namespace TrackableData.Tests
             tracker2.ApplyTo(dict2);
 
             Assert.Equal(
-                new KeyValuePair<int, string>[] {
+                new KeyValuePair<int, string>[]
+                {
                     new KeyValuePair<int, string>(1, "One"),
                     new KeyValuePair<int, string>(2, "Two"),
                     new KeyValuePair<int, string>(3, "Three")

@@ -14,22 +14,24 @@ namespace TrackableData
         {
             if (typeof(ITrackablePoco).IsAssignableFrom(trackableType))
             {
-                var trackerType = trackableType.GetInterfaces()
-                    .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ITrackable<>)).FirstOrDefault();
+                var trackerType =
+                    trackableType.GetInterfaces()
+                                 .FirstOrDefault(t => t.IsGenericType &&
+                                                      t.GetGenericTypeDefinition() == typeof(ITrackable<>));
                 if (trackerType != null)
                     return typeof(TrackablePocoTracker<>).MakeGenericType(trackerType.GetGenericArguments()[0]);
             }
             if (trackableType.IsGenericType)
             {
                 var genericType = trackableType.GetGenericTypeDefinition();
-                if (genericType == typeof (TrackableDictionary<,>))
+                if (genericType == typeof(TrackableDictionary<,>))
                 {
-                    return typeof (TrackableDictionaryTracker<,>).MakeGenericType(
+                    return typeof(TrackableDictionaryTracker<,>).MakeGenericType(
                         trackableType.GenericTypeArguments);
                 }
-                if (genericType == typeof (TrackableList<>))
+                if (genericType == typeof(TrackableList<>))
                 {
-                    return typeof (TrackableListTracker<>).MakeGenericType(
+                    return typeof(TrackableListTracker<>).MakeGenericType(
                         trackableType.GenericTypeArguments);
                 }
             }
@@ -45,8 +47,8 @@ namespace TrackableData
         {
             var trackerType = GetDefaultTracker(trackableType);
             return (trackerType != null)
-                ? (ITracker)Activator.CreateInstance(trackerType)
-                : null;
+                       ? (ITracker)Activator.CreateInstance(trackerType)
+                       : null;
         }
     }
 }

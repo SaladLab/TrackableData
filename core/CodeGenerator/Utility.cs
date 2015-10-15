@@ -29,12 +29,12 @@ namespace CodeGen
                 }
             }
             else if (CodeAnalaysisExtensions.CompareTypeName(genericType.Identifier.ToString(),
-                "TrackableData.TrackableDictionary"))
+                                                             "TrackableData.TrackableDictionary"))
             {
                 return $"TrackableDictionaryTracker{genericType.TypeArgumentList}";
             }
             else if (CodeAnalaysisExtensions.CompareTypeName(genericType.Identifier.ToString(),
-                "TrackableData.TrackableList"))
+                                                             "TrackableData.TrackableList"))
             {
                 return $"TrackableListTracker{genericType.TypeArgumentList}";
             }

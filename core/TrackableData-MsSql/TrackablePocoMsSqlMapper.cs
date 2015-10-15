@@ -35,8 +35,8 @@ namespace TrackableData
 
         public TrackablePocoMsSqlMapper(string tableName, ColumnDefinition[] headKeyColumnDefs = null)
         {
-            var trackableTypeName = typeof (T).Namespace + "." + ("Trackable" + typeof (T).Name.Substring(1));
-            _trackableType = typeof (T).Assembly.GetType(trackableTypeName);
+            var trackableTypeName = typeof(T).Namespace + "." + ("Trackable" + typeof(T).Name.Substring(1));
+            _trackableType = typeof(T).Assembly.GetType(trackableTypeName);
 
             _tableName = tableName;
 
@@ -107,7 +107,9 @@ namespace TrackableData
             _primaryKeyColumns = primaryKeyColumns.ToArray();
             _valueColumns = valueColumns.ToArray();
             _valueColumnMap = _valueColumns.ToDictionary(x => x.PropertyInfo, y => y);
-            _allColumnStringExceptIdentity = string.Join(",", _allColumns.Where(c => c.IsIdentity == false).Select(c => c.Name));
+            _allColumnStringExceptIdentity = string.Join(",",
+                                                         _allColumns.Where(c => c.IsIdentity == false)
+                                                                    .Select(c => c.Name));
             _allColumnStringExceptHead = string.Join(",", _valueColumns.Select(c => c.Name));
         }
 
@@ -138,7 +140,7 @@ namespace TrackableData
             var primaryKeyDef = string.Join(
                 ",",
                 _primaryKeyColumns.Select(c =>
-                    $"{c.Name} ASC"));
+                                          $"{c.Name} ASC"));
 
             var sb = new StringBuilder();
             if (includeDropIfExists)
@@ -149,7 +151,8 @@ namespace TrackableData
             sb.AppendLine($"CREATE TABLE [dbo].[{_tableName}] (");
             sb.AppendLine(columnDef);
             sb.AppendLine($"  CONSTRAINT[PK_{_tableName}] PRIMARY KEY CLUSTERED({primaryKeyDef}) WITH (");
-            sb.AppendLine("  PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON");
+            sb.AppendLine(
+                "  PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON");
             sb.AppendLine("  ) ON[PRIMARY]");
             sb.AppendLine(") ON[PRIMARY]");
             return sb.ToString();
@@ -334,7 +337,8 @@ namespace TrackableData
             return SaveAsync(connection, (TrackablePocoTracker<T>)tracker, keyValues);
         }
 
-        public async Task<int> SaveAsync(SqlConnection connection, TrackablePocoTracker<T> tracker, params object[] keyValues)
+        public async Task<int> SaveAsync(SqlConnection connection, TrackablePocoTracker<T> tracker,
+                                         params object[] keyValues)
         {
             if (tracker.HasChange == false)
                 return 0;

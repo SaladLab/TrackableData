@@ -27,18 +27,12 @@ namespace TrackableData
 
         public bool Changed
         {
-            get
-            {
-                return Tracker != null && Tracker.HasChange;
-            }
+            get { return Tracker != null && Tracker.HasChange; }
         }
 
         ITracker ITrackable.Tracker
         {
-            get
-            {
-                return Tracker;
-            }
+            get { return Tracker; }
 
             set
             {
@@ -49,10 +43,7 @@ namespace TrackableData
 
         ITracker<IDictionary<TKey, TValue>> ITrackable<IDictionary<TKey, TValue>>.Tracker
         {
-            get
-            {
-                return Tracker;
-            }
+            get { return Tracker; }
 
             set
             {
@@ -63,14 +54,14 @@ namespace TrackableData
 
         public ITrackable GetChildTrackable(object name)
         {
-            TKey key = (name.GetType() == typeof (TKey))
-                ? (TKey)name
-                : (TKey)Convert.ChangeType(name, typeof (TKey));
+            TKey key = (name.GetType() == typeof(TKey))
+                           ? (TKey)name
+                           : (TKey)Convert.ChangeType(name, typeof(TKey));
 
             TValue value;
             return _dictionary.TryGetValue(key, out value)
-                ? (ITrackable)value
-                : null;
+                       ? (ITrackable)value
+                       : null;
         }
 
         public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)

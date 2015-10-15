@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using Newtonsoft.Json;
-using TrackableData.Json.Tests;
+﻿using Newtonsoft.Json;
 using Xunit;
 
 namespace TrackableData.Json.Tests
@@ -19,9 +16,9 @@ namespace TrackableData.Json.Tests
                 },
                 Dictionary = new TrackableDictionary<int, string>
                 {
-                    {1, "One"},
-                    {2, "Two"},
-                    {3, "Three"}
+                    { 1, "One" },
+                    { 2, "Two" },
+                    { 3, "Three" }
                 },
                 List = new TrackableList<string>
                 {

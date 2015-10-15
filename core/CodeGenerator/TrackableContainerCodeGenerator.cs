@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeGen
 {
-    class TrackableContainerCodeGenerator
+    internal class TrackableContainerCodeGenerator
     {
         public Options Options { get; set; }
 
@@ -121,7 +119,8 @@ namespace CodeGen
 
             // ITrackable.GetChildTrackables
 
-            sb.AppendLine("\tpublic IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)");
+            sb.AppendLine(
+                "\tpublic IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)");
             sb.AppendLine("\t{");
             if (properties.Any())
             {
@@ -130,8 +129,12 @@ namespace CodeGen
                     var propertyType = p.Type.ToString();
                     var propertyName = p.Identifier.ToString();
                     sb.AppendFormat("\t\tvar trackable{0} = {0} as ITrackable;\n", propertyName, propertyType);
-                    sb.AppendFormat("\t\tif (trackable{0} != null && (changedOnly == false || trackable{0}.Changed))\n", propertyName);
-                    sb.AppendFormat("\t\t\tyield return new KeyValuePair<object, ITrackable>(\"{0}\", trackable{0});\n", propertyName);
+                    sb.AppendFormat(
+                        "\t\tif (trackable{0} != null && (changedOnly == false || trackable{0}.Changed))\n",
+                        propertyName);
+                    sb.AppendFormat(
+                        "\t\t\tyield return new KeyValuePair<object, ITrackable>(\"{0}\", trackable{0});\n",
+                        propertyName);
                 }
             }
             else

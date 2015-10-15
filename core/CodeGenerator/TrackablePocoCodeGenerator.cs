@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeGen
 {
-    class TrackablePocoCodeGenerator
+    internal class TrackablePocoCodeGenerator
     {
         public Options Options { get; set; }
 
@@ -103,15 +101,20 @@ namespace CodeGen
 
             // ITrackable.GetChildTrackables
 
-            sb.AppendLine("\tpublic IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)");
+            sb.AppendLine(
+                "\tpublic IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)");
             sb.AppendLine("\t{");
             if (trackableProperties.Any())
             {
                 foreach (var p in trackableProperties)
                 {
                     sb.AppendFormat("\t\tvar trackable{0} = {0} as ITrackable;\n", p.Identifier);
-                    sb.AppendFormat("\t\tif (trackable{0} != null && (changedOnly == false || trackable{0}.Changed))\n", p.Identifier);
-                    sb.AppendFormat("\t\t\tyield return new KeyValuePair<object, ITrackable>(\"{0}\", trackable{0});\n", p.Identifier);
+                    sb.AppendFormat(
+                        "\t\tif (trackable{0} != null && (changedOnly == false || trackable{0}.Changed))\n",
+                        p.Identifier);
+                    sb.AppendFormat(
+                        "\t\t\tyield return new KeyValuePair<object, ITrackable>(\"{0}\", trackable{0});\n",
+                        p.Identifier);
                 }
             }
             else
@@ -187,9 +190,10 @@ namespace CodeGen
             // Collect properties with ProtoMemberAttribute attribute
 
             var propertyWithTags = idecl.GetProperties()
-                .Select(p => Tuple.Create(p, p.AttributeLists.GetAttribute("ProtoMemberAttribute")))
-                .Where(x => x.Item2 != null)
-                .ToArray();
+                                        .Select(
+                                            p => Tuple.Create(p, p.AttributeLists.GetAttribute("ProtoMemberAttribute")))
+                                        .Where(x => x.Item2 != null)
+                                        .ToArray();
 
             // ProtoMember
 
@@ -226,7 +230,8 @@ namespace CodeGen
                 if (p.Type.IsValueType())
                     sb.AppendLine($"\t\t\t\t\tsurrogate.{p.Identifier} = ({p.Type})changeItem.Value.NewValue;");
                 else
-                    sb.AppendLine($"\t\t\t\t\tsurrogate.{p.Identifier} = new EnvelopedObject<{p.Type}> {{ Value = ({p.Type})changeItem.Value.NewValue }};");
+                    sb.AppendLine(
+                        $"\t\t\t\t\tsurrogate.{p.Identifier} = new EnvelopedObject<{p.Type}> {{ Value = ({p.Type})changeItem.Value.NewValue }};");
 
                 sb.AppendLine($"\t\t\t\t\tbreak;");
             }

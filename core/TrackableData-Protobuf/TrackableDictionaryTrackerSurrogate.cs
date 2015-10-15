@@ -14,8 +14,7 @@ namespace TrackableData
             [ProtoMember(3)] public TValue NewValue;
         }
 
-        [ProtoMember(1)]
-        public List<Change> ChangeList = new List<Change>();
+        [ProtoMember(1)] public List<Change> ChangeList = new List<Change>();
 
         public static implicit operator TrackableDictionaryTrackerSurrogate<TKey, TValue>(
             TrackableDictionaryTracker<TKey, TValue> tracker)

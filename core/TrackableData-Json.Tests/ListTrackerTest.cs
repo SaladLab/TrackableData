@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using TrackableData;
 using Xunit;
 
 namespace TrackableData.Json.Tests
@@ -10,7 +9,9 @@ namespace TrackableData.Json.Tests
         {
             return new TrackableList<string>()
             {
-                "One", "Two", "Three"
+                "One",
+                "Two",
+                "Three"
             };
         }
 
@@ -59,7 +60,7 @@ namespace TrackableData.Json.Tests
             var list2 = CreateTestList();
             tracker2.ApplyTo(list2);
 
-            Assert.Equal(new[] {"OneModified", "TwoInserted", "Three"}, list2);
+            Assert.Equal(new[] { "OneModified", "TwoInserted", "Three" }, list2);
         }
     }
 }

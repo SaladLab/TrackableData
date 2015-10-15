@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using TrackableData;
 using Xunit;
 
 namespace TrackableData.Json.Tests
@@ -59,13 +57,15 @@ namespace TrackableData.Json.Tests
 
             var jsonSerializerSettings = GetJsonSerializerSettings();
             var json = JsonConvert.SerializeObject(dict.Tracker, jsonSerializerSettings);
-            var tracker2 = JsonConvert.DeserializeObject<TrackableDictionaryTracker<int, string>>(json, jsonSerializerSettings);
+            var tracker2 = JsonConvert.DeserializeObject<TrackableDictionaryTracker<int, string>>(json,
+                                                                                                  jsonSerializerSettings);
 
             var dict2 = CreateTestDictionary();
             tracker2.ApplyTo(dict2);
 
             Assert.Equal(
-                new[] {
+                new[]
+                {
                     new KeyValuePair<int, string>(1, "OneModified"),
                     new KeyValuePair<int, string>(3, "Three"),
                     new KeyValuePair<int, string>(4, "FourAdded")

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using Newtonsoft.Json;
-using TrackableData.Json.Tests;
+﻿using Newtonsoft.Json;
 using Xunit;
 
 namespace TrackableData.Json.Tests
@@ -38,9 +35,9 @@ namespace TrackableData.Json.Tests
         {
             return new TrackableDictionary<int, TrackablePerson>
             {
-                {1, new TrackablePerson {Name = "Alice", Age = 20}},
-                {2, new TrackablePerson {Name = "Bob", Age = 30}},
-                {3, new TrackablePerson {Name = "Cindy", Age = 10}},
+                { 1, new TrackablePerson { Name = "Alice", Age = 20 } },
+                { 2, new TrackablePerson { Name = "Bob", Age = 30 } },
+                { 3, new TrackablePerson { Name = "Cindy", Age = 10 } },
             };
         }
 
@@ -55,9 +52,9 @@ namespace TrackableData.Json.Tests
         {
             return new TrackableList<TrackablePerson>
             {
-                new TrackablePerson {Name = "Alice", Age = 20},
-                new TrackablePerson {Name = "Bob", Age = 30},
-                new TrackablePerson {Name = "Cindy", Age = 10},
+                new TrackablePerson { Name = "Alice", Age = 20 },
+                new TrackablePerson { Name = "Bob", Age = 30 },
+                new TrackablePerson { Name = "Cindy", Age = 10 },
             };
         }
 

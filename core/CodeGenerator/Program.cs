@@ -9,9 +9,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeGen
 {
-    class Program
+    internal class Program
     {
-        static int Main(string[] args)
+        private static int Main(string[] args)
         {
             // Parse command line options
 
@@ -38,7 +38,7 @@ namespace CodeGen
 
             Options options = null;
             var result = parser.ParseArguments<Options>(args)
-                .WithParsed(r => { options = r; });
+                               .WithParsed(r => { options = r; });
 
             // Run process !
 
@@ -57,8 +57,15 @@ namespace CodeGen
                 // Resolve options
 
                 var basePath = Path.GetFullPath(options.Path ?? ".");
-                var sources = options.Sources.Where(p => string.IsNullOrWhiteSpace(p) == false && p.ToLower().IndexOf(".codegen.cs") == -1).Select(p => MakeFullPath(p, basePath)).ToArray();
-                var references = options.References.Where(p => string.IsNullOrWhiteSpace(p) == false).Select(p => MakeFullPath(p, basePath)).ToArray();
+                var sources =
+                    options.Sources.Where(p => string.IsNullOrWhiteSpace(p) == false &&
+                                               p.ToLower().IndexOf(".codegen.cs") == -1)
+                           .Select(p => MakeFullPath(p, basePath))
+                           .ToArray();
+                var references =
+                    options.References.Where(p => string.IsNullOrWhiteSpace(p) == false)
+                           .Select(p => MakeFullPath(p, basePath))
+                           .ToArray();
                 var targetDefaultPath = @".\Properties\TrackableData.CodeGen.cs";
                 var targetPath = MakeFullPath(options.TargetFile ?? targetDefaultPath, basePath);
 
@@ -66,8 +73,11 @@ namespace CodeGen
 
                 Console.WriteLine("- Parse sources");
 
-                var syntaxTrees = sources.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file)).ToArray();
-                var interfaceDeclarations = syntaxTrees.SelectMany(st => st.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>()).ToArray();
+                var syntaxTrees =
+                    sources.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file)).ToArray();
+                var interfaceDeclarations =
+                    syntaxTrees.SelectMany(st => st.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>())
+                               .ToArray();
 
                 // Generate code
 
