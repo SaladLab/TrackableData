@@ -149,7 +149,7 @@ namespace CodeGen
                 if (Options.UseProtobuf)
                 {
                     var attr = p.AttributeLists.GetAttribute("ProtoMemberAttribute");
-                    sb.Append($"\t[ProtoMember{attr.ArgumentList}] ");
+                    sb.Append($"\t[ProtoMember{attr?.ArgumentList}] ");
                 }
                 else
                 {
