@@ -121,7 +121,10 @@ namespace TrackableData
 
         public override string ToString()
         {
-            return "{ " + string.Join(", ", ChangeMap.Select(x => x.Key.Name + ":" + x.Value)) + " }";
+            return "{ " +
+                   string.Join(", ",
+                               ChangeMap.Select(x => $"{x.Key.Name}:{x.Value.OldValue}->{x.Value.NewValue}")) +
+                   " }";
         }
     }
 }

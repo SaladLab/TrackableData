@@ -326,7 +326,7 @@ namespace TrackableData
                         return "-" + x.Key + ":" + x.Value.OldValue;
 
                     case TrackableDictionaryOperation.Modify:
-                        return "=" + x.Key + ":" + x.Value.OldValue + "=>" + x.Value.NewValue;
+                        return "=" + x.Key + ":" + x.Value.OldValue + "->" + x.Value.NewValue;
 
                     default:
                         return "";
