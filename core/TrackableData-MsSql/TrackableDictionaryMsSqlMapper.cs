@@ -9,108 +9,197 @@ using System.Threading.Tasks;
 
 namespace TrackableData
 {
-    public class TrackableDictionaryMsSqlMapper<TKey, TValue> where TValue : new()
+    public class TrackableDictionaryMsSqlMapper<TKey, TValue> 
     {
         private class Column
         {
             public string Name;
             public Type Type;
-            public FieldInfo FieldInfo;
+            public int Length;
+            public PropertyInfo PropertyInfo;
             public Func<object, string> ConvertToSqlValue;
         }
 
+        private readonly bool _isTrackableValue;
         private readonly string _tableName;
-        private readonly Column _headKeyColumn;
+        private readonly Column[] _allColumns;
+        private readonly Column[] _headColumns;
+        private readonly Column[] _primaryKeyColumns;
         private readonly Column _keyColumn;
         private readonly Column[] _valueColumns;
+        // private readonly Dictionary<PropertyInfo, Column> _valueColumnMap;
         private readonly string _allColumnString;
         private readonly string _allColumnStringExceptHead;
 
-        public TrackableDictionaryMsSqlMapper(string tableName)
+        private bool IsSingleValueType => _valueColumns.Length == 1 && _valueColumns[0].PropertyInfo == null;
+
+        public TrackableDictionaryMsSqlMapper(string tableName,
+            ColumnDefinition keyColumnDef,
+            ColumnDefinition[] headKeyColumnDefs = null)
+            : this(tableName, keyColumnDef, null, headKeyColumnDefs)
         {
         }
 
         public TrackableDictionaryMsSqlMapper(string tableName,
-                                              string headKeyColumnName, Type headKeyType,
-                                              string keyColumnName, string valueColumnName = null)
+                                              ColumnDefinition keyColumnDef,
+                                              ColumnDefinition singleValueColumnDef,
+                                              ColumnDefinition[] headKeyColumnDefs)
         {
+            _isTrackableValue = typeof (ITrackable).IsAssignableFrom(typeof (TValue));
             _tableName = tableName;
 
-            // 키 컬럼 구성
+            var allColumns = new List<Column>();
+            var headColumns = new List<Column>();
+            var primaryKeyColumns = new List<Column>();
+            var valueColumns = new List<Column>();
 
-            if (string.IsNullOrEmpty(headKeyColumnName) == false)
+            // add head column
+
+            if (headKeyColumnDefs != null)
             {
-                _headKeyColumn = new Column
+                foreach (var headColumnInfo in headKeyColumnDefs)
                 {
-                    Name = SqlMapperHelper.GetEscapedName(headKeyColumnName),
-                    Type = headKeyType,
-                    ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(headKeyType)
-                };
+                    var column = new Column
+                    {
+                        Name = SqlMapperHelper.GetEscapedName(headColumnInfo.Name),
+                        Type = headColumnInfo.Type,
+                        Length = headColumnInfo.Length,
+                        ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(headColumnInfo.Type)
+                    };
+                    headColumns.Add(column);
+                    primaryKeyColumns.Add(column);
+                    allColumns.Add(column);
+                }
             }
+
+            // add key column
 
             _keyColumn = new Column
             {
-                Name = SqlMapperHelper.GetEscapedName(keyColumnName),
+                Name = SqlMapperHelper.GetEscapedName(keyColumnDef.Name),
                 Type = typeof(TKey),
+                Length = keyColumnDef.Length,
                 ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(typeof(TKey))
             };
+            primaryKeyColumns.Add(_keyColumn);
+            allColumns.Add(_keyColumn);
 
-            // 값 컬럼 구성
+            // while scan properties of T, construct value column information.
 
-            if (valueColumnName != null)
+            if (singleValueColumnDef != null)
             {
-                _valueColumns = new[]
+                var column = new Column
                 {
-                    new Column
-                    {
-                        Name = SqlMapperHelper.GetEscapedName(valueColumnName),
-                        Type = typeof(TValue),
-                        ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(typeof(TValue))
-                    }
+                    Name = SqlMapperHelper.GetEscapedName(singleValueColumnDef.Name),
+                    Type = typeof (TValue),
+                    Length = singleValueColumnDef.Length,
+                    ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(typeof (TValue))
                 };
+                valueColumns.Add(column);
+                allColumns.Add(column);
             }
             else
             {
-                //var valueColumns = new List<Column>();
-                //var valueType = typeof(TValue);
-                //foreach (var field in valueType.GetFields())
-                //{
-                //    var attr = field.GetCustomAttribute<TrackableFieldAttribute>();
-                //    if (attr != null && attr.IsColumnIgnored == false)
-                //    {
-                //        valueColumns.Add(new Column
-                //        {
-                //            Name = SqlMapperHelper.GetEscapedName(attr.ColumnName ?? field.Name),
-                //            Type = field.FieldType,
-                //            FieldInfo = field,
-                //            ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(field)
-                //        });
-                //    }
-                //}
-                // _valueColumns = valueColumns.ToArray();
+                var valueType = typeof (TValue);
+                if (_isTrackableValue)
+                {
+                    var trackableT = valueType.GetInterfaces().FirstOrDefault(
+                        t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (ITrackable<>));
+                    if (trackableT != null)
+                        valueType = trackableT.GetGenericArguments()[0];
+                }
+
+                foreach (var property in valueType.GetProperties())
+                {
+                    var columnName = property.Name;
+
+                    var attr = property.GetCustomAttribute<TrackableFieldAttribute>();
+                    if (attr != null)
+                    {
+                        if (attr["sql.ignore"] != null)
+                            continue;
+                        columnName = attr["sql.column:"] ?? columnName;
+                    }
+
+                    var column = new Column
+                    {
+                        Name = SqlMapperHelper.GetEscapedName(columnName),
+                        Type = property.PropertyType,
+                        PropertyInfo = property,
+                        ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(property)
+                    };
+
+                    valueColumns.Add(column);
+                    allColumns.Add(column);
+                }
             }
 
-            // 컬럼 문자열 구축
-
-            var columnNames = new List<string>();
-            columnNames.Add(_keyColumn.Name);
-            columnNames.AddRange(_valueColumns.Select(c => c.Name));
-            _allColumnStringExceptHead = string.Join(",", columnNames);
-            _allColumnString = _headKeyColumn != null
-                                   ? _headKeyColumn.Name + "," + _allColumnStringExceptHead
-                                   : _allColumnStringExceptHead;
+            _allColumns = allColumns.ToArray();
+            _headColumns = headColumns.ToArray();
+            _primaryKeyColumns = primaryKeyColumns.ToArray();
+            _valueColumns = valueColumns.ToArray();
+            // _valueColumnMap = _valueColumns.ToDictionary(x => x.PropertyInfo, y => y);
+            _allColumnString = string.Join(",", _allColumns.Select(c => c.Name));
+            _allColumnStringExceptHead = _keyColumn.Name + "," +
+                                         string.Join(",", _valueColumns.Select(c => c.Name));
         }
 
         // SQL Friendly Methods
 
+        private void BuildWhereClauses(StringBuilder sb, params object[] keyValues)
+        {
+            if (keyValues.Length <= 0)
+                return;
+
+            sb.Append(" WHERE ");
+            sb.Append(string.Join(
+                " AND ",
+                keyValues.Zip(_primaryKeyColumns, (v, c) => $"{c.Name} = {c.ConvertToSqlValue(v)}")));
+        }
+
         public string GenerateCreateTableSql(bool includeDropIfExists = false)
         {
+            var columnDef = string.Join(
+                ",\n",
+                _allColumns.Select(c =>
+                {
+                    var notnull = c.Type.IsValueType ? "NOT NULL" : "";
+                    return $"{c.Name} {SqlMapperHelper.GetSqlType(c.Type, c.Length)} {notnull}";
+                }));
+
+            var primaryKeyDef = string.Join(
+                ",",
+                _headColumns.Concat(new[] {_keyColumn}).Select(c =>
+                    $"{c.Name} ASC"));
+
             var sb = new StringBuilder();
+            if (includeDropIfExists)
+            {
+                sb.AppendLine($"IF OBJECT_ID('dbo.{_tableName}', 'U') IS NOT NULL");
+                sb.AppendLine($"  DROP TABLE dbo.{_tableName}");
+            }
+            sb.AppendLine($"CREATE TABLE [dbo].[{_tableName}] (");
+            sb.AppendLine(columnDef);
+            sb.AppendLine($"  CONSTRAINT[PK_{_tableName}] PRIMARY KEY CLUSTERED({primaryKeyDef}) WITH (");
+            sb.AppendLine("  PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON");
+            sb.AppendLine("  ) ON[PRIMARY]");
+            sb.AppendLine(") ON[PRIMARY]");
             return sb.ToString();
         }
 
-        public string GenerateSaveSql(object headKey, TrackableDictionaryTracker<TKey, TValue> tracker)
+        public string GenerateSelectSql(params object[] keyValues)
         {
+            var sb = new StringBuilder();
+            sb.Append($"SELECT {_allColumnStringExceptHead} FROM {_tableName}");
+            BuildWhereClauses(sb, keyValues);
+            return sb.ToString();
+        }
+
+        public string GenerateUpdateSql(TrackableDictionaryTracker<TKey, TValue> tracker, params object[] keyValues)
+        {
+            if (keyValues.Length != _headColumns.Length)
+                throw new ArgumentException("Number of keyValues should be same with the number of head columns");
+
             if (tracker.ChangeMap.Any() == false)
                 return string.Empty;
 
@@ -118,7 +207,7 @@ namespace TrackableData
             var sqlModify = new StringBuilder();
             var removeIds = new List<TKey>();
 
-            // 변경사항을 돌면서 변경 타입별 SQL 구문 생성
+            // generate sql command for each changes
 
             var insertCount = 0;
             foreach (var i in tracker.ChangeMap)
@@ -138,17 +227,12 @@ namespace TrackableData
                         }
 
                         sqlAdd.Append(" (");
-
-                        if (_headKeyColumn != null)
+                        for (var k = 0; k < _headColumns.Length; k++)
                         {
-                            sqlAdd.Append(_headKeyColumn.ConvertToSqlValue(headKey));
+                            sqlAdd.Append(_headColumns[k].ConvertToSqlValue(keyValues[k]));
                             sqlAdd.Append(",");
-                            sqlAdd.Append(_keyColumn.ConvertToSqlValue(i.Key));
                         }
-                        else
-                        {
-                            sqlAdd.Append(_keyColumn.ConvertToSqlValue(i.Key));
-                        }
+                        sqlAdd.Append(_keyColumn.ConvertToSqlValue(i.Key));
 
                         foreach (var col in _valueColumns)
                             sqlAdd.Append(",").Append(col.ConvertToSqlValue(v));
@@ -177,12 +261,13 @@ namespace TrackableData
                         }
 
                         sqlModify.Append(" WHERE ");
-                        if (_headKeyColumn != null)
+                        for (var k = 0; k < _headColumns.Length; k++)
                         {
-                            sqlModify.Append(_headKeyColumn.Name).Append("=");
-                            sqlModify.Append(_headKeyColumn.ConvertToSqlValue(headKey));
+                            sqlModify.Append(_headColumns[k].Name).Append("=");
+                            sqlModify.Append(_headColumns[k].ConvertToSqlValue(keyValues[k]));
                             sqlModify.Append(" AND ");
                         }
+
                         sqlModify.Append(_keyColumn.Name).Append("=");
                         sqlModify.Append(_keyColumn.ConvertToSqlValue(i.Key)).Append(";\n");
                         break;
@@ -195,7 +280,7 @@ namespace TrackableData
             if (insertCount > 0)
                 sqlAdd.Append(";\n");
 
-            // INSERT, UPDATE, DELETE SQL 문을 합쳐서 하나로 만들기
+            // merge insert, update and delete sql into one sql
 
             var sql = new StringBuilder();
             sql.Append(sqlAdd);
@@ -203,11 +288,11 @@ namespace TrackableData
             if (removeIds.Any())
             {
                 sql.Append("DELETE ").Append(_tableName).Append(" WHERE ");
-                if (_headKeyColumn != null)
+                for (var k = 0; k < _headColumns.Length; k++)
                 {
-                    sql.Append(_headKeyColumn.Name).Append("=");
-                    sql.Append(_headKeyColumn.ConvertToSqlValue(headKey));
-                    sql.Append(" AND ");
+                    sqlModify.Append(_headColumns[k].Name).Append("=");
+                    sqlModify.Append(_headColumns[k].ConvertToSqlValue(keyValues[k]));
+                    sqlModify.Append(" AND ");
                 }
                 sql.Append(_keyColumn.Name).Append(" IN (");
                 var concating = false;
@@ -238,65 +323,54 @@ namespace TrackableData
 
         public async Task<TrackableDictionary<TKey, TValue>> LoadAsync(SqlConnection connection, params object[] keys)
         {
-            /*
-            // SELECT 쿼리문 구축
-
-            var sb = new StringBuilder();
-            sb.Append("SELECT ");
-            sb.Append(_allColumnStringExceptHead);
-            sb.Append(" FROM ");
-            sb.Append(_tableName);
-            if (_headKeyColumn != null)
+            var sql = GenerateSelectSql(keys);
+            var dictionary = new TrackableDictionary<TKey, TValue>();
+            using (var command = new SqlCommand(sql, connection))
             {
-                sb.Append(" WHERE ");
-                sb.Append(_headKeyColumn.Value.Name);
-                sb.Append("=");
-                sb.Append(_headKeyColumn.Value.ConvertToSqlValue(headKey));
-            }
-
-            // 쿼리를 실행해서 Rowset 으로 부터 Dictionary 구성
-
-            var items = new TrackableDictionary<TKey, TValue>();
-            using (var rowset = await session.ExecuteReaderAsync(sb.ToString()))
-            {
-                while (await rowset.ReadAsync())
+                using (var reader = command.ExecuteReader())
                 {
-                    var key = (TKey)SqlMapperHelper.GetNetValue(rowset.GetValue(0), typeof(TKey));
-                    var value = new TValue();
-
-                    if (_valueColumns.Length == 1 && _valueColumns[0].FieldInfo == null)
+                    while (await reader.ReadAsync())
                     {
-                        value = (TValue)SqlMapperHelper.GetNetValue(rowset.GetValue(1), typeof(TValue));
+                        dictionary.Add(ConvertToKeyAndValue(reader));
                     }
-                    else
-                    {
-                        for (var i = 0; i < _valueColumns.Length; i++)
-                        {
-                            _valueColumns[i].FieldInfo.SetValue(
-                                value,
-                                SqlMapperHelper.GetNetValue(rowset.GetValue(i + 1), _valueColumns[i].Type));
-                        }
-                    }
-                    items.Add(key, value);
                 }
             }
-            */
-            var items = new TrackableDictionary<TKey, TValue>();
-            return items;
+            return dictionary;
         }
 
-        private KeyValuePair<TKey, TValue> ConvertToPoco(IDataRecord record)
+        private KeyValuePair<TKey, TValue> ConvertToKeyAndValue(IDataRecord record)
         {
-            return new KeyValuePair<TKey, TValue>();
+            var key = (TKey)SqlMapperHelper.GetNetValue(record.GetValue(0), typeof(TKey));
+            TValue value;
+
+            if (IsSingleValueType)
+            {
+                value = (TValue)SqlMapperHelper.GetNetValue(record.GetValue(1), typeof(TValue));
+            }
+            else
+            {
+                value = (TValue)Activator.CreateInstance(typeof(TValue));
+                for (var i = 0; i < _valueColumns.Length; i++)
+                {
+                    _valueColumns[i].PropertyInfo.SetValue(
+                        value,
+                        SqlMapperHelper.GetNetValue(record.GetValue(i + 1), _valueColumns[i].Type));
+                }
+            }
+
+            return new KeyValuePair<TKey, TValue>(key, value);
         }
 
-        public async Task SaveAsync(SqlConnection connection, TrackableDictionaryTracker<TKey, TValue> tracker, params object[] keyValues)
+        public async Task<int> SaveAsync(SqlConnection connection, TrackableDictionaryTracker<TKey, TValue> tracker, params object[] keyValues)
         {
-            /*
-            var sql = GenerateSaveSql(headKey, tracker);
-            if (string.IsNullOrEmpty(sql) == false)
-                await session.ExecuteNonQueryAsync(sql);
-            */
+            if (tracker.HasChange == false)
+                return 0;
+
+            var sql = GenerateUpdateSql(tracker, keyValues);
+            using (var command = new SqlCommand(sql, connection))
+            {
+                return await command.ExecuteNonQueryAsync();
+            }
         }
     }
 }

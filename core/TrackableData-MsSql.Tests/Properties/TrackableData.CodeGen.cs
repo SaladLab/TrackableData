@@ -13,6 +13,116 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using TrackableData;
 
+#region IItem
+
+namespace TrackableData.Sql.Tests
+{
+    public class TrackableItem : IItem, ITrackable<IItem>
+    {
+        [IgnoreDataMember]
+        public IPocoTracker<IItem> Tracker { get; set; }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
+
+        ITracker ITrackable.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (IPocoTracker<IItem>)value;
+                Tracker = t;
+            }
+        }
+
+        ITracker<IItem> ITrackable<IItem>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (IPocoTracker<IItem>)value;
+                Tracker = t;
+            }
+        }
+
+        public ITrackable GetChildTrackable(object name)
+        {
+            switch ((string)name)
+            {
+                default:
+                    return null;
+            }
+        }
+
+        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
+        {
+            yield break;
+        }
+
+        public static class PropertyTable
+        {
+            public static readonly PropertyInfo Kind = typeof(IItem).GetProperty("Kind");
+            public static readonly PropertyInfo Count = typeof(IItem).GetProperty("Count");
+            public static readonly PropertyInfo Note = typeof(IItem).GetProperty("Note");
+        }
+
+        private short _Kind;
+
+        public short Kind
+        {
+            get
+            {
+                return _Kind;
+            }
+            set
+            {
+                if (Tracker != null && Kind != value)
+                    Tracker.TrackSet(PropertyTable.Kind, _Kind, value);
+                _Kind = value;
+            }
+        }
+
+        private int _Count;
+
+        public int Count
+        {
+            get
+            {
+                return _Count;
+            }
+            set
+            {
+                if (Tracker != null && Count != value)
+                    Tracker.TrackSet(PropertyTable.Count, _Count, value);
+                _Count = value;
+            }
+        }
+
+        private string _Note;
+
+        public string Note
+        {
+            get
+            {
+                return _Note;
+            }
+            set
+            {
+                if (Tracker != null && Note != value)
+                    Tracker.TrackSet(PropertyTable.Note, _Note, value);
+                _Note = value;
+            }
+        }
+    }
+}
+
+#endregion
+
 #region IPerson
 
 namespace TrackableData.Sql.Tests

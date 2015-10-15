@@ -12,6 +12,17 @@ namespace TrackableData
 
         public IDictionaryTracker<TKey, TValue> Tracker { get; set; }
 
+        // Hacky API. It's for intrusive modification of dictionary. (like dict[2].Count += 1)
+        // If you want to have gentle code, use dict[2] = new TValue or use TrackableValue for TValue.
+        public void MarkModify(TKey key)
+        {
+            if (Tracker != null)
+            {
+                var currentValue = _dictionary[key];
+                Tracker.TrackModify(key, currentValue, currentValue);
+            }
+        }
+
         // ITrackable
 
         public bool Changed

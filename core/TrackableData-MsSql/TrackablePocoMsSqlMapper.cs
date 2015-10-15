@@ -41,12 +41,11 @@ namespace TrackableData
         {
             var trackableTypeName = typeof (T).Namespace + "." + ("Trackable" + typeof (T).Name.Substring(1));
             _trackableType = typeof (T).Assembly.GetType(trackableTypeName);
+            _tableName = tableName;
 
             var allColumns = new List<Column>();
             var primaryKeyColumns = new List<Column>();
             var valueColumns = new List<Column>();
-
-            _tableName = tableName;
 
             // add head key to primary keys
 

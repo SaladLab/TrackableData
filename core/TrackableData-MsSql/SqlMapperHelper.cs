@@ -69,15 +69,33 @@ namespace TrackableData
             }
         }
 
-        public static string GetSqlType(Type type)
+        public static string GetSqlType(Type type, int length = 0)
         {
-            // TODO: Make this code complete
+            var lengthStr = length > 0 ? length.ToString() : "MAX";
+            if (type == typeof(bool))
+                return "[bit]";
+            if (type == typeof(byte))
+                return "[tinyint]";
             if (type == typeof(int))
                 return "[int]";
             if (type == typeof(long))
                 return "[bigint]";
+            if (type == typeof(short))
+                return "[smallint]";
+            if (type == typeof(float))
+                return "[real]";
+            if (type == typeof(double))
+                return "[float]";
+            if (type == typeof(DateTime))
+                return "[datetime2]";
+            if (type == typeof(DateTimeOffset))
+                return "[datetimeoffset]";
             if (type == typeof(string))
-                return "[nvarchar](MAX)";
+                return $"[nvarchar]({lengthStr})";
+            if (type == typeof(byte[]))
+                return $"[varbinary]({lengthStr})";
+            if (type == typeof(Guid))
+                return "[uniqueidentifier]";
             return "";
         }
     }
