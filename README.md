@@ -43,11 +43,18 @@ There are several trackable libraries including famous entity framework. But pri
    - Common libraries support only .NET Framework 4.0 and above.
 
 # Manual
-## POCO
+
+## Types supported
+
+### POCO
+
+TrackablePoco traces property set.
 
 You already saw this in Example.
 
-## Dictionary
+### Dictionary
+
+TrackableDictionary traces add, modify and remove.
 
 Source
 ```csharp
@@ -58,16 +65,14 @@ dict.Add(1, "One");
 dict.Add(2, "Two");
 dict.Add(3, "Three");
 
-var json = JsonConvert.SerializeObject(dict.Tracker, JsonSerializerSettings);
-Console.WriteLine(json);
+Console.WriteLine(dict.Tracker);
 dict.Tracker.Clear();
 
 dict.Remove(1);
 dict[2] = "TwoTwo";
 dict.Add(4, "Four");
 
-var json2 = JsonConvert.SerializeObject(dict.Tracker, JsonSerializerSettings);
-Console.WriteLine(json2);
+Console.WriteLine(dict.Tracker);
 ```
 
 Output
@@ -76,7 +81,9 @@ Output
 { -1:One, =2:Two->TwoTwo, +4:Four }
 ```
 
-## List
+### List
+
+TrackableList traces add, modify and remove.
 
 Source
 ```csharp
@@ -87,16 +94,13 @@ list.Add("One");
 list.Add("Two");
 list.Add("Three");
 
-var json = JsonConvert.SerializeObject(list.Tracker, JsonSerializerSettings);
-Console.WriteLine(json);
+Console.WriteLine(list.Tracker);
 list.Tracker.Clear();
 
 list.RemoveAt(0);
 list[1] = "TwoTwo";
 list.Add("Four");
 
-var json2 = JsonConvert.SerializeObject(list.Tracker, JsonSerializerSettings);
-Console.WriteLine(json2);
 ```
 
 Output
@@ -105,22 +109,31 @@ Output
 [ -0:One, =1:Three=>TwoTwo, +2:Four ]
 ```
 
-# Pluging
- 
+## Etc
 
-## Json.NET
-
-TODO
-
-## ProtocolBuffer.NET
+### Tracker
 
 TODO
 
-## MSSQL
+### Nested Tracker
+
+TODO
+
+## Pluging
+
+### Json.NET
+
+TODO
+
+### ProtocolBuffer.NET
+
+TODO
+
+### MSSQL
 
 TODO
 Poco, Dictionary. Not List.
 
-## MongoDB
+### MongoDB
 
 TODO: Implementation
