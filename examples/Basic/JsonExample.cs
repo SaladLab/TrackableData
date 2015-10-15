@@ -2,15 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using TrackableData;
 
 namespace Basic
 {
-    class BasicExample
+    class JsonExample
     {
+        private static JsonSerializerSettings JsonSerializerSettings =
+            new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.None,
+                DefaultValueHandling = DefaultValueHandling.Ignore,
+                Converters = new JsonConverter[]
+                {
+                    new TrackablePocoTrackerJsonConverter<IUserData>(),
+                    new TrackableDictionaryTrackerJsonConverter<int, string>(),
+                    new TrackableListTrackerJsonConverter<string>(),
+                }
+            };
+
         private static void RunTrackablePoco()
         {
-            Console.WriteLine("***** TrackablePoco *****");
+            Console.WriteLine("***** TrackablePoco (Json) *****");
 
             var u = new TrackableUserData();
             u.SetDefaultTracker();
@@ -19,13 +33,15 @@ namespace Basic
             u.Level = 1;
             u.Gold = 10;
 
-            Console.WriteLine(u.Tracker);
+            var json = JsonConvert.SerializeObject(u.Tracker, JsonSerializerSettings);
+            Console.WriteLine(json);
             u.Tracker.Clear();
 
             u.Level += 10;
             u.Gold += 100;
 
-            Console.WriteLine(u.Tracker);
+            var json2 = JsonConvert.SerializeObject(u.Tracker, JsonSerializerSettings);
+            Console.WriteLine(json2);
             u.Tracker.Clear();
 
             Console.WriteLine();
@@ -33,7 +49,7 @@ namespace Basic
 
         private static void RunTrackableDictionary()
         {
-            Console.WriteLine("***** TrackableDictionary *****");
+            Console.WriteLine("***** TrackableDictionary (Json) *****");
 
             var dict = new TrackableDictionary<int, string>();
             dict.SetDefaultTracker();
@@ -42,14 +58,16 @@ namespace Basic
             dict.Add(2, "Two");
             dict.Add(3, "Three");
 
-            Console.WriteLine(dict.Tracker);
+            var json = JsonConvert.SerializeObject(dict.Tracker, JsonSerializerSettings);
+            Console.WriteLine(json);
             dict.Tracker.Clear();
 
             dict.Remove(1);
             dict[2] = "TwoTwo";
             dict.Add(4, "Four");
 
-            Console.WriteLine(dict.Tracker);
+            var json2 = JsonConvert.SerializeObject(dict.Tracker, JsonSerializerSettings);
+            Console.WriteLine(json2);
             dict.Tracker.Clear();
 
             Console.WriteLine();
@@ -57,7 +75,7 @@ namespace Basic
 
         private static void RunTrackableList()
         {
-            Console.WriteLine("***** TrackableList *****");
+            Console.WriteLine("***** TrackableList (Json) *****");
 
             var list = new TrackableList<string>();
             list.SetDefaultTracker();
@@ -66,14 +84,16 @@ namespace Basic
             list.Add("Two");
             list.Add("Three");
 
-            Console.WriteLine(list.Tracker);
+            var json = JsonConvert.SerializeObject(list.Tracker, JsonSerializerSettings);
+            Console.WriteLine(json);
             list.Tracker.Clear();
 
             list.RemoveAt(0);
             list[1] = "TwoTwo";
             list.Add("Four");
 
-            Console.WriteLine(list.Tracker);
+            var json2 = JsonConvert.SerializeObject(list.Tracker, JsonSerializerSettings);
+            Console.WriteLine(json2);
             list.Tracker.Clear();
 
             Console.WriteLine();

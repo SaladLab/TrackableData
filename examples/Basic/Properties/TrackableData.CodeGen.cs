@@ -12,11 +12,14 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 using TrackableData;
+using ProtoBuf;
+using System.ComponentModel;
 
 #region IUserData
 
-namespace Basic.Data
+namespace Basic
 {
+    [ProtoContract]
     public class TrackableUserData : IUserData, ITrackable<IUserData>
     {
         [IgnoreDataMember]
@@ -69,13 +72,11 @@ namespace Basic.Data
             public static readonly PropertyInfo Name = typeof(IUserData).GetProperty("Name");
             public static readonly PropertyInfo Gold = typeof(IUserData).GetProperty("Gold");
             public static readonly PropertyInfo Level = typeof(IUserData).GetProperty("Level");
-            public static readonly PropertyInfo LeftHand = typeof(IUserData).GetProperty("LeftHand");
-            public static readonly PropertyInfo RightHand = typeof(IUserData).GetProperty("RightHand");
         }
 
         private string _Name;
 
-        public string Name
+        [ProtoMember(1)] public string Name
         {
             get
             {
@@ -91,7 +92,7 @@ namespace Basic.Data
 
         private int _Gold;
 
-        public int Gold
+        [ProtoMember(2)] public int Gold
         {
             get
             {
@@ -107,7 +108,7 @@ namespace Basic.Data
 
         private int _Level;
 
-        public int Level
+        [ProtoMember(3)] public int Level
         {
             get
             {
@@ -120,130 +121,53 @@ namespace Basic.Data
                 _Level = value;
             }
         }
-
-        private IUserHandData _LeftHand;
-
-        public IUserHandData LeftHand
-        {
-            get
-            {
-                return _LeftHand;
-            }
-            set
-            {
-                if (Tracker != null && LeftHand != value)
-                    Tracker.TrackSet(PropertyTable.LeftHand, _LeftHand, value);
-                _LeftHand = value;
-            }
-        }
-
-        private IUserHandData _RightHand;
-
-        public IUserHandData RightHand
-        {
-            get
-            {
-                return _RightHand;
-            }
-            set
-            {
-                if (Tracker != null && RightHand != value)
-                    Tracker.TrackSet(PropertyTable.RightHand, _RightHand, value);
-                _RightHand = value;
-            }
-        }
     }
-}
 
-#endregion
-
-#region IUserHandData
-
-namespace Basic.Data
-{
-    public class TrackableUserHandData : IUserHandData, ITrackable<IUserHandData>
+    [ProtoContract]
+    public class TrackableUserDataTrackerSurrogate
     {
-        [IgnoreDataMember]
-        public IPocoTracker<IUserHandData> Tracker { get; set; }
+        [ProtoMember(1)] public EnvelopedObject<string> Name;
+        [ProtoMember(2)] public EnvelopedObject<int> Gold;
+        [ProtoMember(3)] public EnvelopedObject<int> Level;
 
-        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
-
-        ITracker ITrackable.Tracker
+        public static implicit operator TrackableUserDataTrackerSurrogate(TrackablePocoTracker<IUserData> tracker)
         {
-            get
+            if (tracker == null)
+                return null;
+
+            var surrogate = new TrackableUserDataTrackerSurrogate();
+            foreach(var changeItem in tracker.ChangeMap)
             {
-                return Tracker;
+                var tag = changeItem.Key.GetCustomAttribute<ProtoMemberAttribute>().Tag;
+                switch (tag)
+                {
+                    case 1:
+                        surrogate.Name = new EnvelopedObject<string> { Value = (string)changeItem.Value.NewValue };
+                        break;
+                    case 2:
+                        surrogate.Gold = new EnvelopedObject<int> { Value = (int)changeItem.Value.NewValue };
+                        break;
+                    case 3:
+                        surrogate.Level = new EnvelopedObject<int> { Value = (int)changeItem.Value.NewValue };
+                        break;
+                }
             }
-            set
-            {
-                var t = (IPocoTracker<IUserHandData>)value;
-                Tracker = t;
-            }
+            return surrogate;
         }
 
-        ITracker<IUserHandData> ITrackable<IUserHandData>.Tracker
+        public static implicit operator TrackablePocoTracker<IUserData>(TrackableUserDataTrackerSurrogate surrogate)
         {
-            get
-            {
-                return Tracker;
-            }
-            set
-            {
-                var t = (IPocoTracker<IUserHandData>)value;
-                Tracker = t;
-            }
-        }
+            if (surrogate == null)
+                return null;
 
-        public ITrackable GetChildTrackable(object name)
-        {
-            switch ((string)name)
-            {
-                default:
-                    return null;
-            }
-        }
-
-        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
-        {
-            yield break;
-        }
-
-        public static class PropertyTable
-        {
-            public static readonly PropertyInfo FingerCount = typeof(IUserHandData).GetProperty("FingerCount");
-            public static readonly PropertyInfo Dirty = typeof(IUserHandData).GetProperty("Dirty");
-        }
-
-        private int _FingerCount;
-
-        public int FingerCount
-        {
-            get
-            {
-                return _FingerCount;
-            }
-            set
-            {
-                if (Tracker != null && FingerCount != value)
-                    Tracker.TrackSet(PropertyTable.FingerCount, _FingerCount, value);
-                _FingerCount = value;
-            }
-        }
-
-        private bool _Dirty;
-
-        public bool Dirty
-        {
-            get
-            {
-                return _Dirty;
-            }
-            set
-            {
-                if (Tracker != null && Dirty != value)
-                    Tracker.TrackSet(PropertyTable.Dirty, _Dirty, value);
-                _Dirty = value;
-            }
+            var tracker = new TrackablePocoTracker<IUserData>();
+            if (surrogate.Name != null)
+                tracker.ChangeMap.Add(TrackableUserData.PropertyTable.Name, new TrackablePocoTracker<IUserData>.Change { NewValue = surrogate.Name.Value });
+            if (surrogate.Gold != null)
+                tracker.ChangeMap.Add(TrackableUserData.PropertyTable.Gold, new TrackablePocoTracker<IUserData>.Change { NewValue = surrogate.Gold.Value });
+            if (surrogate.Level != null)
+                tracker.ChangeMap.Add(TrackableUserData.PropertyTable.Level, new TrackablePocoTracker<IUserData>.Change { NewValue = surrogate.Level.Value });
+            return tracker;
         }
     }
 }
