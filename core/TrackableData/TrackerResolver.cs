@@ -27,12 +27,12 @@ namespace TrackableData
                 if (genericType == typeof(TrackableDictionary<,>))
                 {
                     return typeof(TrackableDictionaryTracker<,>).MakeGenericType(
-                        trackableType.GenericTypeArguments);
+                        trackableType.GetGenericArguments());
                 }
                 if (genericType == typeof(TrackableList<>))
                 {
                     return typeof(TrackableListTracker<>).MakeGenericType(
-                        trackableType.GenericTypeArguments);
+                        trackableType.GetGenericArguments());
                 }
             }
             return null;

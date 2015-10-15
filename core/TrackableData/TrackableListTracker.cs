@@ -215,7 +215,7 @@ namespace TrackableData
                     default:
                         return "";
                 }
-            })) + " ]";
+            }).ToArray()) + " ]";
         }
     }
 }

@@ -8,7 +8,7 @@ namespace TrackableData
         public static ITrackable GetTrackableByPath(
             this ITrackable trackable, string path)
         {
-            if (string.IsNullOrWhiteSpace(path))
+            if (string.IsNullOrEmpty(path))
                 return trackable;
 
             var si = path.IndexOf('/');

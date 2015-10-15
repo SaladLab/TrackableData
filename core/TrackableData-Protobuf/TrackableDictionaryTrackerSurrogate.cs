@@ -9,8 +9,8 @@ namespace TrackableData
         [ProtoContract]
         public struct Change
         {
-            [ProtoMember(1)] public TrackableDictionaryOperation Operation;
-            [ProtoMember(2)] public TKey Key;
+            [ProtoMember(1, IsRequired = true)] public TrackableDictionaryOperation Operation;
+            [ProtoMember(2, IsRequired = true)] public TKey Key;
             [ProtoMember(3)] public TValue NewValue;
         }
 
