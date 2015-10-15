@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Linq;
 using TrackableData;
 using ProtoBuf;
 using System.ComponentModel;
@@ -165,7 +166,7 @@ namespace TrackableData.Protobuf.Tests
             var surrogate = new TrackablePersonTrackerSurrogate();
             foreach(var changeItem in tracker.ChangeMap)
             {
-                var tag = changeItem.Key.GetCustomAttribute<ProtoMemberAttribute>().Tag;
+                var tag = changeItem.Key.GetCustomAttributes(false).OfType<ProtoMemberAttribute>().First().Tag;
                 switch (tag)
                 {
                     case 1:
@@ -320,7 +321,7 @@ namespace TrackableData.Protobuf.Tests
             var surrogate = new TrackableHandTrackerSurrogate();
             foreach(var changeItem in tracker.ChangeMap)
             {
-                var tag = changeItem.Key.GetCustomAttribute<ProtoMemberAttribute>().Tag;
+                var tag = changeItem.Key.GetCustomAttributes(false).OfType<ProtoMemberAttribute>().First().Tag;
                 switch (tag)
                 {
                     case 1:
@@ -456,7 +457,7 @@ namespace TrackableData.Protobuf.Tests
             var surrogate = new TrackableRingTrackerSurrogate();
             foreach(var changeItem in tracker.ChangeMap)
             {
-                var tag = changeItem.Key.GetCustomAttribute<ProtoMemberAttribute>().Tag;
+                var tag = changeItem.Key.GetCustomAttributes(false).OfType<ProtoMemberAttribute>().First().Tag;
                 switch (tag)
                 {
                     case 1:

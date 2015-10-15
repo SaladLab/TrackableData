@@ -88,6 +88,7 @@ namespace CodeGen
                 writer.AddUsing("System.Collections.Generic");
                 writer.AddUsing("System.Reflection");
                 writer.AddUsing("System.Runtime.Serialization");
+                writer.AddUsing("System.Linq");
                 writer.AddUsing("TrackableData");
                 if (options.UseProtobuf)
                 {

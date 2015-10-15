@@ -219,7 +219,7 @@ namespace CodeGen
             sb.AppendLine($"\t\tvar surrogate = new {className}();");
             sb.AppendLine("\t\tforeach(var changeItem in tracker.ChangeMap)");
             sb.AppendLine("\t\t{");
-            sb.AppendLine("\t\t\tvar tag = changeItem.Key.GetCustomAttribute<ProtoMemberAttribute>().Tag;");
+            sb.AppendLine("\t\t\tvar tag = changeItem.Key.GetCustomAttributes(false).OfType<ProtoMemberAttribute>().First().Tag;");
             sb.AppendLine("\t\t\tswitch (tag)");
             sb.AppendLine("\t\t\t{");
             foreach (var item in propertyWithTags)

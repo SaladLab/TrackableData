@@ -1,14 +1,12 @@
 ﻿## TODO SOON:
 
- - .NET Framework 3.5 지원
-
  - 유니티에서 잘 동작하는지 확인
-   - json, protobuf 모두 확인
+   - json, protobuf 모두 확인 (Editor 는 잘 되네? Android 랑 iOS 보자.)
 
  - 기본 README 작성
    - 앞으로 작성할 매뉴얼의 큰 그림도 만들자
 
- - Fake & nuget 연동
+ - Fake & nuget
 
  - Mongo
 
@@ -24,3 +22,9 @@
    이래야 T 별로 Converter 를 등록하는 수고를 해결할 수 있음
 
  - TrackableData-MsSql 이 Nullable 을 잘 지원하는지 보자.
+
+ - Protobuf 지원은 따로 CodeGenerator 의 옵션으로 처리하지 말고 Poco 등에서 읽어와서 처리해도 될듯?
+   예를 들면 Poco 인터페이스 정의에 [ProtoContract] 등이 있으면 알아서 Protobuf 지원 코드를 넣는 방식으로
+
+ - Poco Tracking 때 에 PropertyInfo 를 키로 사용하지 말고 인덱스를 부여하자 (Protobuf 것이 있으면 그 것을 사용하고)
+   이게 없으니 protobuf surrogate 연결 하는 코드가 비효율적이다 (property -> tag lookup 을 해야 하는 문제...)

@@ -18,7 +18,7 @@ using System.ComponentModel;
 
 #region IUserData
 
-namespace Basic
+namespace Unity.Data
 {
     [ProtoContract]
     public class TrackableUserData : IUserData, ITrackable<IUserData>
