@@ -41,6 +41,7 @@ namespace TrackableData
         {
             var trackableTypeName = typeof (T).Namespace + "." + ("Trackable" + typeof (T).Name.Substring(1));
             _trackableType = typeof (T).Assembly.GetType(trackableTypeName);
+
             _tableName = tableName;
 
             var allColumns = new List<Column>();

@@ -18,16 +18,18 @@ namespace TrackableData
             public int Length;
             public PropertyInfo PropertyInfo;
             public Func<object, string> ConvertToSqlValue;
+            public Func<object, string> ExtractToSqlValue;
         }
 
-        private readonly bool _isTrackableValue;
+        private readonly Type _trackableInterfaceType;
+        private readonly Action<StringBuilder, Dictionary<PropertyInfo, Column>, ITracker> _valueTrackerSetClausesBuilder;
         private readonly string _tableName;
         private readonly Column[] _allColumns;
         private readonly Column[] _headColumns;
         private readonly Column[] _primaryKeyColumns;
         private readonly Column _keyColumn;
         private readonly Column[] _valueColumns;
-        // private readonly Dictionary<PropertyInfo, Column> _valueColumnMap;
+        private readonly Dictionary<PropertyInfo, Column> _valueColumnMap;
         private readonly string _allColumnString;
         private readonly string _allColumnStringExceptHead;
 
@@ -45,7 +47,24 @@ namespace TrackableData
                                               ColumnDefinition singleValueColumnDef,
                                               ColumnDefinition[] headKeyColumnDefs)
         {
-            _isTrackableValue = typeof (ITrackable).IsAssignableFrom(typeof (TValue));
+            if (typeof (ITrackable).IsAssignableFrom(typeof (TValue)))
+            {
+                var trackableT = typeof (TValue).GetInterfaces().FirstOrDefault(
+                    t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (ITrackable<>));
+                if (trackableT != null)
+                {
+                    _trackableInterfaceType = trackableT.GetGenericArguments()[0];
+
+                    var method = typeof (TrackableDictionaryMsSqlMapper<TKey, TValue>).GetMethod(
+                        "GenerateUpdateSetClausesFromTrackablePocoTracker",
+                        BindingFlags.Static | BindingFlags.NonPublic);
+
+                    _valueTrackerSetClausesBuilder = (Action<StringBuilder, Dictionary<PropertyInfo, Column>, ITracker>)
+                        method.MakeGenericMethod(_trackableInterfaceType)
+                            .CreateDelegate(typeof (Action<StringBuilder, Dictionary<PropertyInfo, Column>, ITracker>));
+                }
+            }
+
             _tableName = tableName;
 
             var allColumns = new List<Column>();
@@ -93,22 +112,15 @@ namespace TrackableData
                     Name = SqlMapperHelper.GetEscapedName(singleValueColumnDef.Name),
                     Type = typeof (TValue),
                     Length = singleValueColumnDef.Length,
-                    ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(typeof (TValue))
+                    ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(typeof (TValue)),
+                    ExtractToSqlValue = SqlMapperHelper.GetSqlValueFunc(typeof (TValue))
                 };
                 valueColumns.Add(column);
                 allColumns.Add(column);
             }
             else
             {
-                var valueType = typeof (TValue);
-                if (_isTrackableValue)
-                {
-                    var trackableT = valueType.GetInterfaces().FirstOrDefault(
-                        t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (ITrackable<>));
-                    if (trackableT != null)
-                        valueType = trackableT.GetGenericArguments()[0];
-                }
-
+                var valueType = _trackableInterfaceType ?? typeof (TValue);
                 foreach (var property in valueType.GetProperties())
                 {
                     var columnName = property.Name;
@@ -126,7 +138,8 @@ namespace TrackableData
                         Name = SqlMapperHelper.GetEscapedName(columnName),
                         Type = property.PropertyType,
                         PropertyInfo = property,
-                        ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(property)
+                        ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(property.PropertyType),
+                        ExtractToSqlValue = SqlMapperHelper.GetSqlValueFunc(property)
                     };
 
                     valueColumns.Add(column);
@@ -138,7 +151,7 @@ namespace TrackableData
             _headColumns = headColumns.ToArray();
             _primaryKeyColumns = primaryKeyColumns.ToArray();
             _valueColumns = valueColumns.ToArray();
-            // _valueColumnMap = _valueColumns.ToDictionary(x => x.PropertyInfo, y => y);
+            _valueColumnMap = _valueColumns.ToDictionary(x => x.PropertyInfo, y => y);
             _allColumnString = string.Join(",", _allColumns.Select(c => c.Name));
             _allColumnStringExceptHead = _keyColumn.Name + "," +
                                          string.Join(",", _valueColumns.Select(c => c.Name));
@@ -195,7 +208,9 @@ namespace TrackableData
             return sb.ToString();
         }
 
-        public string GenerateUpdateSql(TrackableDictionaryTracker<TKey, TValue> tracker, params object[] keyValues)
+        public string GenerateUpdateSql(TrackableDictionary<TKey, TValue> trackable,
+                                        TrackableDictionaryTracker<TKey, TValue> tracker,
+                                        params object[] keyValues)
         {
             if (keyValues.Length != _headColumns.Length)
                 throw new ArgumentException("Number of keyValues should be same with the number of head columns");
@@ -235,7 +250,7 @@ namespace TrackableData
                         sqlAdd.Append(_keyColumn.ConvertToSqlValue(i.Key));
 
                         foreach (var col in _valueColumns)
-                            sqlAdd.Append(",").Append(col.ConvertToSqlValue(v));
+                            sqlAdd.Append(",").Append(col.ExtractToSqlValue(v));
 
                         sqlAdd.Append(")");
 
@@ -257,7 +272,7 @@ namespace TrackableData
                                 concating = true;
                             else
                                 sqlModify.Append(",");
-                            sqlModify.Append(col.Name).Append("=").Append(col.ConvertToSqlValue(v));
+                            sqlModify.Append(col.Name).Append("=").Append(col.ExtractToSqlValue(v));
                         }
 
                         sqlModify.Append(" WHERE ");
@@ -279,6 +294,34 @@ namespace TrackableData
             }
             if (insertCount > 0)
                 sqlAdd.Append(";\n");
+
+            // check each value for TrackableValue
+
+            if (trackable != null && _trackableInterfaceType != null)
+            {
+                foreach (var item in trackable)
+                {
+                    var trackableValue = (ITrackable)item.Value;
+                    if (trackableValue != null && trackableValue.Changed)
+                    {
+                        sqlModify.Append("UPDATE ").Append(_tableName);
+                        sqlModify.Append(" SET ");
+
+                        _valueTrackerSetClausesBuilder(sqlModify, _valueColumnMap, trackableValue.Tracker);
+
+                        sqlModify.Append(" WHERE ");
+                        for (var k = 0; k < _headColumns.Length; k++)
+                        {
+                            sqlModify.Append(_headColumns[k].Name).Append("=");
+                            sqlModify.Append(_headColumns[k].ConvertToSqlValue(keyValues[k]));
+                            sqlModify.Append(" AND ");
+                        }
+
+                        sqlModify.Append(_keyColumn.Name).Append("=");
+                        sqlModify.Append(_keyColumn.ConvertToSqlValue(item.Key)).Append(";\n");
+                    }
+                }
+            }
 
             // merge insert, update and delete sql into one sql
 
@@ -308,6 +351,29 @@ namespace TrackableData
             }
 
             return sql.ToString();
+        }
+
+        static private void GenerateUpdateSetClausesFromTrackablePocoTracker<T>(
+            StringBuilder sb, Dictionary<PropertyInfo, Column> valueColumnMap, ITracker tracker)
+        {
+            var pocoTracker = (TrackablePocoTracker<T>)tracker;
+
+            var concating = false;
+            foreach (var c in pocoTracker.ChangeMap)
+            {
+                Column column;
+                if (valueColumnMap.TryGetValue(c.Key, out column) == false)
+                    continue;
+
+                if (concating == false)
+                    concating = true;
+                else
+                    sb.Append(",");
+
+                sb.Append(column.Name);
+                sb.Append("=");
+                sb.Append(column.ConvertToSqlValue(c.Value.NewValue));
+            }
         }
 
         // POCO Friendly Methods
@@ -361,12 +427,21 @@ namespace TrackableData
             return new KeyValuePair<TKey, TValue>(key, value);
         }
 
+        public async Task<int> SaveAsync(SqlConnection connection, TrackableDictionary<TKey, TValue> trackable, params object[] keyValues)
+        {
+            var sql = GenerateUpdateSql(trackable, (TrackableDictionaryTracker<TKey, TValue>)trackable.Tracker, keyValues);
+            using (var command = new SqlCommand(sql, connection))
+            {
+                return await command.ExecuteNonQueryAsync();
+            }
+        }
+
         public async Task<int> SaveAsync(SqlConnection connection, TrackableDictionaryTracker<TKey, TValue> tracker, params object[] keyValues)
         {
             if (tracker.HasChange == false)
                 return 0;
 
-            var sql = GenerateUpdateSql(tracker, keyValues);
+            var sql = GenerateUpdateSql(null, tracker, keyValues);
             using (var command = new SqlCommand(sql, connection))
             {
                 return await command.ExecuteNonQueryAsync();

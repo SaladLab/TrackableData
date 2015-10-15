@@ -201,6 +201,78 @@ namespace TrackableData.Sql.Tests
             }
         }
 
+        // With value which has tracker
+
+        [Fact]
+        public async Task Test_SqlMapperWithTrackableValue_ResetTable()
+        {
+            using (var ctx = await PrepareAsync<int, TrackableItem>())
+            {
+                var dict = await ctx.SqlMapper.LoadAsync(ctx.Connection);
+                Assert.Equal(0, dict.Count);
+            }
+        }
+
+        [Fact]
+        public async Task Test_SqlMapperWithTrackableValue_CreateAndLoad()
+        {
+            using (var ctx = await PrepareAsync<int, TrackableItem>())
+            {
+                var dict = new TrackableDictionary<int, TrackableItem>();
+                dict.SetDefaultTracker();
+                dict.Add(1, new TrackableItem { Kind = 101, Count = 1, Note = "Handmade Sword" });
+                dict[1].SetDefaultTracker();
+                dict.Add(2, new TrackableItem { Kind = 102, Count = 3, Note = "Lord of Ring" });
+                dict[2].SetDefaultTracker();
+
+                await ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, TrackableItem>)dict.Tracker);
+
+                var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
+                Assert.Equal(dict.Count, dict2.Count);
+                foreach (var item in dict)
+                {
+                    Assert.Equal(item.Value.Kind, dict2[item.Key].Kind);
+                    Assert.Equal(item.Value.Count, dict2[item.Key].Count);
+                    Assert.Equal(item.Value.Note, dict2[item.Key].Note);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Test_SqlMapperWithTrackableValue_Update()
+        {
+            using (var ctx = await PrepareAsync<int, TrackableItem>())
+            {
+                var dict = new TrackableDictionary<int, TrackableItem>();
+                dict.SetDefaultTracker();
+                dict.Add(1, new TrackableItem { Kind = 101, Count = 1, Note = "Handmade Sword" });
+                dict[1].SetDefaultTracker();
+                dict.Add(2, new TrackableItem { Kind = 102, Count = 3, Note = "Lord of Ring" });
+                dict[2].SetDefaultTracker();
+
+                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict);
+                dict.Tracker.Clear();
+
+                dict.Remove(1);
+                dict[2].Count -= 1;
+                dict[2].Note = "Destroyed";
+                dict.Add(3, new TrackableItem { Kind = 103, Count = 3, Note = "Just Arrived" });
+                dict[3].SetDefaultTracker();
+
+                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict);
+
+                var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
+                Assert.Equal(dict.Count, dict2.Count);
+                foreach (var item in dict)
+                {
+                    Assert.Equal(item.Value.Kind, dict2[item.Key].Kind);
+                    Assert.Equal(item.Value.Count, dict2[item.Key].Count);
+                    Assert.Equal(item.Value.Note, dict2[item.Key].Note);
+                }
+            }
+        }
+
+
         // With Value
 
         private static readonly ColumnDefinition SingleValueColumnDef = new ColumnDefinition("Value", typeof (string));
@@ -264,7 +336,5 @@ namespace TrackableData.Sql.Tests
                 }
             }
         }
-
-        // With value which has tracker
     }
 }
