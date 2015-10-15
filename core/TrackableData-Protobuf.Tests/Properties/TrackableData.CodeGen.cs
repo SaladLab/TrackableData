@@ -165,19 +165,18 @@ namespace TrackableData.Protobuf.Tests
             var surrogate = new TrackablePersonTrackerSurrogate();
             foreach(var changeItem in tracker.ChangeMap)
             {
-                var tag = changeItem.Key.GetCustomAttributes(false).OfType<ProtoMemberAttribute>().First().Tag;
-                switch (tag)
+                switch (changeItem.Key.Name)
                 {
-                    case 1:
+                    case "Name":
                         surrogate.Name = new EnvelopedObject<string> { Value = (string)changeItem.Value.NewValue };
                         break;
-                    case 2:
+                    case "Age":
                         surrogate.Age = new EnvelopedObject<int> { Value = (int)changeItem.Value.NewValue };
                         break;
-                    case 3:
+                    case "LeftHand":
                         surrogate.LeftHand = new EnvelopedObject<TrackableHand> { Value = (TrackableHand)changeItem.Value.NewValue };
                         break;
-                    case 4:
+                    case "RightHand":
                         surrogate.RightHand = new EnvelopedObject<TrackableHand> { Value = (TrackableHand)changeItem.Value.NewValue };
                         break;
                 }
@@ -320,13 +319,12 @@ namespace TrackableData.Protobuf.Tests
             var surrogate = new TrackableHandTrackerSurrogate();
             foreach(var changeItem in tracker.ChangeMap)
             {
-                var tag = changeItem.Key.GetCustomAttributes(false).OfType<ProtoMemberAttribute>().First().Tag;
-                switch (tag)
+                switch (changeItem.Key.Name)
                 {
-                    case 1:
+                    case "MainRing":
                         surrogate.MainRing = new EnvelopedObject<TrackableRing> { Value = (TrackableRing)changeItem.Value.NewValue };
                         break;
-                    case 2:
+                    case "SubRing":
                         surrogate.SubRing = new EnvelopedObject<TrackableRing> { Value = (TrackableRing)changeItem.Value.NewValue };
                         break;
                 }
@@ -456,13 +454,12 @@ namespace TrackableData.Protobuf.Tests
             var surrogate = new TrackableRingTrackerSurrogate();
             foreach(var changeItem in tracker.ChangeMap)
             {
-                var tag = changeItem.Key.GetCustomAttributes(false).OfType<ProtoMemberAttribute>().First().Tag;
-                switch (tag)
+                switch (changeItem.Key.Name)
                 {
-                    case 1:
+                    case "Name":
                         surrogate.Name = new EnvelopedObject<string> { Value = (string)changeItem.Value.NewValue };
                         break;
-                    case 2:
+                    case "Power":
                         surrogate.Power = new EnvelopedObject<int> { Value = (int)changeItem.Value.NewValue };
                         break;
                 }

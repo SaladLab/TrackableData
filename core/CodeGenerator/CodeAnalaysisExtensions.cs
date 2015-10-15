@@ -75,10 +75,5 @@ namespace CodeGen
             var bp = b.Split('.').Reverse();
             return ap.Zip(bp, (x, y) => x == y).All(x => x);
         }
-
-        public static bool IsValueType(this TypeSyntax node)
-        {
-            return false;
-        }
     }
 }

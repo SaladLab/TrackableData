@@ -22,6 +22,3 @@
    이래야 T 별로 Converter 를 등록하는 수고를 해결할 수 있음
 
  - TrackableData-MsSql 이 Nullable 을 잘 지원하는지 보자.
-
- - Poco Tracking 때 에 PropertyInfo 를 키로 사용하지 말고 인덱스를 부여하자 (Protobuf 것이 있으면 그 것을 사용하고)
-   이게 없으니 protobuf surrogate 연결 하는 코드가 비효율적이다 (property -> tag lookup 을 해야 하는 문제...)

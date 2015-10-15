@@ -139,16 +139,15 @@ namespace Unity.Data
             var surrogate = new TrackableUserDataTrackerSurrogate();
             foreach(var changeItem in tracker.ChangeMap)
             {
-                var tag = changeItem.Key.GetCustomAttributes(false).OfType<ProtoMemberAttribute>().First().Tag;
-                switch (tag)
+                switch (changeItem.Key.Name)
                 {
-                    case 1:
+                    case "Name":
                         surrogate.Name = new EnvelopedObject<string> { Value = (string)changeItem.Value.NewValue };
                         break;
-                    case 2:
+                    case "Gold":
                         surrogate.Gold = new EnvelopedObject<int> { Value = (int)changeItem.Value.NewValue };
                         break;
-                    case 3:
+                    case "Level":
                         surrogate.Level = new EnvelopedObject<int> { Value = (int)changeItem.Value.NewValue };
                         break;
                 }

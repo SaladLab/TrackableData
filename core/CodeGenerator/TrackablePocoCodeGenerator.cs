@@ -199,11 +199,7 @@ namespace CodeGen
             {
                 var p = item.Item1;
                 sb.AppendFormat($"\t[ProtoMember{item.Item2.ArgumentList}] ");
-
-                if (p.Type.IsValueType())
-                    sb.AppendLine($"public {p.Type}? {p.Identifier};");
-                else
-                    sb.AppendLine($"public EnvelopedObject<{p.Type}> {p.Identifier};");
+                sb.AppendLine($"public EnvelopedObject<{p.Type}> {p.Identifier};");
             }
 
             // ConvertTrackerToSurrogate
@@ -217,19 +213,15 @@ namespace CodeGen
             sb.AppendLine($"\t\tvar surrogate = new {className}();");
             sb.AppendLine("\t\tforeach(var changeItem in tracker.ChangeMap)");
             sb.AppendLine("\t\t{");
-            sb.AppendLine("\t\t\tvar tag = changeItem.Key.GetCustomAttributes(false).OfType<ProtoMemberAttribute>().First().Tag;");
-            sb.AppendLine("\t\t\tswitch (tag)");
+            sb.AppendLine("\t\t\tswitch (changeItem.Key.Name)");
             sb.AppendLine("\t\t\t{");
             foreach (var item in propertyWithTags)
             {
                 var p = item.Item1;
 
-                sb.AppendLine($"\t\t\t\tcase {item.Item2.ArgumentList.Arguments[0]}:");
-                if (p.Type.IsValueType())
-                    sb.AppendLine($"\t\t\t\t\tsurrogate.{p.Identifier} = ({p.Type})changeItem.Value.NewValue;");
-                else
-                    sb.AppendLine(
-                        $"\t\t\t\t\tsurrogate.{p.Identifier} = new EnvelopedObject<{p.Type}> {{ Value = ({p.Type})changeItem.Value.NewValue }};");
+                sb.AppendLine($"\t\t\t\tcase \"{item.Item1.Identifier}\":");
+                sb.AppendLine($"\t\t\t\t\tsurrogate.{p.Identifier} = new EnvelopedObject<{p.Type}>" +
+                              $" {{ Value = ({p.Type})changeItem.Value.NewValue }};");
 
                 sb.AppendLine($"\t\t\t\t\tbreak;");
             }
