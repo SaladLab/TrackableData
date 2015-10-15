@@ -30,7 +30,8 @@ namespace CodeGen
             var typeName = idecl.GetTypeName();
             var className = "Trackable" + typeName.Substring(1);
 
-            if (Options.UseProtobuf)
+            var useProtoContract = idecl.AttributeLists.GetAttribute("ProtoContractAttribute") != null;
+            if (useProtoContract)
                 sb.AppendLine("[ProtoContract]");
             sb.AppendLine($"public class {className} : {typeName}, ITrackable<{typeName}>");
             sb.AppendLine("{");
@@ -154,15 +155,11 @@ namespace CodeGen
                 sb.AppendLine($"\tprivate {propertyType} _{propertyName};");
                 sb.AppendLine("");
 
-                if (Options.UseProtobuf)
-                {
-                    var attr = p.AttributeLists.GetAttribute("ProtoMemberAttribute");
-                    sb.Append($"\t[ProtoMember{attr?.ArgumentList}] ");
-                }
+                var protoMemberAttr = p.AttributeLists.GetAttribute("ProtoMemberAttribute");
+                if (protoMemberAttr != null)
+                    sb.Append($"\t[ProtoMember{protoMemberAttr.ArgumentList}] ");
                 else
-                {
-                    sb.Append($"\t");
-                }
+                    sb.Append("\t");
 
                 sb.AppendLine($"public {propertyType} {propertyName}");
                 sb.AppendLine("\t{");
@@ -199,8 +196,10 @@ namespace CodeGen
             var typeName = idecl.GetTypeName();
             var className = "Trackable" + typeName.Substring(1) + "Tracker";
 
-            if (Options.UseProtobuf)
+            var useProtoContract = idecl.AttributeLists.GetAttribute("ProtoContractAttribute") != null;
+            if (useProtoContract)
                 sb.AppendLine("[ProtoContract]");
+
             sb.AppendLine($"public class {className} : IContainerTracker<{typeName}>");
             sb.AppendLine("{");
 
@@ -209,15 +208,11 @@ namespace CodeGen
             var properties = idecl.GetProperties();
             foreach (var p in properties)
             {
-                if (Options.UseProtobuf)
-                {
-                    var attr = p.AttributeLists.GetAttribute("ProtoMemberAttribute");
-                    sb.Append($"\t[ProtoMember{attr?.ArgumentList}] ");
-                }
+                var protoMemberAttr = p.AttributeLists.GetAttribute("ProtoMemberAttribute");
+                if (protoMemberAttr != null)
+                    sb.Append($"\t[ProtoMember{protoMemberAttr.ArgumentList}] ");
                 else
-                {
                     sb.Append("\t");
-                }
 
                 var propertyName = p.Identifier.ToString();
                 var trackerName = Utility.GetTrackerClassName(p.Type);

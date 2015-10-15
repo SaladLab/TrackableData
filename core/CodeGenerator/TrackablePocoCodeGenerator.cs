@@ -17,15 +17,17 @@ namespace CodeGen
             writer.PushRegion(iname);
             writer.PushNamespace(idecl.GetNamespaceScope());
 
-            GenerateTrackablePocoCode(idecl, writer);
-            if (Options.UseProtobuf)
+            var useProtoContract = idecl.AttributeLists.GetAttribute("ProtoContractAttribute") != null;
+            GenerateTrackablePocoCode(idecl, writer, useProtoContract);
+
+            if (useProtoContract)
                 GenerateTrackablePocoSurrogateCode(idecl, writer);
 
             writer.PopNamespace();
             writer.PopRegion();
         }
 
-        private void GenerateTrackablePocoCode(InterfaceDeclarationSyntax idecl, ICodeGenWriter writer)
+        private void GenerateTrackablePocoCode(InterfaceDeclarationSyntax idecl, ICodeGenWriter writer, bool useProtoContract)
         {
             var sb = new StringBuilder();
             var typeName = idecl.GetTypeName();
@@ -34,7 +36,7 @@ namespace CodeGen
             var properties = idecl.GetProperties();
             var trackableProperties = Utility.GetTrackableProperties(properties);
 
-            if (Options.UseProtobuf)
+            if (useProtoContract)
                 sb.AppendLine("[ProtoContract]");
             sb.AppendLine($"public class {className} : {typeName}, ITrackable<{typeName}>");
             sb.AppendLine("{");
@@ -146,15 +148,11 @@ namespace CodeGen
                 sb.AppendLine($"\tprivate {propertyType} _{p.Identifier};");
                 sb.AppendLine("");
 
-                if (Options.UseProtobuf)
-                {
-                    var attr = p.AttributeLists.GetAttribute("ProtoMemberAttribute");
-                    sb.Append($"\t[ProtoMember{attr?.ArgumentList}] ");
-                }
+                var protoMemberAttr = p.AttributeLists.GetAttribute("ProtoMemberAttribute");
+                if (protoMemberAttr != null)
+                    sb.Append($"\t[ProtoMember{protoMemberAttr?.ArgumentList}] ");
                 else
-                {
                     sb.Append($"\t");
-                }
 
                 sb.AppendLine($"public {propertyType} {propertyName}");
                 sb.AppendLine("\t{");

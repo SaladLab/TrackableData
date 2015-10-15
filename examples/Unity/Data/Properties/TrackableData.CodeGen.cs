@@ -9,12 +9,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ProtoBuf;
+using TrackableData;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Linq;
-using TrackableData;
-using ProtoBuf;
-using System.ComponentModel;
 
 #region IUserData
 

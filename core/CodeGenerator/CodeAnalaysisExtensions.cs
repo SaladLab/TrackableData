@@ -33,6 +33,16 @@ namespace CodeGen
             return current;
         }
 
+        public static SyntaxNode GetRootNode(this SyntaxNode node)
+        {
+            if (node == null)
+                return null;
+            if (node.Parent == null)
+                return node;
+            else
+                return GetRootNode(node.Parent);
+        }
+
         public static PropertyDeclarationSyntax[] GetProperties(this InterfaceDeclarationSyntax node)
         {
             return node.Members.OfType<PropertyDeclarationSyntax>().ToArray();

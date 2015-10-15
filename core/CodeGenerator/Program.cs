@@ -6,6 +6,7 @@ using System.Reflection;
 using CommandLine;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis;
 
 namespace CodeGen
 {
@@ -73,28 +74,17 @@ namespace CodeGen
 
                 Console.WriteLine("- Parse sources");
 
-                var syntaxTrees =
-                    sources.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file)).ToArray();
-                var interfaceDeclarations =
-                    syntaxTrees.SelectMany(st => st.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>())
-                               .ToArray();
+                var syntaxTrees = sources.Select(
+                    file => CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file)).ToArray();
+                var interfaceDeclarations = syntaxTrees.SelectMany(
+                    st => st.GetRoot().DescendantNodes().OfType<InterfaceDeclarationSyntax>()).ToArray();
 
                 // Generate code
 
                 Console.WriteLine("- Generate code");
 
                 var writer = new TextCodeGenWriter();
-                writer.AddUsing("System");
-                writer.AddUsing("System.Collections.Generic");
-                writer.AddUsing("System.Reflection");
-                writer.AddUsing("System.Runtime.Serialization");
-                writer.AddUsing("System.Linq");
-                writer.AddUsing("TrackableData");
-                if (options.UseProtobuf)
-                {
-                    writer.AddUsing("ProtoBuf");
-                    writer.AddUsing("System.ComponentModel");
-                }
+                var relatedSourceTrees = new HashSet<SyntaxNode>();
 
                 // TrackablePoco
 
@@ -102,7 +92,10 @@ namespace CodeGen
                 foreach (var idecl in interfaceDeclarations)
                 {
                     if (idecl.HasBase("TrackableData.ITrackablePoco"))
+                    {
                         pocoCodeGen.GenerateCode(idecl, writer);
+                        relatedSourceTrees.Add(idecl.GetRootNode());
+                    }
                 }
 
                 // TrackableContainer
@@ -111,8 +104,24 @@ namespace CodeGen
                 foreach (var idecl in interfaceDeclarations)
                 {
                     if (idecl.HasBase("TrackableData.ITrackableContainer"))
+                    {
                         containerCodeGen.GenerateCode(idecl, writer);
+                        relatedSourceTrees.Add(idecl.GetRootNode());
+                    }
                 }
+
+                // Resolve referenced using
+
+                var usingDirectives = new HashSet<string>(relatedSourceTrees.SelectMany(
+                    st => st.DescendantNodes().OfType<UsingDirectiveSyntax>()).Select(x => x.Name.ToString()));
+                usingDirectives.Add("System");
+                usingDirectives.Add("System.Collections.Generic");
+                usingDirectives.Add("System.Reflection");
+                usingDirectives.Add("System.Runtime.Serialization");
+                usingDirectives.Add("System.Linq");
+                usingDirectives.Add("TrackableData");
+                foreach (var usingDirective in usingDirectives)
+                    writer.AddUsing(usingDirective);
 
                 // Save generated code
 

@@ -19,8 +19,5 @@ namespace CodeGen
 
         [Option('t', "target", HelpText = "Filename of a generated code.")]
         public string TargetFile { get; set; }
-
-        [Option('c', "protobuf", HelpText = "Use protobuf-net for serializing generated type.")]
-        public bool UseProtobuf { get; set; }
     }
 }

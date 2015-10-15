@@ -7,14 +7,13 @@
 // </auto-generated>
 // ------------------------------------------------------------------------------
 
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Linq;
 using TrackableData;
-using ProtoBuf;
-using System.ComponentModel;
 
 #region IPerson
 

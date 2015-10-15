@@ -55,7 +55,6 @@
     <WriteLinesToFile File="$(ArgsFile)" Lines="--reference=$([MSBuild]::Escape($(ReferenceFiles)))"/>
     <WriteLinesToFile File="$(ArgsFile)" Lines="--define=$([MSBuild]::Escape($(DefineConstants)))"/>
     <WriteLinesToFile File="$(ArgsFile)" Lines="--target=$(TrackableDataTarget)" Condition="$(TrackableDataTarget) != ''"/>
-    <WriteLinesToFile File="$(ArgsFile)" Lines="--protobuf=$(TrackableDataProtobuf)" Condition="$(TrackableDataProtobuf) != ''"/>
     <Exec Command='"$(CodeGenToolExe)" "@$(ArgsFile)"' />
   </Target>
 

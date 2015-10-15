@@ -7,6 +7,7 @@ using TrackableData;
 
 namespace Unity.Data
 {
+    [ProtoContract]
     public interface IUserData : ITrackablePoco
     {
         [ProtoMember(1)] string Name { get; set; }
