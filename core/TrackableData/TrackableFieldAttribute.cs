@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 
 namespace TrackableData
 {
@@ -28,6 +29,30 @@ namespace TrackableData
                     return Parameters.Any(p => p == parameter) ? "true" : null;
                 }
             }
+        }
+
+        public static string GetParameter(ICustomAttributeProvider provider, string parameter)
+        {
+            if (parameter.EndsWith(":"))
+            {
+                // as property
+                foreach (var property in provider.GetCustomAttributes(false).OfType<TrackableFieldAttribute>())
+                {
+                    var p = property.Parameters.FirstOrDefault(x => x.StartsWith(parameter));
+                    if (p != null)
+                        return p.Substring(parameter.Length);
+                }
+            }
+            else
+            {
+                // as flag
+                foreach (var property in provider.GetCustomAttributes(false).OfType<TrackableFieldAttribute>())
+                {
+                    if (property.Parameters.Any(p => p == parameter))
+                        return "true";
+                }
+            }
+            return null;
         }
     }
 }

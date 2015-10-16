@@ -14,6 +14,9 @@ namespace TrackableData.MongoDB.Tests
         private static TrackablePocoMongoDbMapper<IPerson> PersonMapper =
             new TrackablePocoMongoDbMapper<IPerson>();
 
+        private static TrackablePocoMongoDbMapper<IPersonWithCustomId> PersonWithCustomIdMapper =
+            new TrackablePocoMongoDbMapper<IPersonWithCustomId>();
+
         private Database _db;
 
         public TrackablePocoTest(Database db)
@@ -147,6 +150,27 @@ namespace TrackableData.MongoDB.Tests
 
             var person2 = await PersonMapper.LoadAsync(collection, 1, "One", person.Id);
             Assert.Equal(person.Id, person2.Id);
+            Assert.Equal(person.Name, person2.Name);
+            Assert.Equal(person.Age, person2.Age);
+        }
+
+        // With Custom Key
+
+        [Fact]
+        public async Task Test_MongoDbMapperWithCustomKey_CreateAndLoadPoco()
+        {
+            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
+
+            var person = new TrackablePersonWithCustomId
+            {
+                CustomId = UniqueInt64Id.GenerateNewId(),
+                Name = "Testor",
+                Age = 25
+            };
+            await PersonWithCustomIdMapper.CreateAsync(collection, person);
+
+            var person2 = await PersonWithCustomIdMapper.LoadAsync(collection, person.CustomId);
+            Assert.Equal(person.CustomId, person2.CustomId);
             Assert.Equal(person.Name, person2.Name);
             Assert.Equal(person.Age, person2.Age);
         }

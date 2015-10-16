@@ -71,6 +71,7 @@ namespace TrackableData.MongoDB.Tests
             public static readonly PropertyInfo Id = typeof(IPerson).GetProperty("Id");
             public static readonly PropertyInfo Name = typeof(IPerson).GetProperty("Name");
             public static readonly PropertyInfo Age = typeof(IPerson).GetProperty("Age");
+            public static readonly PropertyInfo Extra = typeof(IPerson).GetProperty("Extra");
         }
 
         private ObjectId _Id;
@@ -118,6 +119,149 @@ namespace TrackableData.MongoDB.Tests
                 if (Tracker != null && Age != value)
                     Tracker.TrackSet(PropertyTable.Age, _Age, value);
                 _Age = value;
+            }
+        }
+
+        private int _Extra;
+
+        public int Extra
+        {
+            get
+            {
+                return _Extra;
+            }
+            set
+            {
+                if (Tracker != null && Extra != value)
+                    Tracker.TrackSet(PropertyTable.Extra, _Extra, value);
+                _Extra = value;
+            }
+        }
+    }
+}
+
+#endregion
+
+#region IPersonWithCustomId
+
+namespace TrackableData.MongoDB.Tests
+{
+    public class TrackablePersonWithCustomId : IPersonWithCustomId, ITrackable<IPersonWithCustomId>
+    {
+        [IgnoreDataMember]
+        public IPocoTracker<IPersonWithCustomId> Tracker { get; set; }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
+
+        ITracker ITrackable.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (IPocoTracker<IPersonWithCustomId>)value;
+                Tracker = t;
+            }
+        }
+
+        ITracker<IPersonWithCustomId> ITrackable<IPersonWithCustomId>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (IPocoTracker<IPersonWithCustomId>)value;
+                Tracker = t;
+            }
+        }
+
+        public ITrackable GetChildTrackable(object name)
+        {
+            switch ((string)name)
+            {
+                default:
+                    return null;
+            }
+        }
+
+        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
+        {
+            yield break;
+        }
+
+        public static class PropertyTable
+        {
+            public static readonly PropertyInfo CustomId = typeof(IPersonWithCustomId).GetProperty("CustomId");
+            public static readonly PropertyInfo Name = typeof(IPersonWithCustomId).GetProperty("Name");
+            public static readonly PropertyInfo Age = typeof(IPersonWithCustomId).GetProperty("Age");
+            public static readonly PropertyInfo Extra = typeof(IPersonWithCustomId).GetProperty("Extra");
+        }
+
+        private long _CustomId;
+
+        public long CustomId
+        {
+            get
+            {
+                return _CustomId;
+            }
+            set
+            {
+                if (Tracker != null && CustomId != value)
+                    Tracker.TrackSet(PropertyTable.CustomId, _CustomId, value);
+                _CustomId = value;
+            }
+        }
+
+        private string _Name;
+
+        public string Name
+        {
+            get
+            {
+                return _Name;
+            }
+            set
+            {
+                if (Tracker != null && Name != value)
+                    Tracker.TrackSet(PropertyTable.Name, _Name, value);
+                _Name = value;
+            }
+        }
+
+        private int _Age;
+
+        public int Age
+        {
+            get
+            {
+                return _Age;
+            }
+            set
+            {
+                if (Tracker != null && Age != value)
+                    Tracker.TrackSet(PropertyTable.Age, _Age, value);
+                _Age = value;
+            }
+        }
+
+        private int _Extra;
+
+        public int Extra
+        {
+            get
+            {
+                return _Extra;
+            }
+            set
+            {
+                if (Tracker != null && Extra != value)
+                    Tracker.TrackSet(PropertyTable.Extra, _Extra, value);
+                _Extra = value;
             }
         }
     }

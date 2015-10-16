@@ -38,8 +38,33 @@ namespace TrackableData.MongoDB
                 return false;
 
             var classMap = new BsonClassMap(_trackableType);
+
+            // start with auto map
             classMap.AutoMap();
+
+            // ignore extra elements for smooth schema change
+            classMap.SetIgnoreExtraElements(true);
+
+            // set default ignore for saving spaces
+            foreach (var memberMap in classMap.DeclaredMemberMaps)
+            {
+                var mt = memberMap.MemberType;
+                var defaultValue = mt.IsValueType ? Activator.CreateInstance(mt) : null;
+                memberMap.SetDefaultValue(defaultValue);
+                memberMap.SetIgnoreIfDefault(true);
+            }
+
+            // property "Tracker" is not data!
             classMap.UnmapMember(_trackableType.GetProperty("Tracker"));
+
+            // tell customized id to mongo-db
+            var identityColumn = typeof(T).GetProperties().FirstOrDefault(
+                p => TrackableFieldAttribute.GetParameter(p, "mongodb.identity") != null);
+            if (identityColumn != null)
+            {
+                classMap.MapIdProperty(identityColumn.Name);
+            }
+
             BsonClassMap.RegisterClassMap(classMap);
             return true;
         }
@@ -87,8 +112,8 @@ namespace TrackableData.MongoDB
                 {
                     await collection.InsertOneAsync(bson);
 
-                    // TODO: ObjectID 타입에 따라 분기
-                    _idProperty.SetValue(value, bson["_id"].AsObjectId);
+                    var idValue = Convert.ChangeType(bson["_id"], _idProperty.PropertyType);
+                    _idProperty.SetValue(value, idValue);
                 }
                 else
                 {
