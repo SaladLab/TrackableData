@@ -93,10 +93,9 @@ namespace TrackableData.MongoDB
             UpdateDefinition<BsonDocument> update = null;
             foreach (var change in tracker.ChangeMap)
             {
-                if (update == null)
-                    update = Builders<BsonDocument>.Update.Set(keyNamespace + change.Key.Name, change.Value.NewValue);
-                else
-                    update = update.Set(keyNamespace + change.Key.Name, change.Value.NewValue);
+                update = (update == null)
+                    ? Builders<BsonDocument>.Update.Set(keyNamespace + change.Key.Name, change.Value.NewValue)
+                    : update.Set(keyNamespace + change.Key.Name, change.Value.NewValue);
             }
 
             return Tuple.Create(filter, update);
