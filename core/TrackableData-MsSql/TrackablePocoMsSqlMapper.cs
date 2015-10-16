@@ -287,9 +287,9 @@ namespace TrackableData
             }
         }
 
-        public async Task<T> LoadAsync(SqlConnection connection, params object[] keys)
+        public async Task<T> LoadAsync(SqlConnection connection, params object[] keyValues)
         {
-            var sql = GenerateSelectSql(keys);
+            var sql = GenerateSelectSql(keyValues);
             using (var command = new SqlCommand(sql, connection))
             {
                 using (var reader = command.ExecuteReader())
@@ -303,9 +303,9 @@ namespace TrackableData
             return default(T);
         }
 
-        public async Task<List<T>> LoadAllAsync(SqlConnection connection, params object[] keys)
+        public async Task<List<T>> LoadAllAsync(SqlConnection connection, params object[] keyValues)
         {
-            var sql = GenerateSelectSql(keys);
+            var sql = GenerateSelectSql(keyValues);
             var list = new List<T>();
             using (var command = new SqlCommand(sql, connection))
             {

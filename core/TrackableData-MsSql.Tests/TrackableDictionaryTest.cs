@@ -99,7 +99,7 @@ namespace TrackableData.Sql.Tests
             {
                 var dict = CreateTestInventory(true);
 
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, ItemData>)dict.Tracker);
+                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker);
 
                 var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
                 Assert.Equal(dict.Count, dict2.Count);
@@ -119,11 +119,11 @@ namespace TrackableData.Sql.Tests
             {
                 var dict = CreateTestInventory(true);
 
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, ItemData>)dict.Tracker);
+                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker);
                 dict.Tracker.Clear();
 
                 ModifyTestInventory(dict, ModificationWayType.SetNew);
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, ItemData>)dict.Tracker);
+                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker);
 
                 var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
                 Assert.Equal(dict.Count, dict2.Count);
@@ -161,9 +161,7 @@ namespace TrackableData.Sql.Tests
             {
                 var dict = CreateTestInventory(true);
 
-                await
-                    ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, ItemData>)dict.Tracker, 1,
-                                            "One");
+                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker, 1, "One");
 
                 var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection, 1, "One");
                 Assert.Equal(dict.Count, dict2.Count);
@@ -183,15 +181,11 @@ namespace TrackableData.Sql.Tests
             {
                 var dict = CreateTestInventory(true);
 
-                await
-                    ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, ItemData>)dict.Tracker, 1,
-                                            "One");
+                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker, 1, "One");
                 dict.Tracker.Clear();
 
                 ModifyTestInventory(dict, ModificationWayType.SetNew);
-                await
-                    ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, ItemData>)dict.Tracker, 1,
-                                            "One");
+                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker, 1, "One");
 
                 var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection, 1, "One");
                 Assert.Equal(dict.Count, dict2.Count);
@@ -228,8 +222,7 @@ namespace TrackableData.Sql.Tests
                 dict.Add(2, new TrackableItem { Kind = 102, Count = 3, Note = "Lord of Ring" });
                 dict[2].SetDefaultTracker();
 
-                await
-                    ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, TrackableItem>)dict.Tracker);
+                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker);
 
                 var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
                 Assert.Equal(dict.Count, dict2.Count);
@@ -301,7 +294,7 @@ namespace TrackableData.Sql.Tests
                 dict.Add(2, "Two");
                 dict.Add(3, "Three");
 
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, string>)dict.Tracker);
+                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker);
 
                 var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
                 Assert.Equal(dict.Count, dict2.Count);
@@ -323,13 +316,13 @@ namespace TrackableData.Sql.Tests
                 dict.Add(2, "Two");
                 dict.Add(3, "Three");
 
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, string>)dict.Tracker);
+                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker);
                 dict.Tracker.Clear();
 
                 dict.Remove(1);
                 dict[2] = "TwoTwo";
                 dict.Add(4, "Four");
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, (TrackableDictionaryTracker<int, string>)dict.Tracker);
+                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker);
 
                 var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
                 Assert.Equal(dict.Count, dict2.Count);

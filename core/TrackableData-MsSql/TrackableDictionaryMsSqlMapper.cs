@@ -395,9 +395,9 @@ namespace TrackableData
             }
         }
 
-        public async Task<TrackableDictionary<TKey, TValue>> LoadAsync(SqlConnection connection, params object[] keys)
+        public async Task<TrackableDictionary<TKey, TValue>> LoadAsync(SqlConnection connection, params object[] keyValues)
         {
-            var sql = GenerateSelectSql(keys);
+            var sql = GenerateSelectSql(keyValues);
             var dictionary = new TrackableDictionary<TKey, TValue>();
             using (var command = new SqlCommand(sql, connection))
             {
@@ -444,6 +444,12 @@ namespace TrackableData
             {
                 return await command.ExecuteNonQueryAsync();
             }
+        }
+
+        public Task<int> SaveAsync(SqlConnection connection, IDictionaryTracker<TKey, TValue> tracker,
+                                   params object[] keyValues)
+        {
+            return SaveAsync(connection, (TrackableDictionaryTracker<TKey, TValue>)tracker, keyValues);
         }
 
         public async Task<int> SaveAsync(SqlConnection connection, TrackableDictionaryTracker<TKey, TValue> tracker,
