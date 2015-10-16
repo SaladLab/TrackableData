@@ -67,10 +67,11 @@ namespace TrackableData.MongoDB.Tests
         {
             var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
 
+            var id = ObjectId.GenerateNewId();
             var dict = CreateTestInventory(true);
-            await ItemDataMapper.SaveAsync(collection, dict.Tracker, 1);
+            await ItemDataMapper.SaveAsync(collection, dict.Tracker, id);
 
-            var dict2 = await ItemDataMapper.LoadAsync(collection, 1);
+            var dict2 = await ItemDataMapper.LoadAsync(collection, id);
             Assert.Equal(dict.Count, dict2.Count);
             foreach (var item in dict)
             {
@@ -85,14 +86,15 @@ namespace TrackableData.MongoDB.Tests
         {
             var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
 
+            var id = ObjectId.GenerateNewId();
             var dict = CreateTestInventory(true);
-            await ItemDataMapper.SaveAsync(collection, dict.Tracker, 1);
+            await ItemDataMapper.SaveAsync(collection, dict.Tracker, id);
             dict.Tracker.Clear();
 
             ModifyTestInventory(dict, ModificationWayType.SetNew);
-            await ItemDataMapper.SaveAsync(collection, dict.Tracker, 1);
+            await ItemDataMapper.SaveAsync(collection, dict.Tracker, id);
 
-            var dict2 = await ItemDataMapper.LoadAsync(collection, 1);
+            var dict2 = await ItemDataMapper.LoadAsync(collection, id);
             Assert.Equal(dict.Count, dict2.Count);
             foreach (var item in dict)
             {
