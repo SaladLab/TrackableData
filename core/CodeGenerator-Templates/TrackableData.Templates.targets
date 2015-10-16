@@ -8,7 +8,7 @@
         <CodeGenToolExeDir>$(MSBuildThisFileDirectory)..\tools</CodeGenToolExeDir>
       </PropertyGroup>
     </When>
-    <!-- Internal build within Akka.Interfaced solution -->
+    <!-- Internal build within TrackableData solution -->
     <When Condition="Exists('$(MSBuildThisFileDirectory)..\CodeGenerator')">
       <PropertyGroup>
         <CodeGenToolExeDir>$(MSBuildThisFileDirectory)..\..\output\CodeGenerator\bin\Debug</CodeGenToolExeDir>
