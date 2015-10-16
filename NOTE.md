@@ -1,4 +1,17 @@
-﻿## TODO SOON:
+﻿## TODO Mongo:
+
+ - POCO
+   - POCO 자체의 Serialization 가 잘 되는지
+   - Id 필드 핸들링 되나 볼 것
+   - Tracker 등 빠질 Attribute 처리
+   - Default 값 저장 안하게
+   - Update 해보자
+ - PocoTracker 로 부터 Update Bson 만들기 
+ - Dictionary
+ - List
+
+            // ObjectId 대신 long 도 사용할 수 있도록
+## TODO SOON:
 
  - 유니티에서 잘 동작하는지 확인
    - json, protobuf 모두 확인 (Editor 는 잘 되네? Android 랑 iOS 보자.)
@@ -6,9 +19,9 @@
  - 기본 README 작성
    - 앞으로 작성할 매뉴얼의 큰 그림도 만들자
 
- - Fake & nuget
-
  - Mongo
+
+ - Project 별로 Namespace 넣어주자.
 
 ## TODO LATER:
 
