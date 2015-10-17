@@ -88,7 +88,14 @@ namespace TrackableData
         public void Insert(int index, T item)
         {
             if (Tracker != null)
-                Tracker.TrackInsert(index, item);
+            {
+                if (index == 0)
+                    Tracker.TrackPushFront(item);
+                else if (index == _list.Count)
+                    Tracker.TrackPushBack(item);
+                else
+                    Tracker.TrackInsert(index, item);
+            }
 
             _list.Insert(index, item);
         }
@@ -96,7 +103,14 @@ namespace TrackableData
         public void RemoveAt(int index)
         {
             if (Tracker != null)
-                Tracker.TrackRemove(index, _list[index]);
+            {
+                if (index == 0)
+                    Tracker.TrackPopFront(_list[index]);
+                else if (index == _list.Count - 1)
+                    Tracker.TrackPopBack(_list[index]);
+                else
+                    Tracker.TrackRemove(index, _list[index]);
+            }
 
             _list.RemoveAt(index);
         }
@@ -105,10 +119,7 @@ namespace TrackableData
 
         public void Add(T item)
         {
-            if (Tracker != null)
-                Tracker.TrackInsert(_list.Count, item);
-
-            _list.Add(item);
+            Insert(_list.Count, item);
         }
 
         public void Clear()
@@ -118,7 +129,7 @@ namespace TrackableData
                 for (int i = _list.Count - 1; i >= 0; i--)
                 {
                     if (Tracker != null)
-                        Tracker.TrackRemove(i, _list[i]);
+                        Tracker.TrackPopBack(_list[i]);
                 }
             }
 

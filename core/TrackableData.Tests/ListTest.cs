@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System.Collections.Generic;
+using Xunit;
 
 namespace TrackableData.Tests
 {
@@ -18,6 +19,31 @@ namespace TrackableData.Tests
         {
             var list = CreateTestList();
             list.SetDefaultTrackerDeep();
+            return list;
+        }
+
+        private List<string> GetInitialList()
+        {
+            return new List<string>(CreateTestList());
+        }
+
+        private void ModifyListForTest(IList<string> list)
+        {
+            list[0] = "OneModified";
+            list.RemoveAt(1);
+            list.Insert(1, "TwoInserted");
+            list.Insert(0, "Zero");
+            list.RemoveAt(0);
+            list.Insert(0, "ZeroAgain");
+            list.Insert(4, "Four");
+            list.RemoveAt(4);
+            list.Insert(4, "FourAgain");
+        }
+
+        private List<string> GetModifiedList()
+        {
+            var list = GetInitialList();
+            ModifyListForTest(list);
             return list;
         }
 
@@ -55,23 +81,19 @@ namespace TrackableData.Tests
         public void TestList_ApplyToTrackable_Work()
         {
             var list = CreateTestListWithTracker();
-            list[0] = "OneModified";
-            list.RemoveAt(1);
-            list.Insert(1, "TwoInserted");
+            ModifyListForTest(list);
 
             var list2 = CreateTestList();
             list.Tracker.ApplyTo(list2);
 
-            Assert.Equal(new[] { "OneModified", "TwoInserted", "Three" }, list2);
+            Assert.Equal(GetModifiedList(), list2);
         }
 
         [Fact]
         public void TestList_ApplyToTracker_Work()
         {
             var list = CreateTestListWithTracker();
-            list[0] = "OneModified";
-            list.RemoveAt(1);
-            list.Insert(1, "TwoInserted");
+            ModifyListForTest(list);
 
             var tracker2 = new TrackableListTracker<string>();
             list.Tracker.ApplyTo(tracker2);
@@ -79,31 +101,27 @@ namespace TrackableData.Tests
             var list2 = CreateTestList();
             tracker2.ApplyTo(list2);
 
-            Assert.Equal(new[] { "OneModified", "TwoInserted", "Three" }, list2);
+            Assert.Equal(GetModifiedList(), list2);
         }
 
         [Fact]
         public void TestList_RollbackToTrackable_Work()
         {
             var list = CreateTestListWithTracker();
-            list[0] = "OneModified";
-            list.RemoveAt(1);
-            list.Insert(1, "TwoInserted");
+            ModifyListForTest(list);
 
             var list2 = CreateTestList();
             list.Tracker.ApplyTo(list2);
             list.Tracker.RollbackTo(list2);
 
-            Assert.Equal(new[] { "One", "Two", "Three" }, list2);
+            Assert.Equal(GetInitialList(), list2);
         }
 
         [Fact]
         public void TestList_RollbackToTracker_Work()
         {
             var list = CreateTestListWithTracker();
-            list[0] = "OneModified";
-            list.RemoveAt(1);
-            list.Insert(1, "TwoInserted");
+            ModifyListForTest(list);
 
             var tracker2 = new TrackableListTracker<string>();
             list.Tracker.ApplyTo(tracker2);
@@ -112,7 +130,7 @@ namespace TrackableData.Tests
             var list2 = CreateTestList();
             tracker2.ApplyTo(list2);
 
-            Assert.Equal(new[] { "One", "Two", "Three" }, list2);
+            Assert.Equal(GetInitialList(), list2);
         }
     }
 }

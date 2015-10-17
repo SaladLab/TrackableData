@@ -71,5 +71,9 @@ namespace TrackableData
         void TrackInsert(int index, T newValue);
         void TrackRemove(int index, T oldValue);
         void TrackModify(int index, T oldValue, T newValue);
+        void TrackPushFront(T newValue);
+        void TrackPushBack(T newValue);
+        void TrackPopFront(T oldValue);
+        void TrackPopBack(T oldValue);
     }
 }

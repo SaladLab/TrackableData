@@ -10,6 +10,10 @@ namespace TrackableData
         Insert = 1,
         Remove = 2,
         Modify = 3,
+        PushFront = 4,
+        PushBack = 5,
+        PopFront = 6,
+        PopBack = 7,
     }
 
     public class TrackableListTracker<T> : IListTracker<T>
@@ -55,6 +59,42 @@ namespace TrackableData
             });
         }
 
+        public void TrackPushFront(T newValue)
+        {
+            ChangeList.Add(new Change
+            {
+                Operation = TrackableListOperation.PushFront,
+                NewValue = newValue
+            });
+        }
+
+        public void TrackPushBack(T newValue)
+        {
+            ChangeList.Add(new Change
+            {
+                Operation = TrackableListOperation.PushBack,
+                NewValue = newValue
+            });
+        }
+
+        public void TrackPopFront(T oldValue)
+        {
+            ChangeList.Add(new Change
+            {
+                Operation = TrackableListOperation.PopFront,
+                OldValue = oldValue
+            });
+        }
+
+        public void TrackPopBack(T oldValue)
+        {
+            ChangeList.Add(new Change
+            {
+                Operation = TrackableListOperation.PopBack,
+                OldValue = oldValue
+            });
+        }
+
         // ITracker
 
         public bool HasChange
@@ -92,6 +132,22 @@ namespace TrackableData
                     case TrackableListOperation.Modify:
                         trackable[item.Index] = item.NewValue;
                         break;
+
+                    case TrackableListOperation.PushFront:
+                        trackable.Insert(0, item.NewValue);
+                        break;
+
+                    case TrackableListOperation.PushBack:
+                        trackable.Insert(trackable.Count, item.NewValue);
+                        break;
+
+                    case TrackableListOperation.PopFront:
+                        trackable.RemoveAt(0);
+                        break;
+
+                    case TrackableListOperation.PopBack:
+                        trackable.RemoveAt(trackable.Count - 1);
+                        break;
                 }
             }
         }
@@ -126,6 +182,22 @@ namespace TrackableData
                     case TrackableListOperation.Modify:
                         tracker.TrackModify(item.Index, item.OldValue, item.NewValue);
                         break;
+
+                    case TrackableListOperation.PushFront:
+                        tracker.TrackPushFront(item.NewValue);
+                        break;
+
+                    case TrackableListOperation.PushBack:
+                        tracker.TrackPushBack(item.NewValue);
+                        break;
+
+                    case TrackableListOperation.PopFront:
+                        tracker.TrackPopFront(item.OldValue);
+                        break;
+
+                    case TrackableListOperation.PopBack:
+                        tracker.TrackPopBack(item.OldValue);
+                        break;
                 }
             }
         }
@@ -155,6 +227,22 @@ namespace TrackableData
 
                     case TrackableListOperation.Modify:
                         trackable[item.Index] = item.OldValue;
+                        break;
+
+                    case TrackableListOperation.PushFront:
+                        trackable.RemoveAt(0);
+                        break;
+
+                    case TrackableListOperation.PushBack:
+                        trackable.RemoveAt(trackable.Count - 1);
+                        break;
+
+                    case TrackableListOperation.PopFront:
+                        trackable.Insert(0, item.OldValue);
+                        break;
+
+                    case TrackableListOperation.PopBack:
+                        trackable.Insert(trackable.Count, item.OldValue);
                         break;
                 }
             }
@@ -191,6 +279,22 @@ namespace TrackableData
                     case TrackableListOperation.Modify:
                         tracker.TrackModify(item.Index, item.NewValue, item.OldValue);
                         break;
+
+                    case TrackableListOperation.PushFront:
+                        tracker.TrackPopFront(item.NewValue);
+                        break;
+
+                    case TrackableListOperation.PushBack:
+                        tracker.TrackPopBack(item.NewValue);
+                        break;
+
+                    case TrackableListOperation.PopFront:
+                        tracker.TrackPushFront(item.OldValue);
+                        break;
+
+                    case TrackableListOperation.PopBack:
+                        tracker.TrackPushBack(item.OldValue);
+                        break;
                 }
             }
         }
@@ -211,6 +315,18 @@ namespace TrackableData
 
                     case TrackableListOperation.Modify:
                         return "=" + x.Index + ":" + x.OldValue + "=>" + x.NewValue;
+
+                    case TrackableListOperation.PushFront:
+                        return "+F:" + x.NewValue;
+
+                    case TrackableListOperation.PushBack:
+                        return "+B:" + x.NewValue;
+
+                    case TrackableListOperation.PopFront:
+                        return "-F:" + x.OldValue;
+
+                    case TrackableListOperation.PopBack:
+                        return "-B:" + x.OldValue;
 
                     default:
                         return "";

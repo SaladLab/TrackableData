@@ -52,6 +52,12 @@ namespace TrackableData.Json.Tests
             list[0] = "OneModified";
             list.RemoveAt(1);
             list.Insert(1, "TwoInserted");
+            list.Insert(0, "Zero");
+            list.RemoveAt(0);
+            list.Insert(0, "ZeroAgain");
+            list.Insert(4, "Four");
+            list.RemoveAt(4);
+            list.Insert(4, "FourAgain");
 
             var jsonSerializerSettings = GetJsonSerializerSettings();
             var json = JsonConvert.SerializeObject(list.Tracker, jsonSerializerSettings);
@@ -60,7 +66,8 @@ namespace TrackableData.Json.Tests
             var list2 = CreateTestList();
             tracker2.ApplyTo(list2);
 
-            Assert.Equal(new[] { "OneModified", "TwoInserted", "Three" }, list2);
+            Assert.Equal(new[] { "ZeroAgain", "OneModified", "TwoInserted", "Three", "FourAgain" },
+                         list2);
         }
     }
 }

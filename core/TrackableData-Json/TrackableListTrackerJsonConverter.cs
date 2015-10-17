@@ -27,8 +27,15 @@ namespace TrackableData
                 var str = (string)reader.Value;
                 reader.Read();
 
+                if (str.Length < 2)
+                    throw new Exception("Wrong index token: " + str);
+
                 int index;
-                if (int.TryParse(str.Substring(1), out index) == false)
+                if (str[1] == 'F')
+                    index = -2;
+                else if (str[1] == 'B')
+                    index = -1;
+                else if (int.TryParse(str.Substring(1), out index) == false)
                     throw new Exception("Invalid token: " + str);
 
                 T obj;
@@ -37,11 +44,21 @@ namespace TrackableData
                     case '+':
                         obj = serializer.Deserialize<T>(reader);
                         reader.Read();
-                        tracker.TrackInsert(index, obj);
+                        if (index == -2)
+                            tracker.TrackPushFront(obj);
+                        else if (index == -1)
+                            tracker.TrackPushBack(obj);
+                        else
+                            tracker.TrackInsert(index, obj);
                         break;
 
                     case '-':
-                        tracker.TrackRemove(index, default(T));
+                        if (index == -2)
+                            tracker.TrackPopFront(default(T));
+                        else if (index == -1)
+                            tracker.TrackPopBack(default(T));
+                        else
+                            tracker.TrackRemove(index, default(T));
                         break;
 
                     case '=':
@@ -84,6 +101,24 @@ namespace TrackableData
                     case TrackableListOperation.Modify:
                         writer.WriteValue("=" + item.Index);
                         serializer.Serialize(writer, item.NewValue);
+                        break;
+
+                    case TrackableListOperation.PushFront:
+                        writer.WriteValue("+F");
+                        serializer.Serialize(writer, item.NewValue);
+                        break;
+
+                    case TrackableListOperation.PushBack:
+                        writer.WriteValue("+B");
+                        serializer.Serialize(writer, item.NewValue);
+                        break;
+
+                    case TrackableListOperation.PopFront:
+                        writer.WriteValue("-F");
+                        break;
+
+                    case TrackableListOperation.PopBack:
+                        writer.WriteValue("-B");
                         break;
                 }
 
