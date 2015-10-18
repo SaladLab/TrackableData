@@ -6,7 +6,7 @@ using Xunit;
 
 namespace TrackableData.Sql.Tests
 {
-    public class TrackableDictionaryStringTest : StorageDictionaryStringTestKit<int>, IClassFixture<Database>, IDisposable
+    public class TrackableDictionaryStringTest : StorageDictionaryValueTestKit<int>, IClassFixture<Database>, IDisposable
     {
         private static readonly ColumnDefinition SingleValueColumnDef = new ColumnDefinition("Value", typeof(string));
 
@@ -44,7 +44,7 @@ namespace TrackableData.Sql.Tests
         }
     }
 
-    public class TrackableDictionaryItemDataTest : StorageDictionaryItemDataTestKit<int>, IClassFixture<Database>, IDisposable
+    public class TrackableDictionaryDataTest : StorageDictionaryDataTestKit<int>, IClassFixture<Database>, IDisposable
     {
         private static TrackableDictionaryMsSqlMapper<int, ItemData> _mapper =
             new TrackableDictionaryMsSqlMapper<int, ItemData>(nameof(ItemData), new ColumnDefinition("Id"));
@@ -52,7 +52,7 @@ namespace TrackableData.Sql.Tests
         private Database _db;
         private SqlConnection _connection;
 
-        public TrackableDictionaryItemDataTest(Database db)
+        public TrackableDictionaryDataTest(Database db)
         {
             _db = db;
             _connection = db.Connection;
@@ -80,7 +80,7 @@ namespace TrackableData.Sql.Tests
         }
     }
 
-    public class TrackableDictionaryItemDataWithHeadKeysTest : StorageDictionaryItemDataTestKit<int>, IClassFixture<Database>, IDisposable
+    public class TrackableDictionaryDataWithHeadKeysTest : StorageDictionaryDataTestKit<int>, IClassFixture<Database>, IDisposable
     {
         private static readonly ColumnDefinition[] HeadKeyColumnDefs =
         {
@@ -93,7 +93,7 @@ namespace TrackableData.Sql.Tests
         private Database _db;
         private SqlConnection _connection;
 
-        public TrackableDictionaryItemDataWithHeadKeysTest(Database db)
+        public TrackableDictionaryDataWithHeadKeysTest(Database db)
         {
             _db = db;
             _connection = db.Connection;
@@ -128,7 +128,7 @@ namespace TrackableData.Sql.Tests
         string Note { get; set; }
     }
 
-    public class TrackableDictionaryItemPocoTest : StorageDictionaryItemPocoKit<int, TrackableItem>, IClassFixture<Database>, IDisposable
+    public class TrackableDictionaryPocoTest : StorageDictionaryPocoKit<int, TrackableItem>, IClassFixture<Database>, IDisposable
     {
         private static TrackableDictionaryMsSqlMapper<int, TrackableItem> _mapper =
             new TrackableDictionaryMsSqlMapper<int, TrackableItem>(nameof(TrackableItem), new ColumnDefinition("Id"));
@@ -136,7 +136,7 @@ namespace TrackableData.Sql.Tests
         private Database _db;
         private SqlConnection _connection;
 
-        public TrackableDictionaryItemPocoTest(Database db)
+        public TrackableDictionaryPocoTest(Database db)
         {
             _db = db;
             _connection = db.Connection;

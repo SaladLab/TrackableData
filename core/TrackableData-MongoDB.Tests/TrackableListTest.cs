@@ -1,81 +1,120 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using MongoDB.Bson;
+using MongoDB.Driver;
+using TrackableData.TestKits;
 using Xunit;
-using System.Collections.Generic;
 
 namespace TrackableData.MongoDB.Tests
 {
-    public class TrackableListTest : IClassFixture<Database>
+    public class TrackableListStringTest : StorageListValueTestKit, IClassFixture<Database>
     {
-        private static TrackableListMongoDbMapper<string> StringListMapper =
+        private static TrackableListMongoDbMapper<string> _mapper =
             new TrackableListMongoDbMapper<string>();
 
         private Database _db;
+        private IMongoCollection<BsonDocument> _collection;
 
-        public TrackableListTest(Database db)
+        public TrackableListStringTest(Database db)
         {
             _db = db;
+            _db.Test.DropCollectionAsync(nameof(String)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(String));
         }
 
-        private TrackableList<string> CreateTestList(bool withTracker)
+        protected override Task<TrackableList<string>> LoadAsync()
         {
-            var list = new TrackableList<string>();
-            if (withTracker)
-                list.SetDefaultTracker();
-            list.Add("One");
-            list.Add("Two");
-            list.Add("Three");
-            return list;
+            return _mapper.LoadAsync(_collection, 1, "V");
         }
 
-        private void ModifyListForTest(IList<string> list)
+        protected override Task SaveAsync(ITracker tracker)
         {
-            list[0] = "OneModified";
-            list.Insert(0, "Zero");
-            list.RemoveAt(0);
-            list.Insert(0, "ZeroAgain");
-            list.Insert(4, "Four");
-            list.RemoveAt(4);
-            list.Insert(4, "FourAgain");
+            return _mapper.SaveAsync(_collection, (TrackableListTracker<string>)tracker, 1, "V");
+        }
+    }
+
+    public class TrackableListDataTest : StorageListDataTestKit, IClassFixture<Database>
+    {
+        private static TrackableListMongoDbMapper<JobData> _mapper =
+            new TrackableListMongoDbMapper<JobData>();
+
+        private Database _db;
+        private IMongoCollection<BsonDocument> _collection;
+
+        public TrackableListDataTest(Database db)
+        {
+            _db = db;
+            _db.Test.DropCollectionAsync(nameof(JobData)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(JobData));
         }
 
-        private List<string> GetModifiedList()
+        protected override Task<TrackableList<JobData>> LoadAsync()
         {
-            var list = new List<string>(CreateTestList(false));
-            ModifyListForTest(list);
-            return list;
+            return _mapper.LoadAsync(_collection, 1, "V");
         }
 
-        // Regular Test
-
-        [Fact]
-        public async Task Test_MongoDbMapper_CreateAndLoad()
+        protected override Task SaveAsync(ITracker tracker)
         {
-            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
+            return _mapper.SaveAsync(_collection, (TrackableListTracker<JobData>)tracker, 1, "V");
+        }
+    }
 
-            var id = ObjectId.GenerateNewId();
-            var list = CreateTestList(true);
-            await StringListMapper.SaveAsync(collection, list.Tracker, id, "V");
+    public class TrackableListDataWithHeadKeysTest : StorageListDataTestKit, IClassFixture<Database>
+    {
+        private static TrackableListMongoDbMapper<JobData> _mapper =
+            new TrackableListMongoDbMapper<JobData>();
 
-            var list2 = await StringListMapper.LoadAsync(collection, id, "V");
-            Assert.Equal(list, list2);
+        private Database _db;
+        private IMongoCollection<BsonDocument> _collection;
+
+        public TrackableListDataWithHeadKeysTest(Database db)
+        {
+            _db = db;
+            _db.Test.DropCollectionAsync(nameof(JobData)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(JobData));
         }
 
-        [Fact]
-        public async Task Test_MongoDbMapper_Update()
+        protected override Task<TrackableList<JobData>> LoadAsync()
         {
-            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
+            return _mapper.LoadAsync(_collection, 1, "One", "V");
+        }
 
-            var id = ObjectId.GenerateNewId();
-            var list = CreateTestList(true);
-            await StringListMapper.SaveAsync(collection, list.Tracker, id, "V");
-            list.Tracker.Clear();
+        protected override Task SaveAsync(ITracker tracker)
+        {
+            return _mapper.SaveAsync(_collection, (TrackableListTracker<JobData>)tracker, 1, "One", "V");
+        }
+    }
 
-            ModifyListForTest(list);
-            await StringListMapper.SaveAsync(collection, list.Tracker, id, "V");
+    public interface IJob : ITrackablePoco
+    {
+        short Kind { get; set; }
+        int Count { get; set; }
+        string Note { get; set; }
+    }
 
-            var list2 = await StringListMapper.LoadAsync(collection, id, "V");
-            Assert.Equal(list, list2);
+    public class TrackableListPocoTest : StorageListPocoTestKit<TrackableJob>, IClassFixture<Database>
+    {
+        private static TrackableListMongoDbMapper<TrackableJob> _mapper =
+            new TrackableListMongoDbMapper<TrackableJob>();
+
+        private Database _db;
+        private IMongoCollection<BsonDocument> _collection;
+
+        public TrackableListPocoTest(Database db)
+        {
+            _db = db;
+            _db.Test.DropCollectionAsync(nameof(TrackableJob)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackableJob));
+        }
+
+        protected override Task<TrackableList<TrackableJob>> LoadAsync()
+        {
+            return _mapper.LoadAsync(_collection, 1, "V");
+        }
+
+        protected override Task SaveAsync(TrackableList<TrackableJob> list)
+        {
+            return _mapper.SaveAsync(_collection, list, 1, "V");
         }
     }
 }

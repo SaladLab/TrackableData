@@ -7,7 +7,7 @@ using Xunit;
 
 namespace TrackableData.MongoDB.Tests
 {
-    public class TrackableDictionaryStringTest : StorageDictionaryStringTestKit<int>, IClassFixture<Database>
+    public class TrackableDictionaryStringTest : StorageDictionaryValueTestKit<int>, IClassFixture<Database>
     {
         private static TrackableDictionaryMongoDbMapper<int, string> _mapper =
             new TrackableDictionaryMongoDbMapper<int, string>();
@@ -38,7 +38,7 @@ namespace TrackableData.MongoDB.Tests
         }
     }
 
-    public class TrackableDictionaryItemDataTest : StorageDictionaryItemDataTestKit<int>, IClassFixture<Database>
+    public class TrackableDictionaryDataTest : StorageDictionaryDataTestKit<int>, IClassFixture<Database>
     {
         private static TrackableDictionaryMongoDbMapper<int, ItemData> _mapper =
             new TrackableDictionaryMongoDbMapper<int, ItemData>();
@@ -46,7 +46,7 @@ namespace TrackableData.MongoDB.Tests
         private Database _db;
         private IMongoCollection<BsonDocument> _collection;
 
-        public TrackableDictionaryItemDataTest(Database db)
+        public TrackableDictionaryDataTest(Database db)
         {
             _db = db;
             _db.Test.DropCollectionAsync(nameof(ItemData)).Wait();
@@ -69,7 +69,7 @@ namespace TrackableData.MongoDB.Tests
         }
     }
 
-    public class TrackableDictionaryItemDataWithHeadKeysTest : StorageDictionaryItemDataTestKit<int>, IClassFixture<Database>
+    public class TrackableDictionaryDataWithHeadKeysTest : StorageDictionaryDataTestKit<int>, IClassFixture<Database>
     {
         private static TrackableDictionaryMongoDbMapper<int, ItemData> _mapper =
             new TrackableDictionaryMongoDbMapper<int, ItemData>();
@@ -77,7 +77,7 @@ namespace TrackableData.MongoDB.Tests
         private Database _db;
         private IMongoCollection<BsonDocument> _collection;
 
-        public TrackableDictionaryItemDataWithHeadKeysTest(Database db)
+        public TrackableDictionaryDataWithHeadKeysTest(Database db)
         {
             _db = db;
             _db.Test.DropCollectionAsync(nameof(ItemData)).Wait();
@@ -100,7 +100,6 @@ namespace TrackableData.MongoDB.Tests
         }
     }
 
-    /*
     public interface IItem : ITrackablePoco
     {
         short Kind { get; set; }
@@ -108,7 +107,7 @@ namespace TrackableData.MongoDB.Tests
         string Note { get; set; }
     }
 
-    public class TrackableDictionaryItemPocoTest : StorageDictionaryItemPocoKit<int, TrackableItem>, IClassFixture<Database>
+    public class TrackableDictionaryPocoTest : StorageDictionaryPocoKit<int, TrackableItem>, IClassFixture<Database>
     {
         private static TrackableDictionaryMongoDbMapper<int, TrackableItem> _mapper =
             new TrackableDictionaryMongoDbMapper<int, TrackableItem>();
@@ -116,7 +115,7 @@ namespace TrackableData.MongoDB.Tests
         private Database _db;
         private IMongoCollection<BsonDocument> _collection;
 
-        public TrackableDictionaryItemPocoTest(Database db)
+        public TrackableDictionaryPocoTest(Database db)
         {
             _db = db;
             _db.Test.DropCollectionAsync(nameof(ItemData)).Wait();
@@ -138,5 +137,4 @@ namespace TrackableData.MongoDB.Tests
             return _mapper.SaveAsync(_collection, dictionary, 1);
         }
     }
-    */
 }

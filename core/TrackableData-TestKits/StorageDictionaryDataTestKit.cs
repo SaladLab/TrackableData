@@ -7,29 +7,32 @@ using Xunit;
 
 namespace TrackableData.TestKits
 {
-    public abstract class StorageDictionaryItemPocoKit<TKey, TPoco> where TPoco : ITrackable, new()
+    public class ItemData
+    {
+        public short Kind { get; set; }
+        public int Count { get; set; }
+        public string Note { get; set; }
+    }
+
+    public abstract class StorageDictionaryDataTestKit<TKey>
     {
         protected abstract TKey CreateKey(int value);
-        protected abstract Task<TrackableDictionary<TKey, TPoco>> LoadAsync();
-        protected abstract Task SaveAsync(TrackableDictionary<TKey, TPoco> dictionary);
+        protected abstract Task<TrackableDictionary<TKey, ItemData>> LoadAsync();
+        protected abstract Task SaveAsync(ITracker tracker);
 
-        private TrackableDictionary<TKey, TPoco> CreateTestDictionary(bool withTracker)
+        private TrackableDictionary<TKey, ItemData> CreateTestDictionary(bool withTracker)
         {
-            var dict = new TrackableDictionary<TKey, TPoco>();
+            var dict = new TrackableDictionary<TKey, ItemData>();
             if (withTracker)
                 dict.SetDefaultTracker();
 
-            dynamic value1 = new TPoco();
-            if (withTracker)
-                ((ITrackable)value1).SetDefaultTracker();
+            var value1 = new ItemData();
             value1.Kind = 101;
             value1.Count = 1;
             value1.Note = "Handmade Sword";
             dict.Add(CreateKey(1), value1);
 
-            dynamic value2 = new TPoco();
-            if (withTracker)
-                ((ITrackable)value2).SetDefaultTracker();
+            var value2 = new ItemData();
             value2.Kind = 102;
             value2.Count = 3;
             value2.Note = "Lord of Ring";
@@ -38,13 +41,13 @@ namespace TrackableData.TestKits
             return dict;
         }
 
-        private void AssertEqualDictionary(TrackableDictionary<TKey, TPoco> a, TrackableDictionary<TKey, TPoco> b)
+        private void AssertEqualDictionary(TrackableDictionary<TKey, ItemData> a, TrackableDictionary<TKey, ItemData> b)
         {
             Assert.Equal(a.Count, b.Count);
             foreach (var item in a)
             {
-                dynamic a_v = item.Value;
-                dynamic b_v = b[item.Key];
+                var a_v = item.Value;
+                var b_v = b[item.Key];
                 Assert.Equal(a_v.Kind, b_v.Kind);
                 Assert.Equal(a_v.Count, b_v.Count);
                 Assert.Equal(a_v.Note, b_v.Note);
@@ -55,7 +58,7 @@ namespace TrackableData.TestKits
         public async Task Test_CreateAndLoad()
         {
             var dict = CreateTestDictionary(true);
-            await SaveAsync(dict);
+            await SaveAsync(dict.Tracker);
 
             var dict2 = await LoadAsync();
             AssertEqualDictionary(dict, dict2);
@@ -66,26 +69,30 @@ namespace TrackableData.TestKits
         {
             var dict = CreateTestDictionary(true);
 
-            await SaveAsync(dict);
-            dict.ClearTrackerDeep();
+            await SaveAsync(dict.Tracker);
+            dict.Tracker.Clear();
 
             // modify dictionary
 
             dict.Remove(CreateKey(1));
 
-            dynamic item2 = dict[CreateKey(2)];
-            item2.Count = item2.Count - 1;
-            item2.Note = "Destroyed";
+            var item2 = dict[CreateKey(2)];
+            var value2 = new ItemData();
+            value2.Kind = item2.Kind;
+            value2.Count = item2.Count - 1;
+            value2.Note = "Destroyed";
+            dict[CreateKey(2)] = value2;
 
-            dynamic value3 = new TPoco();
+            var value3 = new ItemData();
             value3.Kind = 103;
-            value3.Count = 13;
+            value3.Count = 3;
             value3.Note = "Just Arrived";
-            dict.Add(CreateKey(3), value3);
+            dict.Add(CreateKey(1), value3);
 
             // save modification
 
-            await SaveAsync(dict);
+            await SaveAsync(dict.Tracker);
+            dict.Tracker.Clear();
 
             // check equality
 

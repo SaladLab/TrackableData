@@ -7,7 +7,7 @@ using Xunit;
 
 namespace TrackableData.TestKits
 {
-    public abstract class StorageDictionaryStringTestKit<TKey>
+    public abstract class StorageDictionaryValueTestKit<TKey>
     {
         protected abstract TKey CreateKey(int value);
         protected abstract Task<TrackableDictionary<TKey, string>> LoadAsync();
