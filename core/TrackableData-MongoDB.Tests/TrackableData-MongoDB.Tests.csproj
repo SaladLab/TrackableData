@@ -77,8 +77,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Database.cs" />
-    <Compile Include="IItem.cs" />
-    <Compile Include="IPerson.cs" />
     <Compile Include="Properties\TrackableData.CodeGen.cs" />
     <Compile Include="TrackableDictionaryTest.cs" />
     <Compile Include="TrackableListTest.cs" />
@@ -93,6 +91,10 @@
     <ProjectReference Include="..\TrackableData-MongoDB\TrackableData-MongoDB.csproj">
       <Project>{db0ae3ea-11a6-466c-ad6f-652d64e5d6e1}</Project>
       <Name>TrackableData-MongoDB</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TrackableData-TestKits\TrackableData-TestKits.csproj">
+      <Project>{5d955da9-66ae-458e-8fd4-d6c0c5630d10}</Project>
+      <Name>TrackableData-TestKits</Name>
     </ProjectReference>
     <ProjectReference Include="..\TrackableData\TrackableData.csproj">
       <Project>{c2c3a8ca-62f9-4c5a-8b2b-5091e5a41c54}</Project>

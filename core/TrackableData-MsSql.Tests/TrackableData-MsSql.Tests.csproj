@@ -66,12 +66,10 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Database.cs" />
-    <Compile Include="IItem.cs" />
-    <Compile Include="IPerson.cs" />
     <Compile Include="Properties\TrackableData.CodeGen.cs" />
     <Compile Include="TrackableDictionaryTest.cs" />
-    <Compile Include="TrackablePocoTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TrackablePocoTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
@@ -83,6 +81,10 @@
     <ProjectReference Include="..\TrackableData-MsSql\TrackableData-MsSql.csproj">
       <Project>{505edf72-41f9-499d-b213-9fc9b8932489}</Project>
       <Name>TrackableData-MsSql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TrackableData-TestKits\TrackableData-TestKits.csproj">
+      <Project>{5d955da9-66ae-458e-8fd4-d6c0c5630d10}</Project>
+      <Name>TrackableData-TestKits</Name>
     </ProjectReference>
     <ProjectReference Include="..\TrackableData\TrackableData.csproj">
       <Project>{c2c3a8ca-62f9-4c5a-8b2b-5091e5a41c54}</Project>

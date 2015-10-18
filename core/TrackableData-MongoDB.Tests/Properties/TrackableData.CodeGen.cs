@@ -7,22 +7,26 @@
 // </auto-generated>
 // ------------------------------------------------------------------------------
 
-using MongoDB.Bson;
 using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using Xunit;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Linq;
 using TrackableData;
 
-#region IItem
+#region ITestPoco
 
 namespace TrackableData.MongoDB.Tests
 {
-    public class TrackableItem : IItem, ITrackable<IItem>
+    public class TrackableTestPoco : ITestPoco, ITrackable<ITestPoco>
     {
         [IgnoreDataMember]
-        public IPocoTracker<IItem> Tracker { get; set; }
+        public IPocoTracker<ITestPoco> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -34,12 +38,12 @@ namespace TrackableData.MongoDB.Tests
             }
             set
             {
-                var t = (IPocoTracker<IItem>)value;
+                var t = (IPocoTracker<ITestPoco>)value;
                 Tracker = t;
             }
         }
 
-        ITracker<IItem> ITrackable<IItem>.Tracker
+        ITracker<ITestPoco> ITrackable<ITestPoco>.Tracker
         {
             get
             {
@@ -47,7 +51,7 @@ namespace TrackableData.MongoDB.Tests
             }
             set
             {
-                var t = (IPocoTracker<IItem>)value;
+                var t = (IPocoTracker<ITestPoco>)value;
                 Tracker = t;
             }
         }
@@ -68,120 +72,10 @@ namespace TrackableData.MongoDB.Tests
 
         public static class PropertyTable
         {
-            public static readonly PropertyInfo Kind = typeof(IItem).GetProperty("Kind");
-            public static readonly PropertyInfo Count = typeof(IItem).GetProperty("Count");
-            public static readonly PropertyInfo Note = typeof(IItem).GetProperty("Note");
-        }
-
-        private short _Kind;
-
-        public short Kind
-        {
-            get
-            {
-                return _Kind;
-            }
-            set
-            {
-                if (Tracker != null && Kind != value)
-                    Tracker.TrackSet(PropertyTable.Kind, _Kind, value);
-                _Kind = value;
-            }
-        }
-
-        private int _Count;
-
-        public int Count
-        {
-            get
-            {
-                return _Count;
-            }
-            set
-            {
-                if (Tracker != null && Count != value)
-                    Tracker.TrackSet(PropertyTable.Count, _Count, value);
-                _Count = value;
-            }
-        }
-
-        private string _Note;
-
-        public string Note
-        {
-            get
-            {
-                return _Note;
-            }
-            set
-            {
-                if (Tracker != null && Note != value)
-                    Tracker.TrackSet(PropertyTable.Note, _Note, value);
-                _Note = value;
-            }
-        }
-    }
-}
-
-#endregion
-
-#region IPerson
-
-namespace TrackableData.MongoDB.Tests
-{
-    public class TrackablePerson : IPerson, ITrackable<IPerson>
-    {
-        [IgnoreDataMember]
-        public IPocoTracker<IPerson> Tracker { get; set; }
-
-        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
-
-        ITracker ITrackable.Tracker
-        {
-            get
-            {
-                return Tracker;
-            }
-            set
-            {
-                var t = (IPocoTracker<IPerson>)value;
-                Tracker = t;
-            }
-        }
-
-        ITracker<IPerson> ITrackable<IPerson>.Tracker
-        {
-            get
-            {
-                return Tracker;
-            }
-            set
-            {
-                var t = (IPocoTracker<IPerson>)value;
-                Tracker = t;
-            }
-        }
-
-        public ITrackable GetChildTrackable(object name)
-        {
-            switch ((string)name)
-            {
-                default:
-                    return null;
-            }
-        }
-
-        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
-        {
-            yield break;
-        }
-
-        public static class PropertyTable
-        {
-            public static readonly PropertyInfo Id = typeof(IPerson).GetProperty("Id");
-            public static readonly PropertyInfo Name = typeof(IPerson).GetProperty("Name");
-            public static readonly PropertyInfo Age = typeof(IPerson).GetProperty("Age");
-            public static readonly PropertyInfo Extra = typeof(IPerson).GetProperty("Extra");
+            public static readonly PropertyInfo Id = typeof(ITestPoco).GetProperty("Id");
+            public static readonly PropertyInfo Name = typeof(ITestPoco).GetProperty("Name");
+            public static readonly PropertyInfo Age = typeof(ITestPoco).GetProperty("Age");
+            public static readonly PropertyInfo Extra = typeof(ITestPoco).GetProperty("Extra");
         }
 
         private ObjectId _Id;
@@ -252,14 +146,14 @@ namespace TrackableData.MongoDB.Tests
 
 #endregion
 
-#region IPersonWithCustomId
+#region ITestPocoWithCustomId
 
 namespace TrackableData.MongoDB.Tests
 {
-    public class TrackablePersonWithCustomId : IPersonWithCustomId, ITrackable<IPersonWithCustomId>
+    public class TrackableTestPocoWithCustomId : ITestPocoWithCustomId, ITrackable<ITestPocoWithCustomId>
     {
         [IgnoreDataMember]
-        public IPocoTracker<IPersonWithCustomId> Tracker { get; set; }
+        public IPocoTracker<ITestPocoWithCustomId> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -271,12 +165,12 @@ namespace TrackableData.MongoDB.Tests
             }
             set
             {
-                var t = (IPocoTracker<IPersonWithCustomId>)value;
+                var t = (IPocoTracker<ITestPocoWithCustomId>)value;
                 Tracker = t;
             }
         }
 
-        ITracker<IPersonWithCustomId> ITrackable<IPersonWithCustomId>.Tracker
+        ITracker<ITestPocoWithCustomId> ITrackable<ITestPocoWithCustomId>.Tracker
         {
             get
             {
@@ -284,7 +178,7 @@ namespace TrackableData.MongoDB.Tests
             }
             set
             {
-                var t = (IPocoTracker<IPersonWithCustomId>)value;
+                var t = (IPocoTracker<ITestPocoWithCustomId>)value;
                 Tracker = t;
             }
         }
@@ -305,10 +199,10 @@ namespace TrackableData.MongoDB.Tests
 
         public static class PropertyTable
         {
-            public static readonly PropertyInfo CustomId = typeof(IPersonWithCustomId).GetProperty("CustomId");
-            public static readonly PropertyInfo Name = typeof(IPersonWithCustomId).GetProperty("Name");
-            public static readonly PropertyInfo Age = typeof(IPersonWithCustomId).GetProperty("Age");
-            public static readonly PropertyInfo Extra = typeof(IPersonWithCustomId).GetProperty("Extra");
+            public static readonly PropertyInfo CustomId = typeof(ITestPocoWithCustomId).GetProperty("CustomId");
+            public static readonly PropertyInfo Name = typeof(ITestPocoWithCustomId).GetProperty("Name");
+            public static readonly PropertyInfo Age = typeof(ITestPocoWithCustomId).GetProperty("Age");
+            public static readonly PropertyInfo Extra = typeof(ITestPocoWithCustomId).GetProperty("Extra");
         }
 
         private long _CustomId;

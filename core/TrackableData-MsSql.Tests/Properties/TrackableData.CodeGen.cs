@@ -8,6 +8,10 @@
 // ------------------------------------------------------------------------------
 
 using System;
+using System.Data.SqlClient;
+using System.Threading.Tasks;
+using TrackableData.TestKits;
+using Xunit;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -124,14 +128,14 @@ namespace TrackableData.Sql.Tests
 
 #endregion
 
-#region IPerson
+#region ITestPoco
 
 namespace TrackableData.Sql.Tests
 {
-    public class TrackablePerson : IPerson, ITrackable<IPerson>
+    public class TrackableTestPoco : ITestPoco, ITrackable<ITestPoco>
     {
         [IgnoreDataMember]
-        public IPocoTracker<IPerson> Tracker { get; set; }
+        public IPocoTracker<ITestPoco> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -143,12 +147,12 @@ namespace TrackableData.Sql.Tests
             }
             set
             {
-                var t = (IPocoTracker<IPerson>)value;
+                var t = (IPocoTracker<ITestPoco>)value;
                 Tracker = t;
             }
         }
 
-        ITracker<IPerson> ITrackable<IPerson>.Tracker
+        ITracker<ITestPoco> ITrackable<ITestPoco>.Tracker
         {
             get
             {
@@ -156,7 +160,7 @@ namespace TrackableData.Sql.Tests
             }
             set
             {
-                var t = (IPocoTracker<IPerson>)value;
+                var t = (IPocoTracker<ITestPoco>)value;
                 Tracker = t;
             }
         }
@@ -177,9 +181,9 @@ namespace TrackableData.Sql.Tests
 
         public static class PropertyTable
         {
-            public static readonly PropertyInfo Id = typeof(IPerson).GetProperty("Id");
-            public static readonly PropertyInfo Name = typeof(IPerson).GetProperty("Name");
-            public static readonly PropertyInfo Age = typeof(IPerson).GetProperty("Age");
+            public static readonly PropertyInfo Id = typeof(ITestPoco).GetProperty("Id");
+            public static readonly PropertyInfo Name = typeof(ITestPoco).GetProperty("Name");
+            public static readonly PropertyInfo Age = typeof(ITestPoco).GetProperty("Age");
         }
 
         private int _Id;
@@ -234,14 +238,14 @@ namespace TrackableData.Sql.Tests
 
 #endregion
 
-#region IPersonWithIdentity
+#region ITestPocoWithIdentity
 
 namespace TrackableData.Sql.Tests
 {
-    public class TrackablePersonWithIdentity : IPersonWithIdentity, ITrackable<IPersonWithIdentity>
+    public class TrackableTestPocoWithIdentity : ITestPocoWithIdentity, ITrackable<ITestPocoWithIdentity>
     {
         [IgnoreDataMember]
-        public IPocoTracker<IPersonWithIdentity> Tracker { get; set; }
+        public IPocoTracker<ITestPocoWithIdentity> Tracker { get; set; }
 
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -253,12 +257,12 @@ namespace TrackableData.Sql.Tests
             }
             set
             {
-                var t = (IPocoTracker<IPersonWithIdentity>)value;
+                var t = (IPocoTracker<ITestPocoWithIdentity>)value;
                 Tracker = t;
             }
         }
 
-        ITracker<IPersonWithIdentity> ITrackable<IPersonWithIdentity>.Tracker
+        ITracker<ITestPocoWithIdentity> ITrackable<ITestPocoWithIdentity>.Tracker
         {
             get
             {
@@ -266,7 +270,7 @@ namespace TrackableData.Sql.Tests
             }
             set
             {
-                var t = (IPocoTracker<IPersonWithIdentity>)value;
+                var t = (IPocoTracker<ITestPocoWithIdentity>)value;
                 Tracker = t;
             }
         }
@@ -287,9 +291,9 @@ namespace TrackableData.Sql.Tests
 
         public static class PropertyTable
         {
-            public static readonly PropertyInfo Id = typeof(IPersonWithIdentity).GetProperty("Id");
-            public static readonly PropertyInfo Name = typeof(IPersonWithIdentity).GetProperty("Name");
-            public static readonly PropertyInfo Age = typeof(IPersonWithIdentity).GetProperty("Age");
+            public static readonly PropertyInfo Id = typeof(ITestPocoWithIdentity).GetProperty("Id");
+            public static readonly PropertyInfo Name = typeof(ITestPocoWithIdentity).GetProperty("Name");
+            public static readonly PropertyInfo Age = typeof(ITestPocoWithIdentity).GetProperty("Age");
         }
 
         private int _Id;

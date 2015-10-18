@@ -1,336 +1,166 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using TrackableData.TestKits;
 using Xunit;
 
 namespace TrackableData.Sql.Tests
 {
-    public class TrackableDictionaryTest : IClassFixture<Database>
+    public class TrackableDictionaryStringTest : StorageDictionaryStringTestKit<int>, IClassFixture<Database>, IDisposable
     {
-        private Database _db;
+        private static readonly ColumnDefinition SingleValueColumnDef = new ColumnDefinition("Value", typeof(string));
 
-        public TrackableDictionaryTest(Database db)
+        private static TrackableDictionaryMsSqlMapper<int, string> _mapper =
+            new TrackableDictionaryMsSqlMapper<int, string>("String", new ColumnDefinition("Id"), SingleValueColumnDef, null);
+
+        private Database _db;
+        private SqlConnection _connection;
+
+        public TrackableDictionaryStringTest(Database db)
         {
             _db = db;
+            _connection = db.Connection;
+            _mapper.ResetTableAsync(_connection).Wait();
         }
 
-        private struct Context<TKey, TValue> : IDisposable
+        public void Dispose()
         {
-            public TrackableDictionaryMsSqlMapper<TKey, TValue> SqlMapper;
-            public SqlConnection Connection;
-
-            public void Dispose()
-            {
-                if (Connection != null)
-                {
-                    Connection.Dispose();
-                    Connection = null;
-                }
-            }
+            _connection.Dispose();
         }
 
-        private async Task<Context<TKey, TValue>> PrepareAsync<TKey, TValue>(
-            ColumnDefinition singleValueColumnDef = null, ColumnDefinition[] headKeyColumnDefs = null)
+        protected override int CreateKey(int value)
         {
-            var sqlMapper = new TrackableDictionaryMsSqlMapper<TKey, TValue>(
-                typeof(TValue).Name, new ColumnDefinition("Id"), singleValueColumnDef, headKeyColumnDefs);
-            var connection = _db.Connection;
-            await sqlMapper.ResetTableAsync(connection);
-            return new Context<TKey, TValue> { SqlMapper = sqlMapper, Connection = connection };
+            return value;
         }
 
-        private TrackableDictionary<int, ItemData> CreateTestInventory(bool withTracker)
+        protected override Task<TrackableDictionary<int, string>> LoadAsync()
         {
-            var dict = new TrackableDictionary<int, ItemData>();
-            if (withTracker)
-                dict.SetDefaultTracker();
-            dict.Add(1, new ItemData { Kind = 101, Count = 1, Note = "Handmade Sword" });
-            dict.Add(2, new ItemData { Kind = 102, Count = 3, Note = "Lord of Ring" });
-            return dict;
+            return _mapper.LoadAsync(_connection);
         }
 
-        private enum ModificationWayType
+        protected override Task SaveAsync(ITracker tracker)
         {
-            Intrusive,
-            IntrusiveAndMark,
-            SetNew,
+            return _mapper.SaveAsync(_connection, (TrackableDictionaryTracker<int, string>)tracker);
         }
+    }
 
-        private void ModifyTestInventory(TrackableDictionary<int, ItemData> dict, ModificationWayType type)
+    public class TrackableDictionaryItemDataTest : StorageDictionaryItemDataTestKit<int>, IClassFixture<Database>, IDisposable
+    {
+        private static TrackableDictionaryMsSqlMapper<int, ItemData> _mapper =
+            new TrackableDictionaryMsSqlMapper<int, ItemData>(nameof(ItemData), new ColumnDefinition("Id"));
+
+        private Database _db;
+        private SqlConnection _connection;
+
+        public TrackableDictionaryItemDataTest(Database db)
         {
-            dict.Remove(1);
-            switch (type)
-            {
-                case ModificationWayType.Intrusive:
-                    dict[2].Count -= 1;
-                    dict[2].Note = "Destroyed";
-                    break;
-
-                case ModificationWayType.IntrusiveAndMark:
-                    dict[2].Count -= 1;
-                    dict[2].Note = "Destroyed";
-                    dict.MarkModify(2);
-                    break;
-
-                case ModificationWayType.SetNew:
-                    var item = dict[2];
-                    dict[2] = new ItemData { Kind = item.Kind, Count = item.Count - 1, Note = "Destroyed" };
-                    break;
-            }
-            dict.Add(3, new ItemData { Kind = 103, Count = 3, Note = "Just Arrived" });
+            _db = db;
+            _connection = db.Connection;
+            _mapper.ResetTableAsync(_connection).Wait();
         }
 
-        // Regular Test
-
-        [Fact]
-        public async Task Test_SqlMapper_ResetTable()
+        public void Dispose()
         {
-            using (var ctx = await PrepareAsync<int, ItemData>())
-            {
-                var dict = await ctx.SqlMapper.LoadAsync(ctx.Connection);
-                Assert.Equal(0, dict.Count);
-            }
+            _connection.Dispose();
         }
 
-        [Fact]
-        public async Task Test_SqlMapper_CreateAndLoad()
+        protected override int CreateKey(int value)
         {
-            using (var ctx = await PrepareAsync<int, ItemData>())
-            {
-                var dict = CreateTestInventory(true);
-
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker);
-
-                var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
-                Assert.Equal(dict.Count, dict2.Count);
-                foreach (var item in dict)
-                {
-                    Assert.Equal(item.Value.Kind, dict2[item.Key].Kind);
-                    Assert.Equal(item.Value.Count, dict2[item.Key].Count);
-                    Assert.Equal(item.Value.Note, dict2[item.Key].Note);
-                }
-            }
+            return value;
         }
 
-        [Fact]
-        public async Task Test_SqlMapper_Update()
+        protected override Task<TrackableDictionary<int, ItemData>> LoadAsync()
         {
-            using (var ctx = await PrepareAsync<int, ItemData>())
-            {
-                var dict = CreateTestInventory(true);
-
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker);
-                dict.Tracker.Clear();
-
-                ModifyTestInventory(dict, ModificationWayType.SetNew);
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker);
-
-                var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
-                Assert.Equal(dict.Count, dict2.Count);
-                foreach (var item in dict)
-                {
-                    Assert.Equal(item.Value.Kind, dict2[item.Key].Kind);
-                    Assert.Equal(item.Value.Count, dict2[item.Key].Count);
-                    Assert.Equal(item.Value.Note, dict2[item.Key].Note);
-                }
-            }
+            return _mapper.LoadAsync(_connection);
         }
 
-        // With Head Key Columns
+        protected override Task SaveAsync(ITracker tracker)
+        {
+            return _mapper.SaveAsync(_connection, (TrackableDictionaryTracker<int, ItemData>)tracker);
+        }
+    }
 
+    public class TrackableDictionaryItemDataWithHeadKeysTest : StorageDictionaryItemDataTestKit<int>, IClassFixture<Database>, IDisposable
+    {
         private static readonly ColumnDefinition[] HeadKeyColumnDefs =
         {
             new ColumnDefinition("Head1", typeof(int)),
             new ColumnDefinition("Head2", typeof(string), 100)
         };
+        private static TrackableDictionaryMsSqlMapper<int, ItemData> _mapper =
+            new TrackableDictionaryMsSqlMapper<int, ItemData>(nameof(ItemData), new ColumnDefinition("Id"), HeadKeyColumnDefs);
 
-        [Fact]
-        public async Task Test_SqlMapperWithHead_ResetTable()
+        private Database _db;
+        private SqlConnection _connection;
+
+        public TrackableDictionaryItemDataWithHeadKeysTest(Database db)
         {
-            using (var ctx = await PrepareAsync<int, ItemData>(null, HeadKeyColumnDefs))
-            {
-                var dict = await ctx.SqlMapper.LoadAsync(ctx.Connection);
-                Assert.Equal(0, dict.Count);
-            }
+            _db = db;
+            _connection = db.Connection;
+            _mapper.ResetTableAsync(_connection).Wait();
         }
 
-        [Fact]
-        public async Task Test_SqlMapperWithHead_CreateAndLoad()
+        public void Dispose()
         {
-            using (var ctx = await PrepareAsync<int, ItemData>(null, HeadKeyColumnDefs))
-            {
-                var dict = CreateTestInventory(true);
-
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker, 1, "One");
-
-                var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection, 1, "One");
-                Assert.Equal(dict.Count, dict2.Count);
-                foreach (var item in dict)
-                {
-                    Assert.Equal(item.Value.Kind, dict2[item.Key].Kind);
-                    Assert.Equal(item.Value.Count, dict2[item.Key].Count);
-                    Assert.Equal(item.Value.Note, dict2[item.Key].Note);
-                }
-            }
+            _connection.Dispose();
         }
 
-        [Fact]
-        public async Task Test_SqlMapperWithHead_Update()
+        protected override int CreateKey(int value)
         {
-            using (var ctx = await PrepareAsync<int, ItemData>(null, HeadKeyColumnDefs))
-            {
-                var dict = CreateTestInventory(true);
-
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker, 1, "One");
-                dict.Tracker.Clear();
-
-                ModifyTestInventory(dict, ModificationWayType.SetNew);
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker, 1, "One");
-
-                var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection, 1, "One");
-                Assert.Equal(dict.Count, dict2.Count);
-                foreach (var item in dict)
-                {
-                    Assert.Equal(item.Value.Kind, dict2[item.Key].Kind);
-                    Assert.Equal(item.Value.Count, dict2[item.Key].Count);
-                    Assert.Equal(item.Value.Note, dict2[item.Key].Note);
-                }
-            }
+            return value;
         }
 
-        // With value which has tracker
-
-        [Fact]
-        public async Task Test_SqlMapperWithTrackableValue_ResetTable()
+        protected override Task<TrackableDictionary<int, ItemData>> LoadAsync()
         {
-            using (var ctx = await PrepareAsync<int, TrackableItem>())
-            {
-                var dict = await ctx.SqlMapper.LoadAsync(ctx.Connection);
-                Assert.Equal(0, dict.Count);
-            }
+            return _mapper.LoadAsync(_connection, 1, "One");
         }
 
-        [Fact]
-        public async Task Test_SqlMapperWithTrackableValue_CreateAndLoad()
+        protected override Task SaveAsync(ITracker tracker)
         {
-            using (var ctx = await PrepareAsync<int, TrackableItem>())
-            {
-                var dict = new TrackableDictionary<int, TrackableItem>();
-                dict.SetDefaultTracker();
-                dict.Add(1, new TrackableItem { Kind = 101, Count = 1, Note = "Handmade Sword" });
-                dict[1].SetDefaultTracker();
-                dict.Add(2, new TrackableItem { Kind = 102, Count = 3, Note = "Lord of Ring" });
-                dict[2].SetDefaultTracker();
+            return _mapper.SaveAsync(_connection, (TrackableDictionaryTracker<int, ItemData>)tracker, 1, "One");
+        }
+    }
 
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker);
+    public interface IItem : ITrackablePoco
+    {
+        short Kind { get; set; }
+        int Count { get; set; }
+        string Note { get; set; }
+    }
 
-                var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
-                Assert.Equal(dict.Count, dict2.Count);
-                foreach (var item in dict)
-                {
-                    Assert.Equal(item.Value.Kind, dict2[item.Key].Kind);
-                    Assert.Equal(item.Value.Count, dict2[item.Key].Count);
-                    Assert.Equal(item.Value.Note, dict2[item.Key].Note);
-                }
-            }
+    public class TrackableDictionaryItemPocoTest : StorageDictionaryItemPocoKit<int, TrackableItem>, IClassFixture<Database>, IDisposable
+    {
+        private static TrackableDictionaryMsSqlMapper<int, TrackableItem> _mapper =
+            new TrackableDictionaryMsSqlMapper<int, TrackableItem>(nameof(TrackableItem), new ColumnDefinition("Id"));
+
+        private Database _db;
+        private SqlConnection _connection;
+
+        public TrackableDictionaryItemPocoTest(Database db)
+        {
+            _db = db;
+            _connection = db.Connection;
+            _mapper.ResetTableAsync(_connection).Wait();
         }
 
-        [Fact]
-        public async Task Test_SqlMapperWithTrackableValue_Update()
+        public void Dispose()
         {
-            using (var ctx = await PrepareAsync<int, TrackableItem>())
-            {
-                var dict = new TrackableDictionary<int, TrackableItem>();
-                dict.SetDefaultTracker();
-                dict.Add(1, new TrackableItem { Kind = 101, Count = 1, Note = "Handmade Sword" });
-                dict[1].SetDefaultTracker();
-                dict.Add(2, new TrackableItem { Kind = 102, Count = 3, Note = "Lord of Ring" });
-                dict[2].SetDefaultTracker();
-
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict);
-                dict.Tracker.Clear();
-
-                dict.Remove(1);
-                dict[2].Count -= 1;
-                dict[2].Note = "Destroyed";
-                dict.Add(3, new TrackableItem { Kind = 103, Count = 3, Note = "Just Arrived" });
-                dict[3].SetDefaultTracker();
-
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict);
-
-                var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
-                Assert.Equal(dict.Count, dict2.Count);
-                foreach (var item in dict)
-                {
-                    Assert.Equal(item.Value.Kind, dict2[item.Key].Kind);
-                    Assert.Equal(item.Value.Count, dict2[item.Key].Count);
-                    Assert.Equal(item.Value.Note, dict2[item.Key].Note);
-                }
-            }
+            _connection.Dispose();
         }
 
-        // With Value
-
-        private static readonly ColumnDefinition SingleValueColumnDef = new ColumnDefinition("Value", typeof(string));
-
-        [Fact]
-        public async Task Test_SqlMapperWithValue_ResetTable()
+        protected override int CreateKey(int value)
         {
-            using (var ctx = await PrepareAsync<int, string>(SingleValueColumnDef))
-            {
-                var dict = await ctx.SqlMapper.LoadAsync(ctx.Connection);
-                Assert.Equal(0, dict.Count);
-            }
+            return value;
         }
 
-        [Fact]
-        public async Task Test_SqlMapperWitValue_CreateAndLoad()
+        protected override Task<TrackableDictionary<int, TrackableItem>> LoadAsync()
         {
-            using (var ctx = await PrepareAsync<int, string>(SingleValueColumnDef))
-            {
-                var dict = new TrackableDictionary<int, string>();
-                dict.SetDefaultTracker();
-                dict.Add(1, "One");
-                dict.Add(2, "Two");
-                dict.Add(3, "Three");
-
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker);
-
-                var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
-                Assert.Equal(dict.Count, dict2.Count);
-                foreach (var item in dict)
-                {
-                    Assert.Equal(item.Value, dict2[item.Key]);
-                }
-            }
+            return _mapper.LoadAsync(_connection);
         }
 
-        [Fact]
-        public async Task Test_SqlMapperWithValue_Update()
+        protected override Task SaveAsync(TrackableDictionary<int, TrackableItem> dictionary)
         {
-            using (var ctx = await PrepareAsync<int, string>(SingleValueColumnDef))
-            {
-                var dict = new TrackableDictionary<int, string>();
-                dict.SetDefaultTracker();
-                dict.Add(1, "One");
-                dict.Add(2, "Two");
-                dict.Add(3, "Three");
-
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker);
-                dict.Tracker.Clear();
-
-                dict.Remove(1);
-                dict[2] = "TwoTwo";
-                dict.Add(4, "Four");
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, dict.Tracker);
-
-                var dict2 = await ctx.SqlMapper.LoadAsync(ctx.Connection);
-                Assert.Equal(dict.Count, dict2.Count);
-                foreach (var item in dict)
-                {
-                    Assert.Equal(item.Value, dict2[item.Key]);
-                }
-            }
+            return _mapper.SaveAsync(_connection, dictionary);
         }
     }
 }

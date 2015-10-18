@@ -1,4 +1,22 @@
-﻿## TODO Mongo:
+﻿## TODO TestKit
+
+  - POCO
+    - 생성, 삭제, 저장
+	- Identity 처리
+	- Head key 넣고 잘 되나.
+  - Dictionary
+    - int-string 이 잘 되나
+	- int-class 잘 되나
+	- int-Trackable 이 잘 되나
+	- 각 케이스 모두 head key 넣고 잘 되나
+  - List
+    - stirng 이 잘 되나
+	- class 잘 되나
+	- Trackable 이 잘 되나.
+	- 각 케이스 모두 head key 넣고 잘 되나.
+
+	
+## TODO Mongo:
 
  - POCO
    - POCO 자체의 Serialization 가 잘 되는지

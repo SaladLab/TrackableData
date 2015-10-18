@@ -73,6 +73,17 @@ namespace TrackableData
             }
         }
 
+        public static void ClearTrackerDeep(this ITrackable trackable)
+        {
+            if (trackable.Tracker != null)
+                trackable.Tracker.Clear();
+
+            foreach (var child in trackable.GetChildTrackables())
+            {
+                child.Value.ClearTrackerDeep();
+            }
+        }
+
         public static void Rollback(this ITrackable trackable)
         {
             var tracker = trackable.Tracker;

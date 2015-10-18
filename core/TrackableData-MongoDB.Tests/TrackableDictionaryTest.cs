@@ -1,159 +1,142 @@
-﻿using System.Threading.Tasks;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using System;
+using System.Threading.Tasks;
+using TrackableData.TestKits;
 using Xunit;
 
 namespace TrackableData.MongoDB.Tests
 {
-    public class TrackableDictionaryTest : IClassFixture<Database>
+    public class TrackableDictionaryStringTest : StorageDictionaryStringTestKit<int>, IClassFixture<Database>
     {
-        private static TrackableDictionaryMongoDbMapper<int, ItemData> ItemDataMapper =
-            new TrackableDictionaryMongoDbMapper<int, ItemData>();
-
-        private static TrackableDictionaryMongoDbMapper<int, string> StringMapper =
+        private static TrackableDictionaryMongoDbMapper<int, string> _mapper =
             new TrackableDictionaryMongoDbMapper<int, string>();
 
         private Database _db;
+        private IMongoCollection<BsonDocument> _collection;
 
-        public TrackableDictionaryTest(Database db)
+        public TrackableDictionaryStringTest(Database db)
         {
             _db = db;
+            _db.Test.DropCollectionAsync(nameof(String)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(String));
         }
 
-        private TrackableDictionary<int, ItemData> CreateTestInventory(bool withTracker)
+        protected override int CreateKey(int value)
         {
-            var dict = new TrackableDictionary<int, ItemData>();
-            if (withTracker)
-                dict.SetDefaultTracker();
-            dict.Add(1, new ItemData { Kind = 101, Count = 1, Note = "Handmade Sword" });
-            dict.Add(2, new ItemData { Kind = 102, Count = 3, Note = "Lord of Ring" });
-            return dict;
+            return value;
         }
 
-        private enum ModificationWayType
+        protected override Task<TrackableDictionary<int, string>> LoadAsync()
         {
-            Intrusive,
-            IntrusiveAndMark,
-            SetNew,
+            return _mapper.LoadAsync(_collection, 1);
         }
 
-        private void ModifyTestInventory(TrackableDictionary<int, ItemData> dict, ModificationWayType type)
+        protected override Task SaveAsync(ITracker tracker)
         {
-            dict.Remove(1);
-            switch (type)
-            {
-                case ModificationWayType.Intrusive:
-                    dict[2].Count -= 1;
-                    dict[2].Note = "Destroyed";
-                    break;
-
-                case ModificationWayType.IntrusiveAndMark:
-                    dict[2].Count -= 1;
-                    dict[2].Note = "Destroyed";
-                    dict.MarkModify(2);
-                    break;
-
-                case ModificationWayType.SetNew:
-                    var item = dict[2];
-                    dict[2] = new ItemData { Kind = item.Kind, Count = item.Count - 1, Note = "Destroyed" };
-                    break;
-            }
-            dict.Add(3, new ItemData { Kind = 103, Count = 3, Note = "Just Arrived" });
-        }
-
-        // Regular Test
-
-        [Fact]
-        public async Task Test_MongoDbMapper_CreateAndLoad()
-        {
-            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
-
-            var id = ObjectId.GenerateNewId();
-            var dict = CreateTestInventory(true);
-            await ItemDataMapper.SaveAsync(collection, dict.Tracker, id);
-
-            var dict2 = await ItemDataMapper.LoadAsync(collection, id);
-            Assert.Equal(dict.Count, dict2.Count);
-            foreach (var item in dict)
-            {
-                Assert.Equal(item.Value.Kind, dict2[item.Key].Kind);
-                Assert.Equal(item.Value.Count, dict2[item.Key].Count);
-                Assert.Equal(item.Value.Note, dict2[item.Key].Note);
-            }
-        }
-
-        [Fact]
-        public async Task Test_MongoDbMapper_Update()
-        {
-            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
-
-            var id = ObjectId.GenerateNewId();
-            var dict = CreateTestInventory(true);
-            await ItemDataMapper.SaveAsync(collection, dict.Tracker, id);
-            dict.Tracker.Clear();
-
-            ModifyTestInventory(dict, ModificationWayType.SetNew);
-            await ItemDataMapper.SaveAsync(collection, dict.Tracker, id);
-
-            var dict2 = await ItemDataMapper.LoadAsync(collection, id);
-            Assert.Equal(dict.Count, dict2.Count);
-            foreach (var item in dict)
-            {
-                Assert.Equal(item.Value.Kind, dict2[item.Key].Kind);
-                Assert.Equal(item.Value.Count, dict2[item.Key].Count);
-                Assert.Equal(item.Value.Note, dict2[item.Key].Note);
-            }
-        }
-
-        // With Value
-
-        [Fact]
-        public async Task Test_MongoDbMapperWitValue_CreateAndLoad()
-        {
-            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
-
-            var id = ObjectId.GenerateNewId();
-            var dict = new TrackableDictionary<int, string>();
-            dict.SetDefaultTracker();
-            dict.Add(1, "One");
-            dict.Add(2, "Two");
-            dict.Add(3, "Three");
-
-            await StringMapper.SaveAsync(collection, dict.Tracker, id);
-
-            var dict2 = await StringMapper.LoadAsync(collection, id);
-            Assert.Equal(dict.Count, dict2.Count);
-            foreach (var item in dict)
-            {
-                Assert.Equal(item.Value, dict2[item.Key]);
-            }
-        }
-
-        [Fact]
-        public async Task Test_MongoDbMapperWithValue_Update()
-        {
-            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
-
-            var id = ObjectId.GenerateNewId();
-            var dict = new TrackableDictionary<int, string>();
-            dict.SetDefaultTracker();
-            dict.Add(1, "One");
-            dict.Add(2, "Two");
-            dict.Add(3, "Three");
-
-            await StringMapper.SaveAsync(collection, dict.Tracker, id);
-            dict.Tracker.Clear();
-
-            dict.Remove(1);
-            dict[2] = "TwoTwo";
-            dict.Add(4, "Four");
-            await StringMapper.SaveAsync(collection, dict.Tracker, id);
-
-            var dict2 = await StringMapper.LoadAsync(collection, id);
-            Assert.Equal(dict.Count, dict2.Count);
-            foreach (var item in dict)
-            {
-                Assert.Equal(item.Value, dict2[item.Key]);
-            }
+            return _mapper.SaveAsync(_collection, (TrackableDictionaryTracker<int, string>)tracker, 1);
         }
     }
+
+    public class TrackableDictionaryItemDataTest : StorageDictionaryItemDataTestKit<int>, IClassFixture<Database>
+    {
+        private static TrackableDictionaryMongoDbMapper<int, ItemData> _mapper =
+            new TrackableDictionaryMongoDbMapper<int, ItemData>();
+
+        private Database _db;
+        private IMongoCollection<BsonDocument> _collection;
+
+        public TrackableDictionaryItemDataTest(Database db)
+        {
+            _db = db;
+            _db.Test.DropCollectionAsync(nameof(ItemData)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(ItemData));
+        }
+
+        protected override int CreateKey(int value)
+        {
+            return value;
+        }
+
+        protected override Task<TrackableDictionary<int, ItemData>> LoadAsync()
+        {
+            return _mapper.LoadAsync(_collection, 1);
+        }
+
+        protected override Task SaveAsync(ITracker tracker)
+        {
+            return _mapper.SaveAsync(_collection, (TrackableDictionaryTracker<int, ItemData>)tracker, 1);
+        }
+    }
+
+    public class TrackableDictionaryItemDataWithHeadKeysTest : StorageDictionaryItemDataTestKit<int>, IClassFixture<Database>
+    {
+        private static TrackableDictionaryMongoDbMapper<int, ItemData> _mapper =
+            new TrackableDictionaryMongoDbMapper<int, ItemData>();
+
+        private Database _db;
+        private IMongoCollection<BsonDocument> _collection;
+
+        public TrackableDictionaryItemDataWithHeadKeysTest(Database db)
+        {
+            _db = db;
+            _db.Test.DropCollectionAsync(nameof(ItemData)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(ItemData));
+        }
+
+        protected override int CreateKey(int value)
+        {
+            return value;
+        }
+
+        protected override Task<TrackableDictionary<int, ItemData>> LoadAsync()
+        {
+            return _mapper.LoadAsync(_collection, 1, "One");
+        }
+
+        protected override Task SaveAsync(ITracker tracker)
+        {
+            return _mapper.SaveAsync(_collection, (TrackableDictionaryTracker<int, ItemData>)tracker, 1, "One");
+        }
+    }
+
+    /*
+    public interface IItem : ITrackablePoco
+    {
+        short Kind { get; set; }
+        int Count { get; set; }
+        string Note { get; set; }
+    }
+
+    public class TrackableDictionaryItemPocoTest : StorageDictionaryItemPocoKit<int, TrackableItem>, IClassFixture<Database>
+    {
+        private static TrackableDictionaryMongoDbMapper<int, TrackableItem> _mapper =
+            new TrackableDictionaryMongoDbMapper<int, TrackableItem>();
+
+        private Database _db;
+        private IMongoCollection<BsonDocument> _collection;
+
+        public TrackableDictionaryItemPocoTest(Database db)
+        {
+            _db = db;
+            _db.Test.DropCollectionAsync(nameof(ItemData)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(ItemData));
+        }
+
+        protected override int CreateKey(int value)
+        {
+            return value;
+        }
+
+        protected override Task<TrackableDictionary<int, TrackableItem>> LoadAsync()
+        {
+            return _mapper.LoadAsync(_collection, 1);
+        }
+
+        protected override Task SaveAsync(TrackableDictionary<int, TrackableItem> dictionary)
+        {
+            return _mapper.SaveAsync(_collection, dictionary, 1);
+        }
+    }
+    */
 }

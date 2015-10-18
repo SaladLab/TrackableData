@@ -3,199 +3,131 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Xunit;
 
 namespace TrackableData.MongoDB.Tests
 {
-    public class TrackablePocoTest : IClassFixture<Database>
+    public interface ITestPoco : ITrackablePoco
     {
-        private static TrackablePocoMongoDbMapper<IPerson> PersonMapper =
-            new TrackablePocoMongoDbMapper<IPerson>();
+        ObjectId Id { get; set; }
+        string Name { get; set; }
+        int Age { get; set; }
+        int Extra { get; set; }
+    }
 
-        private static TrackablePocoMongoDbMapper<IPersonWithCustomId> PersonWithCustomIdMapper =
-            new TrackablePocoMongoDbMapper<IPersonWithCustomId>();
+    public interface ITestPocoWithCustomId : ITrackablePoco
+    {
+        [TrackableField("mongodb.identity")]
+        long CustomId { get; set; }
+        string Name { get; set; }
+        int Age { get; set; }
+        int Extra { get; set; }
+    }
+
+    public class TrackablePocoTest : TestKits.StoragePocoTestKit<TrackableTestPoco, ObjectId>, IClassFixture<Database>
+    {
+        private static TrackablePocoMongoDbMapper<ITestPoco> _mapper =
+            new TrackablePocoMongoDbMapper<ITestPoco>();
 
         private Database _db;
+        private IMongoCollection<BsonDocument> _collection;
 
         public TrackablePocoTest(Database db)
         {
             _db = db;
+            _db.Test.DropCollectionAsync(nameof(ITestPoco)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(ITestPoco));
         }
 
-        // Regular Test
-
-        [Fact]
-        public async Task Test_MongoDbMapper_CreateAndLoadPoco()
+        protected override Task CreateAsync(TrackableTestPoco person)
         {
-            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
-
-            var person = new TrackablePerson
-            {
-                Id = ObjectId.GenerateNewId(),
-                Name = "Testor",
-                Age = 10
-            };
-            await PersonMapper.CreateAsync(collection, person);
-
-            var person2 = await PersonMapper.LoadAsync(collection, person.Id);
-            Assert.Equal(person.Id, person2.Id);
-            Assert.Equal(person.Name, person2.Name);
-            Assert.Equal(person.Age, person2.Age);
+            return _mapper.CreateAsync(_collection, person);
         }
 
-        [Fact]
-        public async Task Test_MongoDbMapper_DeletePoco()
+        protected override async Task<TrackableTestPoco> LoadAsync(ObjectId id)
         {
-            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
-
-            var person = new TrackablePerson
-            {
-                Id = ObjectId.GenerateNewId(),
-                Name = "Testor",
-                Age = 10
-            };
-            await PersonMapper.CreateAsync(collection, person);
-
-            await PersonMapper.RemoveAsync(collection, person.Id);
-
-            var person2 = await PersonMapper.LoadAsync(collection, person.Id);
-            Assert.Equal(null, person2);
+            return (TrackableTestPoco)(await _mapper.LoadAsync(_collection, id));
         }
 
-        [Fact]
-        public async Task Test_MongoDbMapper_SavePoco()
+        protected override Task<int> RemoveAsync(ObjectId id)
         {
-            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
-
-            var person = new TrackablePerson
-            {
-                Id = ObjectId.GenerateNewId(),
-                Name = "Testor",
-                Age = 10
-            };
-            await PersonMapper.CreateAsync(collection, person);
-
-            person.SetDefaultTracker();
-            person.Name = "SuperTestor";
-            person.Age += 1;
-            await PersonMapper.SaveAsync(collection, person.Tracker, person.Id);
-            person.Tracker.Clear();
-
-            var person2 = await PersonMapper.LoadAsync(collection, person.Id);
-            Assert.Equal(person.Id, person2.Id);
-            Assert.Equal(person.Name, person2.Name);
-            Assert.Equal(person.Age, person2.Age);
+            return _mapper.RemoveAsync(_collection, id);
         }
 
-        // With Head Keys
-
-        [Fact]
-        public async Task Test_MongoDbMapperWithHead_CreateAndLoadPoco()
+        protected override Task SaveAsync(ITracker tracker, ObjectId id)
         {
-            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
-
-            var person = new TrackablePerson
-            {
-                Id = ObjectId.GenerateNewId(),
-                Name = "Testor",
-                Age = 25
-            };
-            await PersonMapper.CreateAsync(collection, person, 1, "One");
-
-            var person2 = await PersonMapper.LoadAsync(collection, 1, "One", person.Id);
-            Assert.Equal(person.Id, person2.Id);
-            Assert.Equal(person.Name, person2.Name);
-            Assert.Equal(person.Age, person2.Age);
+            return _mapper.SaveAsync(_collection, (TrackablePocoTracker<ITestPoco>)tracker, id);
         }
+    }
 
-        [Fact]
-        public async Task Test_MongoDbMapperWithHead_DeletePoco()
+    public class TrackablePocoWithHeadKeysTest : TestKits.StoragePocoTestKit<TrackableTestPoco, ObjectId>, IClassFixture<Database>
+    {
+        private static TrackablePocoMongoDbMapper<ITestPoco> _mapper =
+                   new TrackablePocoMongoDbMapper<ITestPoco>();
+
+        private Database _db;
+        private IMongoCollection<BsonDocument> _collection;
+
+        public TrackablePocoWithHeadKeysTest(Database db)
         {
-            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
-
-            var person = new TrackablePerson
-            {
-                Id = ObjectId.GenerateNewId(),
-                Name = "Testor",
-                Age = 10
-            };
-            await PersonMapper.CreateAsync(collection, person, 1, "One");
-
-            await PersonMapper.RemoveAsync(collection, 1, "One", person.Id);
-
-            var person2 = await PersonMapper.LoadAsync(collection, 1, "One", person.Id);
-            Assert.Equal(null, person2);
+            _db = db;
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(ITestPoco));
         }
 
-        [Fact]
-        public async Task Test_MongoDbMapperWithHead_SavePoco()
+        protected override Task CreateAsync(TrackableTestPoco person)
         {
-            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
-
-            var person = new TrackablePerson
-            {
-                Id = ObjectId.GenerateNewId(),
-                Name = "Testor",
-                Age = 10
-            };
-            await PersonMapper.CreateAsync(collection, person, 1, "One");
-
-            person.SetDefaultTracker();
-            person.Name = "SuperTestor";
-            person.Age += 1;
-            await PersonMapper.SaveAsync(collection, person.Tracker, 1, "One", person.Id);
-            person.Tracker.Clear();
-
-            var person2 = await PersonMapper.LoadAsync(collection, 1, "One", person.Id);
-            Assert.Equal(person.Id, person2.Id);
-            Assert.Equal(person.Name, person2.Name);
-            Assert.Equal(person.Age, person2.Age);
+            return _mapper.CreateAsync(_collection, person, 1, "One");
         }
 
-        // With Custom Key
+        protected override async Task<TrackableTestPoco> LoadAsync(ObjectId id)
+        {
+            return (TrackableTestPoco)(await _mapper.LoadAsync(_collection, 1, "One", id));
+        }
+
+        protected override Task<int> RemoveAsync(ObjectId id)
+        {
+            return _mapper.RemoveAsync(_collection, 1, "One", id);
+        }
+
+        protected override Task SaveAsync(ITracker tracker, ObjectId id)
+        {
+            return _mapper.SaveAsync(_collection, (TrackablePocoTracker<ITestPoco>)tracker, 1, "One", id);
+        }
+    }
+
+    public class TrackablePocoWithCustomIdTest : IClassFixture<Database>
+    {
+        private static TrackablePocoMongoDbMapper<ITestPocoWithCustomId> _mapper =
+            new TrackablePocoMongoDbMapper<ITestPocoWithCustomId>();
+
+        private Database _db;
+        private IMongoCollection<BsonDocument> _collection;
+
+        public TrackablePocoWithCustomIdTest(Database db)
+        {
+            _db = db;
+            _db.Test.DropCollectionAsync(nameof(ITestPocoWithCustomId)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(ITestPocoWithCustomId));
+        }
 
         [Fact]
         public async Task Test_MongoDbMapperWithCustomKey_CreateAndLoadPoco()
         {
             var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
 
-            var person = new TrackablePersonWithCustomId
+            var person = new TrackableTestPocoWithCustomId
             {
                 CustomId = UniqueInt64Id.GenerateNewId(),
                 Name = "Testor",
                 Age = 25
             };
-            await PersonWithCustomIdMapper.CreateAsync(collection, person);
+            await _mapper.CreateAsync(collection, person);
 
-            var person2 = await PersonWithCustomIdMapper.LoadAsync(collection, person.CustomId);
+            var person2 = await _mapper.LoadAsync(collection, person.CustomId);
             Assert.Equal(person.CustomId, person2.CustomId);
             Assert.Equal(person.Name, person2.Name);
             Assert.Equal(person.Age, person2.Age);
-        }
-
-        // Workshop
-
-        [Fact]
-        public async Task Test_Workshop()
-        {
-            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
-
-            var person = new TrackablePerson
-            {
-                Id = ObjectId.GenerateNewId(),
-                Name = "Alice",
-                Age = 10
-            };
-            var bson = person.ToBsonDocument();
-            await collection.InsertOneAsync(bson);
-            var id = bson["_id"];
-            Assert.Equal(person.Id, id);
-
-            await collection.UpdateOneAsync(
-                Builders<BsonDocument>.Filter.Eq("_id", person.Id),
-                Builders<BsonDocument>.Update.Set("1.def.ghi", 10));
         }
     }
 }

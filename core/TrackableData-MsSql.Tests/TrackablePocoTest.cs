@@ -5,211 +5,148 @@ using Xunit;
 
 namespace TrackableData.Sql.Tests
 {
-    public class TrackablePocoTest : IClassFixture<Database>
+    public interface ITestPoco : ITrackablePoco
     {
+        [TrackableField("sql.primary-key")]
+        int Id { get; set; }
+        string Name { get; set; }
+        int Age { get; set; }
+    }
+
+    public interface ITestPocoWithIdentity : ITrackablePoco
+    {
+        [TrackableField("sql.primary-key", "sql.identity")]
+        int Id { get; set; }
+        string Name { get; set; }
+        int Age { get; set; }
+    }
+
+    public class TrackablePocoTest : TestKits.StoragePocoTestKit<TrackableTestPoco, int>, IClassFixture<Database>, IDisposable
+    {
+        private static TrackablePocoMsSqlMapper<ITestPoco> _mapper =
+            new TrackablePocoMsSqlMapper<ITestPoco>(nameof(ITestPoco));
+
         private Database _db;
+        private SqlConnection _connection;
 
         public TrackablePocoTest(Database db)
         {
             _db = db;
+            _connection = db.Connection;
+            _mapper.ResetTableAsync(_connection).Wait();
         }
 
-        private struct Context<T> : IDisposable
-            where T : ITrackablePoco
+        public void Dispose()
         {
-            public TrackablePocoMsSqlMapper<T> SqlMapper;
-            public SqlConnection Connection;
-
-            public void Dispose()
-            {
-                if (Connection != null)
-                {
-                    Connection.Dispose();
-                    Connection = null;
-                }
-            }
+            _connection.Dispose();
         }
 
-        private async Task<Context<T>> PrepareAsync<T>(ColumnDefinition[] headKeyColumnDefs = null)
-            where T : ITrackablePoco
+        protected override Task CreateAsync(TrackableTestPoco person)
         {
-            var sqlMapper = new TrackablePocoMsSqlMapper<T>(typeof(T).Name, headKeyColumnDefs);
-            var connection = _db.Connection;
-            await sqlMapper.ResetTableAsync(connection);
-            return new Context<T> { SqlMapper = sqlMapper, Connection = connection };
+            return _mapper.CreateAsync(_connection, person);
         }
 
-        // Regular Test
-
-        [Fact]
-        public async Task Test_SqlMapper_ResetTable()
+        protected override async Task<TrackableTestPoco> LoadAsync(int id)
         {
-            using (var ctx = await PrepareAsync<IPerson>())
-            {
-                var persons = await ctx.SqlMapper.LoadAllAsync(ctx.Connection);
-                Assert.Equal(0, persons.Count);
-            }
+            return (TrackableTestPoco)(await _mapper.LoadAsync(_connection, id));
         }
 
-        [Fact]
-        public async Task Test_SqlMapper_CreateAndLoadPoco()
+        protected override Task<int> RemoveAsync(int id)
         {
-            using (var ctx = await PrepareAsync<IPerson>())
-            {
-                var person = new TrackablePerson
-                {
-                    Id = 1,
-                    Name = "Testor",
-                    Age = 10
-                };
-                await ctx.SqlMapper.CreateAsync(ctx.Connection, person);
-
-                var person2 = await ctx.SqlMapper.LoadAsync(ctx.Connection, person.Id);
-                Assert.Equal(person.Id, person2.Id);
-                Assert.Equal(person.Name, person2.Name);
-                Assert.Equal(person.Age, person2.Age);
-            }
+            return _mapper.RemoveAsync(_connection, id);
         }
 
-        [Fact]
-        public async Task Test_SqlMapper_DeletePoco()
+        protected override Task SaveAsync(ITracker tracker, int id)
         {
-            using (var ctx = await PrepareAsync<IPerson>())
-            {
-                var person = new TrackablePerson();
-                await ctx.SqlMapper.CreateAsync(ctx.Connection, person);
-
-                var count = await ctx.SqlMapper.RemoveAsync(ctx.Connection, person.Id);
-                Assert.Equal(1, count);
-            }
+            return _mapper.SaveAsync(_connection, (TrackablePocoTracker<ITestPoco>)tracker, id);
         }
+    }
 
-        [Fact]
-        public async Task Test_SqlMapper_SavePoco()
-        {
-            using (var ctx = await PrepareAsync<IPerson>())
-            {
-                var person = new TrackablePerson
-                {
-                    Id = 1,
-                    Name = "Alice"
-                };
-                await ctx.SqlMapper.CreateAsync(ctx.Connection, person);
-
-                person.SetDefaultTracker();
-                person.Name = "Testor";
-                person.Age = 10;
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, person.Tracker, person.Id);
-
-                var person2 = await ctx.SqlMapper.LoadAsync(ctx.Connection, person.Id);
-                Assert.Equal(person.Id, person2.Id);
-                Assert.Equal(person.Name, person2.Name);
-                Assert.Equal(person.Age, person2.Age);
-            }
-        }
-
-        [Fact]
-        public async Task Test_SqlMapper_CreateAndLoadPoco_WithIdentity()
-        {
-            using (var ctx = await PrepareAsync<IPersonWithIdentity>())
-            {
-                var person = new TrackablePersonWithIdentity
-                {
-                    Name = "Testor",
-                    Age = 10
-                };
-                await ctx.SqlMapper.CreateAsync(ctx.Connection, person);
-                Assert.Equal(1, person.Id);
-            }
-        }
-
-        // With Head Key Columns
-
+    public class TrackablePocoWithHeadKeysTest : TestKits.StoragePocoTestKit<TrackableTestPoco, int>, IClassFixture<Database>, IDisposable
+    {
         private static readonly ColumnDefinition[] HeadKeyColumnDefs =
         {
             new ColumnDefinition("Head1", typeof(int)),
             new ColumnDefinition("Head2", typeof(string), 100)
         };
+        private static TrackablePocoMsSqlMapper<ITestPoco> _mapper =
+            new TrackablePocoMsSqlMapper<ITestPoco>(nameof(ITestPoco), HeadKeyColumnDefs);
 
-        [Fact]
-        public async Task Test_SqlMapperWithHead_ResetTable()
+        private Database _db;
+        private SqlConnection _connection;
+
+        public TrackablePocoWithHeadKeysTest(Database db)
         {
-            using (var ctx = await PrepareAsync<IPerson>(HeadKeyColumnDefs))
-            {
-                var persons = await ctx.SqlMapper.LoadAllAsync(ctx.Connection);
-                Assert.Equal(0, persons.Count);
-            }
+            _db = db;
+            _connection = db.Connection;
+            _mapper.ResetTableAsync(_connection).Wait();
         }
 
-        [Fact]
-        public async Task Test_SqlMapperWithHead_CreateAndLoadPoco()
+        public void Dispose()
         {
-            using (var ctx = await PrepareAsync<IPerson>(HeadKeyColumnDefs))
-            {
-                var person = new TrackablePerson
-                {
-                    Id = 1,
-                    Name = "Testor",
-                    Age = 10
-                };
-                await ctx.SqlMapper.CreateAsync(ctx.Connection, person, 1, "One");
-
-                var person2 = await ctx.SqlMapper.LoadAsync(ctx.Connection, 1, "One", person.Id);
-                Assert.Equal(person.Id, person2.Id);
-                Assert.Equal(person.Name, person2.Name);
-                Assert.Equal(person.Age, person2.Age);
-            }
+            _connection.Dispose();
         }
 
-        [Fact]
-        public async Task Test_SqlMapperWithHead_DeletePoco()
+        protected override Task CreateAsync(TrackableTestPoco person)
         {
-            using (var ctx = await PrepareAsync<IPerson>(HeadKeyColumnDefs))
-            {
-                var person = new TrackablePerson();
-                await ctx.SqlMapper.CreateAsync(ctx.Connection, person, 1, "One");
-
-                var count = await ctx.SqlMapper.RemoveAsync(ctx.Connection, 1, "One", person.Id);
-                Assert.Equal(1, count);
-            }
+            return _mapper.CreateAsync(_connection, person, 1, "One");
         }
 
-        [Fact]
-        public async Task Test_SqlMapperWithHead_SavePoco()
+        protected override async Task<TrackableTestPoco> LoadAsync(int id)
         {
-            using (var ctx = await PrepareAsync<IPerson>(HeadKeyColumnDefs))
-            {
-                var person = new TrackablePerson
-                {
-                    Id = 1,
-                    Name = "Alice"
-                };
-                await ctx.SqlMapper.CreateAsync(ctx.Connection, person, 1, "One");
-
-                person.SetDefaultTracker();
-                person.Name = "Testor";
-                person.Age = 10;
-                await ctx.SqlMapper.SaveAsync(ctx.Connection, person.Tracker, 1, "One", person.Id);
-
-                var person2 = await ctx.SqlMapper.LoadAsync(ctx.Connection, 1, "One", person.Id);
-                Assert.Equal(person.Id, person2.Id);
-                Assert.Equal(person.Name, person2.Name);
-                Assert.Equal(person.Age, person2.Age);
-            }
+            return (TrackableTestPoco)(await _mapper.LoadAsync(_connection, 1, "One", id));
         }
 
-        [Fact]
-        public async Task Test_SqlMapperWithHead_CreateAndLoadPoco_WithIdentity()
+        protected override Task<int> RemoveAsync(int id)
         {
-            using (var ctx = await PrepareAsync<IPersonWithIdentity>(HeadKeyColumnDefs))
-            {
-                var person = new TrackablePersonWithIdentity();
-                person.Name = "Testor";
-                person.Age = 10;
+            return _mapper.RemoveAsync(_connection, 1, "One", id);
+        }
 
-                await ctx.SqlMapper.CreateAsync(ctx.Connection, person, 1, "One");
-                Assert.Equal(1, person.Id);
-            }
+        protected override Task SaveAsync(ITracker tracker, int id)
+        {
+            return _mapper.SaveAsync(_connection, (TrackablePocoTracker<ITestPoco>)tracker, 1, "One", id);
         }
     }
+
+    public class TrackablePocoWithAutoIdTest : TestKits.StoragePocoWithAutoIdTestKit<TrackableTestPocoWithIdentity, int>, IClassFixture<Database>, IDisposable
+    {
+        private static TrackablePocoMsSqlMapper<ITestPocoWithIdentity> _mapper =
+            new TrackablePocoMsSqlMapper<ITestPocoWithIdentity>(nameof(ITestPocoWithIdentity));
+
+        private Database _db;
+        private SqlConnection _connection;
+
+        public TrackablePocoWithAutoIdTest(Database db)
+        {
+            _db = db;
+            _connection = db.Connection;
+            _mapper.ResetTableAsync(_connection).Wait();
+        }
+
+        public void Dispose()
+        {
+            _connection.Dispose();
+        }
+
+        protected override Task CreateAsync(TrackableTestPocoWithIdentity person)
+        {
+            return _mapper.CreateAsync(_connection, person);
+        }
+
+        protected override async Task<TrackableTestPocoWithIdentity> LoadAsync(int id)
+        {
+            return (TrackableTestPocoWithIdentity)(await _mapper.LoadAsync(_connection, id));
+        }
+
+        protected override Task<int> RemoveAsync(int id)
+        {
+            return _mapper.RemoveAsync(_connection, id);
+        }
+
+        protected override Task SaveAsync(ITracker tracker, int id)
+        {
+            return _mapper.SaveAsync(_connection, (TrackablePocoTracker<ITestPocoWithIdentity>)tracker, id);
+        }
+    }
+
 }
