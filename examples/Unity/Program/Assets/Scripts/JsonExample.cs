@@ -5,6 +5,7 @@ using System.Text;
 using Newtonsoft.Json;
 using TrackableData;
 using Unity.Data;
+using TrackableData.Json;
 
 namespace Basic
 {
