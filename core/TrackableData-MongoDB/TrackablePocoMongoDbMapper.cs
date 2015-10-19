@@ -65,7 +65,16 @@ namespace TrackableData.MongoDB
                 classMap.MapIdProperty(identityColumn.Name);
             }
 
-            BsonClassMap.RegisterClassMap(classMap);
+            try
+            {
+                BsonClassMap.RegisterClassMap(classMap);
+            }
+            catch (ArgumentException)
+            {
+                // if duplicate key exists
+                return false;
+            }
+            
             return true;
         }
 
@@ -99,6 +108,20 @@ namespace TrackableData.MongoDB
             }
 
             return Tuple.Create(filter, update);
+        }
+
+        public UpdateDefinition<BsonDocument> GenerateUpdateBson(
+            UpdateDefinition<BsonDocument> update, TrackablePocoTracker<T> tracker, params object[] keyValues)
+        {
+            var keyNamespace = keyValues.Length > 0 ? CreatePath(keyValues) + "." : "";
+            foreach (var change in tracker.ChangeMap)
+            {
+                update = (update == null)
+                    ? Builders<BsonDocument>.Update.Set(keyNamespace + change.Key.Name, change.Value.NewValue)
+                    : update.Set(keyNamespace + change.Key.Name, change.Value.NewValue);
+            }
+
+            return update;
         }
 
         public async Task CreateAsync(IMongoCollection<BsonDocument> collection, T value, params object[] keyValues)

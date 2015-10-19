@@ -14,12 +14,13 @@ namespace TrackableData.MongoDB.Tests
 
         private Database _db;
         private IMongoCollection<BsonDocument> _collection;
+        private ObjectId _testId = ObjectId.GenerateNewId();
 
         public TrackableDictionaryStringTest(Database db)
         {
             _db = db;
-            _db.Test.DropCollectionAsync(nameof(String)).Wait();
-            _collection = _db.Test.GetCollection<BsonDocument>(nameof(String));
+            _db.Test.DropCollectionAsync(nameof(TrackableDictionaryStringTest)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackableDictionaryStringTest));
         }
 
         protected override int CreateKey(int value)
@@ -29,12 +30,12 @@ namespace TrackableData.MongoDB.Tests
 
         protected override Task<TrackableDictionary<int, string>> LoadAsync()
         {
-            return _mapper.LoadAsync(_collection, 1);
+            return _mapper.LoadAsync(_collection, _testId);
         }
 
         protected override Task SaveAsync(ITracker tracker)
         {
-            return _mapper.SaveAsync(_collection, (TrackableDictionaryTracker<int, string>)tracker, 1);
+            return _mapper.SaveAsync(_collection, (TrackableDictionaryTracker<int, string>)tracker, _testId);
         }
     }
 
@@ -45,12 +46,13 @@ namespace TrackableData.MongoDB.Tests
 
         private Database _db;
         private IMongoCollection<BsonDocument> _collection;
+        private ObjectId _testId = ObjectId.GenerateNewId();
 
         public TrackableDictionaryDataTest(Database db)
         {
             _db = db;
-            _db.Test.DropCollectionAsync(nameof(ItemData)).Wait();
-            _collection = _db.Test.GetCollection<BsonDocument>(nameof(ItemData));
+            _db.Test.DropCollectionAsync(nameof(TrackableDictionaryDataTest)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackableDictionaryDataTest));
         }
 
         protected override int CreateKey(int value)
@@ -60,12 +62,12 @@ namespace TrackableData.MongoDB.Tests
 
         protected override Task<TrackableDictionary<int, ItemData>> LoadAsync()
         {
-            return _mapper.LoadAsync(_collection, 1);
+            return _mapper.LoadAsync(_collection, _testId);
         }
 
         protected override Task SaveAsync(ITracker tracker)
         {
-            return _mapper.SaveAsync(_collection, (TrackableDictionaryTracker<int, ItemData>)tracker, 1);
+            return _mapper.SaveAsync(_collection, (TrackableDictionaryTracker<int, ItemData>)tracker, _testId);
         }
     }
 
@@ -73,15 +75,16 @@ namespace TrackableData.MongoDB.Tests
     {
         private static TrackableDictionaryMongoDbMapper<int, ItemData> _mapper =
             new TrackableDictionaryMongoDbMapper<int, ItemData>();
-
+        
         private Database _db;
         private IMongoCollection<BsonDocument> _collection;
+        private ObjectId _testId = ObjectId.GenerateNewId();
 
         public TrackableDictionaryDataWithHeadKeysTest(Database db)
         {
             _db = db;
-            _db.Test.DropCollectionAsync(nameof(ItemData)).Wait();
-            _collection = _db.Test.GetCollection<BsonDocument>(nameof(ItemData));
+            _db.Test.DropCollectionAsync(nameof(TrackableDictionaryDataWithHeadKeysTest)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackableDictionaryDataWithHeadKeysTest));
         }
 
         protected override int CreateKey(int value)
@@ -91,12 +94,12 @@ namespace TrackableData.MongoDB.Tests
 
         protected override Task<TrackableDictionary<int, ItemData>> LoadAsync()
         {
-            return _mapper.LoadAsync(_collection, 1, "One");
+            return _mapper.LoadAsync(_collection, _testId, 1, "One");
         }
 
         protected override Task SaveAsync(ITracker tracker)
         {
-            return _mapper.SaveAsync(_collection, (TrackableDictionaryTracker<int, ItemData>)tracker, 1, "One");
+            return _mapper.SaveAsync(_collection, (TrackableDictionaryTracker<int, ItemData>)tracker, _testId, 1, "One");
         }
     }
 
@@ -114,12 +117,13 @@ namespace TrackableData.MongoDB.Tests
 
         private Database _db;
         private IMongoCollection<BsonDocument> _collection;
+        private ObjectId _testId = ObjectId.GenerateNewId();
 
         public TrackableDictionaryPocoTest(Database db)
         {
             _db = db;
-            _db.Test.DropCollectionAsync(nameof(ItemData)).Wait();
-            _collection = _db.Test.GetCollection<BsonDocument>(nameof(ItemData));
+            _db.Test.DropCollectionAsync(nameof(TrackableDictionaryPocoTest)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackableDictionaryPocoTest));
         }
 
         protected override int CreateKey(int value)
@@ -129,12 +133,12 @@ namespace TrackableData.MongoDB.Tests
 
         protected override Task<TrackableDictionary<int, TrackableItem>> LoadAsync()
         {
-            return _mapper.LoadAsync(_collection, 1);
+            return _mapper.LoadAsync(_collection, _testId);
         }
 
         protected override Task SaveAsync(TrackableDictionary<int, TrackableItem> dictionary)
         {
-            return _mapper.SaveAsync(_collection, dictionary, 1);
+            return _mapper.SaveAsync(_collection, dictionary, _testId);
         }
     }
 }

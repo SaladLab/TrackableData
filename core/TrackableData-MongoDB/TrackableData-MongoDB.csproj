@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="TrackableDictionaryMongoDbMapper.cs" />
     <Compile Include="TrackableListMongoDbMapper.cs" />
+    <Compile Include="TrackableMongoDbMapper.cs" />
     <Compile Include="UniqueInt64Id.cs" />
     <Compile Include="TrackablePocoMongoDbMapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -16,7 +16,7 @@ namespace TrackableData.MongoDB
         }
 
         public Tuple<FilterDefinition<BsonDocument>, UpdateDefinition<BsonDocument>, int>
-            GenerateUpdateBson(TrackableListTracker<T>tracker, int cursor, params object[] keyValues)
+            GenerateUpdateBson(TrackableListTracker<T> tracker, int cursor, params object[] keyValues)
         {
             if (keyValues.Length < 2)
                 throw new ArgumentException("At least 2 keyValues required.");

@@ -14,10 +14,9 @@ namespace TrackableData
         {
             if (typeof(ITrackablePoco).IsAssignableFrom(trackableType))
             {
-                var trackerType =
-                    trackableType.GetInterfaces()
-                                 .FirstOrDefault(t => t.IsGenericType &&
-                                                      t.GetGenericTypeDefinition() == typeof(ITrackable<>));
+                var trackerType = trackableType.GetInterfaces()
+                                               .FirstOrDefault(t => t.IsGenericType &&
+                                                                    t.GetGenericTypeDefinition() == typeof(ITrackable<>));
                 if (trackerType != null)
                     return typeof(TrackablePocoTracker<>).MakeGenericType(trackerType.GetGenericArguments()[0]);
             }

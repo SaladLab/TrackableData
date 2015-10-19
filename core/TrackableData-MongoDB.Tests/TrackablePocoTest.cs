@@ -36,8 +36,8 @@ namespace TrackableData.MongoDB.Tests
         public TrackablePocoTest(Database db)
         {
             _db = db;
-            _db.Test.DropCollectionAsync(nameof(ITestPoco)).Wait();
-            _collection = _db.Test.GetCollection<BsonDocument>(nameof(ITestPoco));
+            _db.Test.DropCollectionAsync(nameof(TrackablePocoTest)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackablePocoTest));
         }
 
         protected override Task CreateAsync(TrackableTestPoco person)
@@ -68,31 +68,33 @@ namespace TrackableData.MongoDB.Tests
 
         private Database _db;
         private IMongoCollection<BsonDocument> _collection;
+        private ObjectId _testId = ObjectId.GenerateNewId();
 
         public TrackablePocoWithHeadKeysTest(Database db)
         {
             _db = db;
-            _collection = _db.Test.GetCollection<BsonDocument>(nameof(ITestPoco));
+            _db.Test.DropCollectionAsync(nameof(TrackablePocoWithHeadKeysTest)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackablePocoWithHeadKeysTest));
         }
 
         protected override Task CreateAsync(TrackableTestPoco person)
         {
-            return _mapper.CreateAsync(_collection, person, 1, "One");
+            return _mapper.CreateAsync(_collection, person, _testId, "One");
         }
 
         protected override async Task<TrackableTestPoco> LoadAsync(ObjectId id)
         {
-            return (TrackableTestPoco)(await _mapper.LoadAsync(_collection, 1, "One", id));
+            return (TrackableTestPoco)(await _mapper.LoadAsync(_collection, _testId, "One", id));
         }
 
         protected override Task<int> RemoveAsync(ObjectId id)
         {
-            return _mapper.RemoveAsync(_collection, 1, "One", id);
+            return _mapper.RemoveAsync(_collection, _testId, "One", id);
         }
 
         protected override Task SaveAsync(ITracker tracker, ObjectId id)
         {
-            return _mapper.SaveAsync(_collection, (TrackablePocoTracker<ITestPoco>)tracker, 1, "One", id);
+            return _mapper.SaveAsync(_collection, (TrackablePocoTracker<ITestPoco>)tracker, _testId, "One", id);
         }
     }
 
@@ -107,24 +109,22 @@ namespace TrackableData.MongoDB.Tests
         public TrackablePocoWithCustomIdTest(Database db)
         {
             _db = db;
-            _db.Test.DropCollectionAsync(nameof(ITestPocoWithCustomId)).Wait();
-            _collection = _db.Test.GetCollection<BsonDocument>(nameof(ITestPocoWithCustomId));
+            _db.Test.DropCollectionAsync(nameof(TrackablePocoWithCustomIdTest)).Wait();
+            _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackablePocoWithCustomIdTest));
         }
 
         [Fact]
         public async Task Test_MongoDbMapperWithCustomKey_CreateAndLoadPoco()
         {
-            var collection = _db.Test.GetCollection<BsonDocument>("Trackable");
-
             var person = new TrackableTestPocoWithCustomId
             {
                 CustomId = UniqueInt64Id.GenerateNewId(),
                 Name = "Testor",
                 Age = 25
             };
-            await _mapper.CreateAsync(collection, person);
+            await _mapper.CreateAsync(_collection, person);
 
-            var person2 = await _mapper.LoadAsync(collection, person.CustomId);
+            var person2 = await _mapper.LoadAsync(_collection, person.CustomId);
             Assert.Equal(person.CustomId, person2.CustomId);
             Assert.Equal(person.Name, person2.Name);
             Assert.Equal(person.Age, person2.Age);

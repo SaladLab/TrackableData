@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -10,16 +11,27 @@ namespace TrackableData.MongoDB
 {
     public class TrackableDictionaryMongoDbMapper<TKey, TValue>
     {
+        private readonly Func<UpdateDefinition<BsonDocument>, TValue, object[], UpdateDefinition<BsonDocument>> _updateGenerator;
+
+        public TrackableDictionaryMongoDbMapper()
+        {
+            _updateGenerator = TrackableMongoDbMapper.CreatePocoUpdateFunc<TValue>();
+        }
+
         private string CreatePath(IEnumerable<object> keys)
         {
             return string.Join(".", keys.Select(x => x.ToString()));
         }
 
         public Tuple<FilterDefinition<BsonDocument>, UpdateDefinition<BsonDocument>>
-            GenerateUpdateBson(TrackableDictionaryTracker<TKey, TValue> tracker, params object[] keyValues)
+            GenerateUpdateBson(TrackableDictionary<TKey, TValue> trackable,
+                               TrackableDictionaryTracker<TKey, TValue> tracker,
+                               params object[] keyValues)
         {
             if (keyValues.Length == 0)
                 throw new ArgumentException("At least 1 keyValue required.");
+
+            // generate update command for each changes
 
             var filter = Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]);
             var keyNamespace = keyValues.Length > 1 ? CreatePath(keyValues.Skip(1)) + "." : "";
@@ -31,15 +43,30 @@ namespace TrackableData.MongoDB
                     case TrackableDictionaryOperation.Add:
                     case TrackableDictionaryOperation.Modify:
                         update = update == null
-                            ? Builders<BsonDocument>.Update.Set(keyNamespace + change.Key, change.Value.NewValue)
-                            : update.Set(keyNamespace + change.Key, change.Value.NewValue);
+                                     ? Builders<BsonDocument>.Update.Set(keyNamespace + change.Key,
+                                                                         change.Value.NewValue)
+                                     : update.Set(keyNamespace + change.Key, change.Value.NewValue);
                         break;
 
                     case TrackableDictionaryOperation.Remove:
                         update = update == null
-                            ? Builders<BsonDocument>.Update.Unset(keyNamespace + change.Key)
-                            : update.Unset(keyNamespace + change.Key);
+                                     ? Builders<BsonDocument>.Update.Unset(keyNamespace + change.Key)
+                                     : update.Unset(keyNamespace + change.Key);
                         break;
+                }
+            }
+
+            // check each value for TrackableValue
+
+            if (trackable != null && _updateGenerator != null)
+            {
+                foreach (var item in trackable)
+                {
+                    var trackableValue = (ITrackable)item.Value;
+                    if (trackableValue.Changed == false || tracker.ChangeMap.ContainsKey(item.Key))
+                        continue;
+
+                    update = _updateGenerator(update, item.Value, keyValues.Skip(1).Concat(new object[] { item.Key}).ToArray());
                 }
             }
 
@@ -98,11 +125,13 @@ namespace TrackableData.MongoDB
             return dictionary;
         }
 
-        public async Task<UpdateResult> SaveAsync(IMongoCollection<BsonDocument> collection,
-                                                  TrackableDictionary<TKey, TValue> trackable,
-                                                  params object[] keyValues)
+        public Task<UpdateResult> SaveAsync(IMongoCollection<BsonDocument> collection,
+                                            TrackableDictionary<TKey, TValue> trackable,
+                                            params object[] keyValues)
         {
-            return null;
+            var ret = GenerateUpdateBson(
+                trackable, (TrackableDictionaryTracker<TKey, TValue>)trackable.Tracker, keyValues);
+            return collection.UpdateOneAsync(ret.Item1, ret.Item2, new UpdateOptions { IsUpsert = true });
         }
 
         public Task<UpdateResult> SaveAsync(IMongoCollection<BsonDocument> collection,
@@ -119,7 +148,7 @@ namespace TrackableData.MongoDB
             if (tracker.HasChange == false)
                 return null;
 
-            var ret = GenerateUpdateBson(tracker, keyValues);
+            var ret = GenerateUpdateBson(null, tracker, keyValues);
             return collection.UpdateOneAsync(ret.Item1, ret.Item2, new UpdateOptions { IsUpsert = true });
         }
     }

@@ -223,7 +223,7 @@ namespace TrackableData
             if (keyValues.Length != _headKeyColumns.Length)
                 throw new ArgumentException("Number of keyValues should be same with the number of head columns");
 
-            if (tracker.ChangeMap.Any() == false)
+            if (trackable == null && tracker.ChangeMap.Any() == false)
                 return string.Empty;
 
             var sqlAdd = new StringBuilder();
@@ -309,6 +309,8 @@ namespace TrackableData
             {
                 foreach (var item in trackable)
                 {
+                    if (tracker.ChangeMap.ContainsKey(item.Key))
+                        continue;
                     var trackableValue = (ITrackable)item.Value;
                     if (trackableValue != null && trackableValue.Changed)
                     {
