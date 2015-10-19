@@ -66,7 +66,8 @@ namespace CodeGen
 
         public static bool HasBase(this InterfaceDeclarationSyntax node, string name)
         {
-            return node.BaseList.Types.Any(type => CompareTypeName(type.Type.ToString(), name));
+            return node.BaseList != null &&
+                   node.BaseList.Types.Any(type => CompareTypeName(type.Type.ToString(), name));
         }
 
         public static bool CompareTypeName(string a, string b)
