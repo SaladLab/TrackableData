@@ -7,7 +7,7 @@
     <ProjectGuid>{505EDF72-41F9-499D-B213-9FC9B8932489}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TrackableData</RootNamespace>
+    <RootNamespace>TrackableData.MsSql</RootNamespace>
     <AssemblyName>TrackableData-MsSql</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

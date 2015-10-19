@@ -6,12 +6,6 @@
  - 기본 README 작성
    - 앞으로 작성할 매뉴얼의 큰 그림도 만들자
 
- - Mongo
-
- - Project 별로 Namespace 넣어주자.
-
- - Nested Trackable 가 MongoDB 등에서 잘 되도록
-
 ## TODO LATER:
 
  - ITrackable 의 GetChildTrackable 를 외부로 분리하자. 여기에 있을 필요가 없다.
@@ -24,3 +18,10 @@
    이래야 T 별로 Converter 를 등록하는 수고를 해결할 수 있음
 
  - TrackableData-MsSql 이 Nullable 을 잘 지원하는지 보자.
+
+## IDEA:
+
+ - 중첩된 Trackable 에 대한 지원이 제한적이다.
+   예를 들면 TrackableDictionary 의 TValue 로 TrackableDictionary 가 들어가는 등을 제대로 지원하지 않는다.
+   이게 중요한 개발 피쳐가 아니었으며 가벼운 라이브러리에 반하는 기능이었기 때문에 제외되었다.
+   나중에 개발할지도 모르니 이 이슈에 대해 정리를 해놓자.

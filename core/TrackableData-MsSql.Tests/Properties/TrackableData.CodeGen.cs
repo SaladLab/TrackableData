@@ -10,6 +10,7 @@
 using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using TrackableData.MsSql;
 using TrackableData.TestKits;
 using Xunit;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ using TrackableData;
 
 #region IItem
 
-namespace TrackableData.Sql.Tests
+namespace TrackableData.MsSql.Tests
 {
     public class TrackableItem : IItem, ITrackable<IItem>
     {
@@ -130,7 +131,7 @@ namespace TrackableData.Sql.Tests
 
 #region ITestPoco
 
-namespace TrackableData.Sql.Tests
+namespace TrackableData.MsSql.Tests
 {
     public class TrackableTestPoco : ITestPoco, ITrackable<ITestPoco>
     {
@@ -240,7 +241,7 @@ namespace TrackableData.Sql.Tests
 
 #region ITestPocoWithIdentity
 
-namespace TrackableData.Sql.Tests
+namespace TrackableData.MsSql.Tests
 {
     public class TrackableTestPocoWithIdentity : ITestPocoWithIdentity, ITrackable<ITestPocoWithIdentity>
     {

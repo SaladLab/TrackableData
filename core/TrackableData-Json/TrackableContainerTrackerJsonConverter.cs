@@ -2,7 +2,7 @@
 using System.Reflection;
 using Newtonsoft.Json;
 
-namespace TrackableData
+namespace TrackableData.Json
 {
     public class TrackableContainerTrackerJsonConverter : JsonConverter
     {

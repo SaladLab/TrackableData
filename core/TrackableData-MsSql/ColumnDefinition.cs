@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TrackableData
+namespace TrackableData.MsSql
 {
     public class ColumnDefinition
     {

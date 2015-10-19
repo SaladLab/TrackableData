@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using TrackableData.MsSql;
 using Xunit;
 
-namespace TrackableData.Sql.Tests
+namespace TrackableData.MsSql.Tests
 {
     public interface ITestPoco : ITrackablePoco
     {

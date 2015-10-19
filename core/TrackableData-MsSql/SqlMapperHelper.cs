@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Reflection;
 
-namespace TrackableData
+namespace TrackableData.MsSql
 {
     public static class SqlMapperHelper
     {

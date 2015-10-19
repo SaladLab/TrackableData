@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using ProtoBuf.Meta;
 using TrackableData;
+using TrackableData.Protobuf;
 
 namespace Basic
 {

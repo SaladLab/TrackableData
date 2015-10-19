@@ -7,7 +7,7 @@
     <ProjectGuid>{F4185A6A-B952-4EA5-9B23-5C7AF6AE7712}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TrackableData</RootNamespace>
+    <RootNamespace>TrackableData.Json</RootNamespace>
     <AssemblyName>TrackableData-Json</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -30,7 +30,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release-Net35|AnyCPU'">
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion> 
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <DefineConstants>TRACE;NET35</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -51,7 +51,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" Condition="'$(TargetFrameworkVersion)' != 'v3.5'"/>
+    <Reference Include="Microsoft.CSharp" Condition="'$(TargetFrameworkVersion)' != 'v3.5'" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>

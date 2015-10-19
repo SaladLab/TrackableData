@@ -3,7 +3,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace TrackableData
+namespace TrackableData.Json
 {
     public struct PathAndTrackerJObject
     {

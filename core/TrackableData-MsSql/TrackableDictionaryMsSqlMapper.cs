@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TrackableData
+namespace TrackableData.MsSql
 {
     public class TrackableDictionaryMsSqlMapper<TKey, TValue>
     {

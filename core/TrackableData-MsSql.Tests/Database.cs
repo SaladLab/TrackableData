@@ -2,7 +2,7 @@
 using System.Configuration;
 using System.Data.SqlClient;
 
-namespace TrackableData.Sql.Tests
+namespace TrackableData.MsSql.Tests
 {
     public class Database : IDisposable
     {

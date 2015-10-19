@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using ProtoBuf;
 
-namespace TrackableData
+namespace TrackableData.Protobuf
 {
     [ProtoContract]
     public class TrackableListTrackerSurrogate<T>

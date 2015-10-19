@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace TrackableData
+namespace TrackableData.Json
 {
     public class TrackableDictionaryTrackerJsonConverter<TKey, TValue> : JsonConverter
     {
