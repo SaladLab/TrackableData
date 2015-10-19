@@ -45,6 +45,17 @@ namespace TrackableData.MongoDB
             // ignore extra elements for smooth schema change
             classMap.SetIgnoreExtraElements(true);
 
+            // unmap all members which T doesn't have
+            var propertyNames = new HashSet<string>(typeof(T).GetProperties().Select(p => p.Name));
+            var deletingMembers = classMap.DeclaredMemberMaps.Where(m =>
+            {
+                var propertyInfo = m.MemberInfo as PropertyInfo;
+                return propertyInfo == null ||
+                       propertyNames.Contains(propertyInfo.Name) == false;
+            }).ToList();
+            foreach (var m in deletingMembers)
+                classMap.UnmapMember(m.MemberInfo);
+
             // set default ignore for saving spaces
             foreach (var memberMap in classMap.DeclaredMemberMaps)
             {
@@ -53,9 +64,6 @@ namespace TrackableData.MongoDB
                 memberMap.SetDefaultValue(defaultValue);
                 memberMap.SetIgnoreIfDefault(true);
             }
-
-            // property "Tracker" is not data!
-            classMap.UnmapMember(_trackableType.GetProperty("Tracker"));
 
             // tell customized id to mongo-db
             var identityColumn = typeof(T).GetProperties().FirstOrDefault(
