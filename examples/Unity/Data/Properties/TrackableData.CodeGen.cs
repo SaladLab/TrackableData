@@ -21,7 +21,7 @@ using System.Runtime.Serialization;
 namespace Unity.Data
 {
     [ProtoContract]
-    public class TrackableUserData : IUserData, ITrackable<IUserData>
+    public partial class TrackableUserData : IUserData
     {
         [IgnoreDataMember]
         public IPocoTracker<IUserData> Tracker { get; set; }

@@ -24,7 +24,7 @@ using TrackableData;
 
 namespace TrackableData.MongoDB.Tests
 {
-    public class TrackableItem : IItem, ITrackable<IItem>
+    public partial class TrackableItem : IItem
     {
         [IgnoreDataMember]
         public IPocoTracker<IItem> Tracker { get; set; }
@@ -134,7 +134,7 @@ namespace TrackableData.MongoDB.Tests
 
 namespace TrackableData.MongoDB.Tests
 {
-    public class TrackableTestPoco : ITestPoco, ITrackable<ITestPoco>
+    public partial class TrackableTestPoco : ITestPoco
     {
         [IgnoreDataMember]
         public IPocoTracker<ITestPoco> Tracker { get; set; }
@@ -261,7 +261,7 @@ namespace TrackableData.MongoDB.Tests
 
 namespace TrackableData.MongoDB.Tests
 {
-    public class TrackableTestPocoWithCustomId : ITestPocoWithCustomId, ITrackable<ITestPocoWithCustomId>
+    public partial class TrackableTestPocoWithCustomId : ITestPocoWithCustomId
     {
         [IgnoreDataMember]
         public IPocoTracker<ITestPocoWithCustomId> Tracker { get; set; }

@@ -89,7 +89,7 @@ namespace TrackableData.MongoDB.Tests
     }
 
     /*
-    public interface IJob : ITrackablePoco
+    public interface IJob : ITrackablePoco<IJob>
     {
         short Kind { get; set; }
         int Count { get; set; }

@@ -8,7 +8,7 @@ using Xunit;
 
 namespace TrackableData.MongoDB.Tests
 {
-    public interface ITestPoco : ITrackablePoco
+    public interface ITestPoco : ITrackablePoco<ITestPoco>
     {
         ObjectId Id { get; set; }
         string Name { get; set; }
@@ -16,7 +16,7 @@ namespace TrackableData.MongoDB.Tests
         int Extra { get; set; }
     }
 
-    public interface ITestPocoWithCustomId : ITrackablePoco
+    public interface ITestPocoWithCustomId : ITrackablePoco<ITestPocoWithCustomId>
     {
         [TrackableField("mongodb.identity")]
         long CustomId { get; set; }

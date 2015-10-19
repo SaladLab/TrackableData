@@ -23,7 +23,7 @@ using TrackableData;
 
 namespace TrackableData.MsSql.Tests
 {
-    public class TrackableItem : IItem, ITrackable<IItem>
+    public partial class TrackableItem : IItem
     {
         [IgnoreDataMember]
         public IPocoTracker<IItem> Tracker { get; set; }
@@ -133,7 +133,7 @@ namespace TrackableData.MsSql.Tests
 
 namespace TrackableData.MsSql.Tests
 {
-    public class TrackableTestPoco : ITestPoco, ITrackable<ITestPoco>
+    public partial class TrackableTestPoco : ITestPoco
     {
         [IgnoreDataMember]
         public IPocoTracker<ITestPoco> Tracker { get; set; }
@@ -243,7 +243,7 @@ namespace TrackableData.MsSql.Tests
 
 namespace TrackableData.MsSql.Tests
 {
-    public class TrackableTestPocoWithIdentity : ITestPocoWithIdentity, ITrackable<ITestPocoWithIdentity>
+    public partial class TrackableTestPocoWithIdentity : ITestPocoWithIdentity
     {
         [IgnoreDataMember]
         public IPocoTracker<ITestPocoWithIdentity> Tracker { get; set; }

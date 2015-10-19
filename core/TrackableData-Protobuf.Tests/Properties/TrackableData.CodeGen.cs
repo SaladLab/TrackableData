@@ -20,7 +20,7 @@ using TrackableData;
 namespace TrackableData.Protobuf.Tests
 {
     [ProtoContract]
-    public class TrackablePerson : IPerson, ITrackable<IPerson>
+    public partial class TrackablePerson : IPerson
     {
         [IgnoreDataMember]
         public IPocoTracker<IPerson> Tracker { get; set; }
@@ -210,7 +210,7 @@ namespace TrackableData.Protobuf.Tests
 namespace TrackableData.Protobuf.Tests
 {
     [ProtoContract]
-    public class TrackableHand : IHand, ITrackable<IHand>
+    public partial class TrackableHand : IHand
     {
         [IgnoreDataMember]
         public IPocoTracker<IHand> Tracker { get; set; }
@@ -354,7 +354,7 @@ namespace TrackableData.Protobuf.Tests
 namespace TrackableData.Protobuf.Tests
 {
     [ProtoContract]
-    public class TrackableRing : IRing, ITrackable<IRing>
+    public partial class TrackableRing : IRing
     {
         [IgnoreDataMember]
         public IPocoTracker<IRing> Tracker { get; set; }
@@ -489,7 +489,7 @@ namespace TrackableData.Protobuf.Tests
 namespace TrackableData.Protobuf.Tests
 {
     [ProtoContract]
-    public class TrackableDataContainer : IDataContainer, ITrackable<IDataContainer>
+    public partial class TrackableDataContainer : IDataContainer
     {
         [IgnoreDataMember]
         private TrackableDataContainerTracker _tracker;
@@ -526,6 +526,19 @@ namespace TrackableData.Protobuf.Tests
         }
 
         ITracker<IDataContainer> ITrackable<IDataContainer>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackableDataContainerTracker)value;
+                Tracker = t;
+            }
+        }
+
+        IContainerTracker<IDataContainer> ITrackableContainer<IDataContainer>.Tracker
         {
             get
             {

@@ -3,7 +3,7 @@
 namespace TrackableData.Protobuf.Tests
 {
     [ProtoContract]
-    public interface IDataContainer : ITrackableContainer
+    public interface IDataContainer : ITrackableContainer<IDataContainer>
     {
         [ProtoMember(1)]
         TrackablePerson Person { get; set; }

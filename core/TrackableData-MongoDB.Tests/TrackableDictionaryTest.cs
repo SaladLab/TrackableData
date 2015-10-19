@@ -103,7 +103,7 @@ namespace TrackableData.MongoDB.Tests
         }
     }
 
-    public interface IItem : ITrackablePoco
+    public interface IItem : ITrackablePoco<IItem>
     {
         short Kind { get; set; }
         int Count { get; set; }

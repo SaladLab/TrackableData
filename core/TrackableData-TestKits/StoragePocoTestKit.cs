@@ -7,18 +7,18 @@ using Xunit;
 
 namespace TrackableData.TestKits
 {
-    public abstract class StoragePocoTestKit<TPoco, TId>
-        where TPoco : ITrackablePoco, new()
+    public abstract class StoragePocoTestKit<TTrackablePoco, TId>
+        where TTrackablePoco : ITrackablePoco, new()
     {
-        protected abstract Task CreateAsync(TPoco person);
+        protected abstract Task CreateAsync(TTrackablePoco person);
         protected abstract Task<int> RemoveAsync(TId id);
-        protected abstract Task<TPoco> LoadAsync(TId id);
+        protected abstract Task<TTrackablePoco> LoadAsync(TId id);
         protected abstract Task SaveAsync(ITracker tracker, TId id);
         
         [Fact]
         public async Task Test_CreateAndLoad()
         {
-            dynamic person = new TPoco();
+            dynamic person = new TTrackablePoco();
             person.Id = default(TId);
             person.Name = "Testor";
             person.Age = 10;
@@ -33,7 +33,7 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_Delete()
         {
-            dynamic person = new TPoco();
+            dynamic person = new TTrackablePoco();
             person.Id = default(TId);
 
             await CreateAsync(person);
@@ -48,7 +48,7 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_Save()
         {
-            dynamic person = new TPoco();
+            dynamic person = new TTrackablePoco();
             person.Id = default(TId);
             person.Name = "Alice";
             await CreateAsync(person);

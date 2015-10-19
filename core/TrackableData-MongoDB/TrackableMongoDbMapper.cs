@@ -69,7 +69,7 @@ namespace TrackableData.MongoDB
 
         private static Func<UpdateDefinition<BsonDocument>, TTrackablePoco, object[], UpdateDefinition<BsonDocument>>
             GeneratePocoUpdateBson<TPoco, TTrackablePoco>(TrackablePocoMongoDbMapper<TPoco> mapper)
-            where TPoco : ITrackablePoco
+            where TPoco : ITrackablePoco<TPoco>
             where TTrackablePoco : ITrackable<TPoco>
         {
             return (update, trackablePoco, keyValues) =>

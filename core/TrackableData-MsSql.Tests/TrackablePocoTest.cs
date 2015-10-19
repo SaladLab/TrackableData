@@ -6,7 +6,7 @@ using Xunit;
 
 namespace TrackableData.MsSql.Tests
 {
-    public interface ITestPoco : ITrackablePoco
+    public interface ITestPoco : ITrackablePoco<ITestPoco>
     {
         [TrackableField("sql.primary-key")]
         int Id { get; set; }
@@ -14,7 +14,7 @@ namespace TrackableData.MsSql.Tests
         int Age { get; set; }
     }
 
-    public interface ITestPocoWithIdentity : ITrackablePoco
+    public interface ITestPocoWithIdentity : ITrackablePoco<ITestPocoWithIdentity>
     {
         [TrackableField("sql.primary-key", "sql.identity")]
         int Id { get; set; }

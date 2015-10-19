@@ -30,6 +30,7 @@ namespace TrackableData
 
     public interface ITrackablePoco<T> : ITrackable<T>, ITrackablePoco
     {
+        new IPocoTracker<T> Tracker { get; set; }
     }
 
     public interface ITrackableContainer
@@ -38,5 +39,6 @@ namespace TrackableData
 
     public interface ITrackableContainer<T> : ITrackable<T>, ITrackableContainer
     {
+        new IContainerTracker<T> Tracker { get; set; }
     }
 }

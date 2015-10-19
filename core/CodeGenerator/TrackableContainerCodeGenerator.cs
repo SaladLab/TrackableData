@@ -33,7 +33,7 @@ namespace CodeGen
             var useProtoContract = idecl.AttributeLists.GetAttribute("ProtoContractAttribute") != null;
             if (useProtoContract)
                 sb.AppendLine("[ProtoContract]");
-            sb.AppendLine($"public class {className} : {typeName}, ITrackable<{typeName}>");
+            sb.AppendLine($"public partial class {className} : {typeName}");
             sb.AppendLine("{");
 
             var properties = idecl.GetProperties();
@@ -87,6 +87,22 @@ namespace CodeGen
             // ITrackable<T>.Tracker
 
             sb.AppendLine($"\tITracker<{typeName}> ITrackable<{typeName}>.Tracker");
+            sb.AppendLine("\t{");
+            sb.AppendLine("\t\tget");
+            sb.AppendLine("\t\t{");
+            sb.AppendLine("\t\t\treturn Tracker;");
+            sb.AppendLine("\t\t}");
+            sb.AppendLine("\t\tset");
+            sb.AppendLine("\t\t{");
+            sb.AppendLine($"\t\t\tvar t = ({className}Tracker)value;");
+            sb.AppendLine("\t\t\tTracker = t;");
+            sb.AppendLine("\t\t}");
+            sb.AppendLine("\t}");
+            sb.AppendLine("");
+
+            // IContainerTracker<T>.Tracker
+
+            sb.AppendLine($"\tIContainerTracker<{typeName}> ITrackableContainer<{typeName}>.Tracker");
             sb.AppendLine("\t{");
             sb.AppendLine("\t\tget");
             sb.AppendLine("\t\t{");

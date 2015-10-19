@@ -7,19 +7,19 @@ using Xunit;
 
 namespace TrackableData.TestKits
 {
-    public abstract class StorageDictionaryPocoKit<TKey, TPoco> where TPoco : ITrackable, new()
+    public abstract class StorageDictionaryPocoKit<TKey, TTrackablePoco> where TTrackablePoco : ITrackable, new()
     {
         protected abstract TKey CreateKey(int value);
-        protected abstract Task<TrackableDictionary<TKey, TPoco>> LoadAsync();
-        protected abstract Task SaveAsync(TrackableDictionary<TKey, TPoco> dictionary);
+        protected abstract Task<TrackableDictionary<TKey, TTrackablePoco>> LoadAsync();
+        protected abstract Task SaveAsync(TrackableDictionary<TKey, TTrackablePoco> dictionary);
 
-        private TrackableDictionary<TKey, TPoco> CreateTestDictionary(bool withTracker)
+        private TrackableDictionary<TKey, TTrackablePoco> CreateTestDictionary(bool withTracker)
         {
-            var dict = new TrackableDictionary<TKey, TPoco>();
+            var dict = new TrackableDictionary<TKey, TTrackablePoco>();
             if (withTracker)
                 dict.SetDefaultTracker();
 
-            dynamic value1 = new TPoco();
+            dynamic value1 = new TTrackablePoco();
             if (withTracker)
                 ((ITrackable)value1).SetDefaultTracker();
             value1.Kind = 101;
@@ -27,7 +27,7 @@ namespace TrackableData.TestKits
             value1.Note = "Handmade Sword";
             dict.Add(CreateKey(1), value1);
 
-            dynamic value2 = new TPoco();
+            dynamic value2 = new TTrackablePoco();
             if (withTracker)
                 ((ITrackable)value2).SetDefaultTracker();
             value2.Kind = 102;
@@ -38,7 +38,7 @@ namespace TrackableData.TestKits
             return dict;
         }
 
-        private void AssertEqualDictionary(TrackableDictionary<TKey, TPoco> a, TrackableDictionary<TKey, TPoco> b)
+        private void AssertEqualDictionary(TrackableDictionary<TKey, TTrackablePoco> a, TrackableDictionary<TKey, TTrackablePoco> b)
         {
             Assert.Equal(a.Count, b.Count);
             foreach (var item in a)
@@ -77,7 +77,7 @@ namespace TrackableData.TestKits
             item2.Count = item2.Count - 1;
             item2.Note = "Destroyed";
 
-            dynamic value3 = new TPoco();
+            dynamic value3 = new TTrackablePoco();
             value3.Kind = 103;
             value3.Count = 13;
             value3.Note = "Just Arrived";

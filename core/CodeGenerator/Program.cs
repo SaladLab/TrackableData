@@ -91,8 +91,15 @@ namespace CodeGen
                 var pocoCodeGen = new TrackablePocoCodeGenerator() { Options = options };
                 foreach (var idecl in interfaceDeclarations)
                 {
-                    if (idecl.HasBase("TrackableData.ITrackablePoco"))
+                    var baseType = idecl.GetGenericBase("TrackableData.ITrackablePoco");
+                    if (baseType != null)
                     {
+                        var pocoType = baseType.TypeArgumentList.Arguments[0].ToString();
+                        if (CodeAnalaysisExtensions.CompareTypeName(idecl.Identifier.ToString(), pocoType) == false)
+                        {
+                            throw new Exception($"Invalid base type of ITrackablePoco<{pocoType}>");
+                        }
+
                         pocoCodeGen.GenerateCode(idecl, writer);
                         relatedSourceTrees.Add(idecl.GetRootNode());
                     }
@@ -103,8 +110,15 @@ namespace CodeGen
                 var containerCodeGen = new TrackableContainerCodeGenerator() { Options = options };
                 foreach (var idecl in interfaceDeclarations)
                 {
-                    if (idecl.HasBase("TrackableData.ITrackableContainer"))
+                    var baseType = idecl.GetGenericBase("TrackableData.ITrackableContainer");
+                    if (baseType != null)
                     {
+                        var containerType = baseType.TypeArgumentList.Arguments[0].ToString();
+                        if (CodeAnalaysisExtensions.CompareTypeName(idecl.Identifier.ToString(), containerType) == false)
+                        {
+                            throw new Exception($"Invalid base type of ITrackableContainer<{containerType}>");
+                        }
+
                         containerCodeGen.GenerateCode(idecl, writer);
                         relatedSourceTrees.Add(idecl.GetRootNode());
                     }

@@ -38,7 +38,7 @@ namespace CodeGen
 
             if (useProtoContract)
                 sb.AppendLine("[ProtoContract]");
-            sb.AppendLine($"public class {className} : {typeName}, ITrackable<{typeName}>");
+            sb.AppendLine($"public partial class {className} : {typeName}");
             sb.AppendLine("{");
 
             // Tracker

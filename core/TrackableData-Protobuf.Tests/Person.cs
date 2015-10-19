@@ -3,7 +3,7 @@
 namespace TrackableData.Protobuf.Tests
 {
     [ProtoContract]
-    public interface IPerson : ITrackablePoco
+    public interface IPerson : ITrackablePoco<IPerson>
     {
         [ProtoMember(1)]
         string Name { get; set; }
@@ -19,7 +19,7 @@ namespace TrackableData.Protobuf.Tests
     }
 
     [ProtoContract]
-    public interface IHand : ITrackablePoco
+    public interface IHand : ITrackablePoco<IHand>
     {
         [ProtoMember(1)]
         TrackableRing MainRing { get; set; }
@@ -29,7 +29,7 @@ namespace TrackableData.Protobuf.Tests
     }
 
     [ProtoContract]
-    public interface IRing : ITrackablePoco
+    public interface IRing : ITrackablePoco<IRing>
     {
         [ProtoMember(1)]
         string Name { get; set; }

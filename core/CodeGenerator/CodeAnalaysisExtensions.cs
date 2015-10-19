@@ -64,10 +64,20 @@ namespace CodeGen
             return null;
         }
 
-        public static bool HasBase(this InterfaceDeclarationSyntax node, string name)
+        public static GenericNameSyntax GetGenericBase(this InterfaceDeclarationSyntax node, string name)
         {
-            return node.BaseList != null &&
-                   node.BaseList.Types.Any(type => CompareTypeName(type.Type.ToString(), name));
+            if (node.BaseList == null)
+                return null;
+            foreach (var type in node.BaseList.Types)
+            {
+                var genericName = type.Type as GenericNameSyntax;
+                if (genericName != null)
+                {
+                    if (CompareTypeName(genericName.Identifier.ToString(), name))
+                        return genericName;
+                }
+            }
+            return null;
         }
 
         public static bool CompareTypeName(string a, string b)

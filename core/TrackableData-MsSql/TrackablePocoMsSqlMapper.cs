@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace TrackableData.MsSql
 {
     public class TrackablePocoMsSqlMapper<T>
-        where T : ITrackablePoco
+        where T : ITrackablePoco<T>
     {
         private class Column
         {

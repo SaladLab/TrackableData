@@ -12,7 +12,7 @@ using MongoDB.Driver;
 namespace TrackableData.MongoDB
 {
     public class TrackablePocoMongoDbMapper<T>
-        where T : ITrackablePoco
+        where T : ITrackablePoco<T>
     {
         private readonly Type _trackableType;
         private readonly PropertyInfo _idProperty;
