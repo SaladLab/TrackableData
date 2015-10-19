@@ -94,17 +94,4 @@ namespace Model
         Hard,
         Hell
     }
-
-    public enum UserBanCode : byte
-    {
-        Normal = 0
-    }
-
-    public class UserBanInfo
-    {
-        public DateTime StartTime;
-        public DateTime EndTime;
-        public string Subject;
-        public string Reason;
-    }
 }

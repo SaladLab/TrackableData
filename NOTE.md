@@ -6,6 +6,9 @@
  - 기본 README 작성
    - 앞으로 작성할 매뉴얼의 큰 그림도 만들자
 
+ - 고정 배열 처리 (UserTeam.Members)
+ - 필드 무시 (ignore)
+
 ## TODO LATER:
 
  - ITrackable 의 GetChildTrackable 를 외부로 분리하자. 여기에 있을 필요가 없다.

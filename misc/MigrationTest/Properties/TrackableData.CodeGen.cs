@@ -1368,6 +1368,13 @@ namespace Model
                 _tracker = value;
                 Data.Tracker = value?.DataTracker;
                 Items.Tracker = value?.ItemsTracker;
+                Teams.Tracker = value?.TeamsTracker;
+                Tanks.Tracker = value?.TanksTracker;
+                Cards.Tracker = value?.CardsTracker;
+                Friends.Tracker = value?.FriendsTracker;
+                Missions.Tracker = value?.MissionsTracker;
+                StageGrades.Tracker = value?.StageGradesTracker;
+                Posts.Tracker = value?.PostsTracker;
             }
         }
 
@@ -1407,6 +1414,20 @@ namespace Model
                     return Data as ITrackable;
                 case "Items":
                     return Items as ITrackable;
+                case "Teams":
+                    return Teams as ITrackable;
+                case "Tanks":
+                    return Tanks as ITrackable;
+                case "Cards":
+                    return Cards as ITrackable;
+                case "Friends":
+                    return Friends as ITrackable;
+                case "Missions":
+                    return Missions as ITrackable;
+                case "StageGrades":
+                    return StageGrades as ITrackable;
+                case "Posts":
+                    return Posts as ITrackable;
                 default:
                     return null;
             }
@@ -1420,6 +1441,27 @@ namespace Model
             var trackableItems = Items as ITrackable;
             if (trackableItems != null && (changedOnly == false || trackableItems.Changed))
                 yield return new KeyValuePair<object, ITrackable>("Items", trackableItems);
+            var trackableTeams = Teams as ITrackable;
+            if (trackableTeams != null && (changedOnly == false || trackableTeams.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Teams", trackableTeams);
+            var trackableTanks = Tanks as ITrackable;
+            if (trackableTanks != null && (changedOnly == false || trackableTanks.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Tanks", trackableTanks);
+            var trackableCards = Cards as ITrackable;
+            if (trackableCards != null && (changedOnly == false || trackableCards.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Cards", trackableCards);
+            var trackableFriends = Friends as ITrackable;
+            if (trackableFriends != null && (changedOnly == false || trackableFriends.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Friends", trackableFriends);
+            var trackableMissions = Missions as ITrackable;
+            if (trackableMissions != null && (changedOnly == false || trackableMissions.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Missions", trackableMissions);
+            var trackableStageGrades = StageGrades as ITrackable;
+            if (trackableStageGrades != null && (changedOnly == false || trackableStageGrades.Changed))
+                yield return new KeyValuePair<object, ITrackable>("StageGrades", trackableStageGrades);
+            var trackablePosts = Posts as ITrackable;
+            if (trackablePosts != null && (changedOnly == false || trackablePosts.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Posts", trackablePosts);
         }
 
         private TrackableUserData _Data;
@@ -1469,6 +1511,174 @@ namespace Model
             get { return _Items; }
             set { _Items = (TrackableDictionary<int, UserItem>)value; }
         }
+
+        private TrackableDictionary<byte, UserTeam> _Teams;
+
+        [ProtoMember(3)] public TrackableDictionary<byte, UserTeam> Teams
+        {
+            get
+            {
+                return _Teams;
+            }
+            set
+            {
+                if (_Teams != null)
+                    _Teams.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.TeamsTracker;
+                _Teams = value;
+            }
+        }
+
+        TrackableDictionary<byte, UserTeam> IUserContext.Teams
+        {
+            get { return _Teams; }
+            set { _Teams = (TrackableDictionary<byte, UserTeam>)value; }
+        }
+
+        private TrackableDictionary<int, UserTank> _Tanks;
+
+        [ProtoMember(4)] public TrackableDictionary<int, UserTank> Tanks
+        {
+            get
+            {
+                return _Tanks;
+            }
+            set
+            {
+                if (_Tanks != null)
+                    _Tanks.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.TanksTracker;
+                _Tanks = value;
+            }
+        }
+
+        TrackableDictionary<int, UserTank> IUserContext.Tanks
+        {
+            get { return _Tanks; }
+            set { _Tanks = (TrackableDictionary<int, UserTank>)value; }
+        }
+
+        private TrackableDictionary<byte, long> _Cards;
+
+        [ProtoMember(5)] public TrackableDictionary<byte, long> Cards
+        {
+            get
+            {
+                return _Cards;
+            }
+            set
+            {
+                if (_Cards != null)
+                    _Cards.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.CardsTracker;
+                _Cards = value;
+            }
+        }
+
+        TrackableDictionary<byte, long> IUserContext.Cards
+        {
+            get { return _Cards; }
+            set { _Cards = (TrackableDictionary<byte, long>)value; }
+        }
+
+        private TrackableDictionary<int, UserFriend> _Friends;
+
+        [ProtoMember(6)] public TrackableDictionary<int, UserFriend> Friends
+        {
+            get
+            {
+                return _Friends;
+            }
+            set
+            {
+                if (_Friends != null)
+                    _Friends.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.FriendsTracker;
+                _Friends = value;
+            }
+        }
+
+        TrackableDictionary<int, UserFriend> IUserContext.Friends
+        {
+            get { return _Friends; }
+            set { _Friends = (TrackableDictionary<int, UserFriend>)value; }
+        }
+
+        private TrackableDictionary<byte, UserMission> _Missions;
+
+        [ProtoMember(7)] public TrackableDictionary<byte, UserMission> Missions
+        {
+            get
+            {
+                return _Missions;
+            }
+            set
+            {
+                if (_Missions != null)
+                    _Missions.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.MissionsTracker;
+                _Missions = value;
+            }
+        }
+
+        TrackableDictionary<byte, UserMission> IUserContext.Missions
+        {
+            get { return _Missions; }
+            set { _Missions = (TrackableDictionary<byte, UserMission>)value; }
+        }
+
+        private TrackableDictionary<byte, long> _StageGrades;
+
+        [ProtoMember(8)] public TrackableDictionary<byte, long> StageGrades
+        {
+            get
+            {
+                return _StageGrades;
+            }
+            set
+            {
+                if (_StageGrades != null)
+                    _StageGrades.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.StageGradesTracker;
+                _StageGrades = value;
+            }
+        }
+
+        TrackableDictionary<byte, long> IUserContext.StageGrades
+        {
+            get { return _StageGrades; }
+            set { _StageGrades = (TrackableDictionary<byte, long>)value; }
+        }
+
+        private TrackableDictionary<int, UserPost> _Posts;
+
+        [ProtoMember(9)] public TrackableDictionary<int, UserPost> Posts
+        {
+            get
+            {
+                return _Posts;
+            }
+            set
+            {
+                if (_Posts != null)
+                    _Posts.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.PostsTracker;
+                _Posts = value;
+            }
+        }
+
+        TrackableDictionary<int, UserPost> IUserContext.Posts
+        {
+            get { return _Posts; }
+            set { _Posts = (TrackableDictionary<int, UserPost>)value; }
+        }
     }
 
     [ProtoContract]
@@ -1476,6 +1686,13 @@ namespace Model
     {
         [ProtoMember(1)] public TrackablePocoTracker<IUserData> DataTracker = new TrackablePocoTracker<IUserData>();
         [ProtoMember(2)] public TrackableDictionaryTracker<int, UserItem> ItemsTracker = new TrackableDictionaryTracker<int, UserItem>();
+        [ProtoMember(3)] public TrackableDictionaryTracker<byte, UserTeam> TeamsTracker = new TrackableDictionaryTracker<byte, UserTeam>();
+        [ProtoMember(4)] public TrackableDictionaryTracker<int, UserTank> TanksTracker = new TrackableDictionaryTracker<int, UserTank>();
+        [ProtoMember(5)] public TrackableDictionaryTracker<byte, long> CardsTracker = new TrackableDictionaryTracker<byte, long>();
+        [ProtoMember(6)] public TrackableDictionaryTracker<int, UserFriend> FriendsTracker = new TrackableDictionaryTracker<int, UserFriend>();
+        [ProtoMember(7)] public TrackableDictionaryTracker<byte, UserMission> MissionsTracker = new TrackableDictionaryTracker<byte, UserMission>();
+        [ProtoMember(8)] public TrackableDictionaryTracker<byte, long> StageGradesTracker = new TrackableDictionaryTracker<byte, long>();
+        [ProtoMember(9)] public TrackableDictionaryTracker<int, UserPost> PostsTracker = new TrackableDictionaryTracker<int, UserPost>();
 
         public bool HasChange
         {
@@ -1484,6 +1701,13 @@ namespace Model
                 return
                     DataTracker.HasChange ||
                     ItemsTracker.HasChange ||
+                    TeamsTracker.HasChange ||
+                    TanksTracker.HasChange ||
+                    CardsTracker.HasChange ||
+                    FriendsTracker.HasChange ||
+                    MissionsTracker.HasChange ||
+                    StageGradesTracker.HasChange ||
+                    PostsTracker.HasChange ||
                     false;
             }
         }
@@ -1492,6 +1716,13 @@ namespace Model
         {
             DataTracker.Clear();
             ItemsTracker.Clear();
+            TeamsTracker.Clear();
+            TanksTracker.Clear();
+            CardsTracker.Clear();
+            FriendsTracker.Clear();
+            MissionsTracker.Clear();
+            StageGradesTracker.Clear();
+            PostsTracker.Clear();
         }
 
         public void ApplyTo(object trackable)
@@ -1503,6 +1734,13 @@ namespace Model
         {
             DataTracker.ApplyTo(trackable.Data);
             ItemsTracker.ApplyTo(trackable.Items);
+            TeamsTracker.ApplyTo(trackable.Teams);
+            TanksTracker.ApplyTo(trackable.Tanks);
+            CardsTracker.ApplyTo(trackable.Cards);
+            FriendsTracker.ApplyTo(trackable.Friends);
+            MissionsTracker.ApplyTo(trackable.Missions);
+            StageGradesTracker.ApplyTo(trackable.StageGrades);
+            PostsTracker.ApplyTo(trackable.Posts);
         }
 
         public void ApplyTo(ITracker tracker)
@@ -1519,6 +1757,13 @@ namespace Model
         {
             DataTracker.ApplyTo(tracker.DataTracker);
             ItemsTracker.ApplyTo(tracker.ItemsTracker);
+            TeamsTracker.ApplyTo(tracker.TeamsTracker);
+            TanksTracker.ApplyTo(tracker.TanksTracker);
+            CardsTracker.ApplyTo(tracker.CardsTracker);
+            FriendsTracker.ApplyTo(tracker.FriendsTracker);
+            MissionsTracker.ApplyTo(tracker.MissionsTracker);
+            StageGradesTracker.ApplyTo(tracker.StageGradesTracker);
+            PostsTracker.ApplyTo(tracker.PostsTracker);
         }
 
         public void RollbackTo(object trackable)
@@ -1530,6 +1775,13 @@ namespace Model
         {
             DataTracker.RollbackTo(trackable.Data);
             ItemsTracker.RollbackTo(trackable.Items);
+            TeamsTracker.RollbackTo(trackable.Teams);
+            TanksTracker.RollbackTo(trackable.Tanks);
+            CardsTracker.RollbackTo(trackable.Cards);
+            FriendsTracker.RollbackTo(trackable.Friends);
+            MissionsTracker.RollbackTo(trackable.Missions);
+            StageGradesTracker.RollbackTo(trackable.StageGrades);
+            PostsTracker.RollbackTo(trackable.Posts);
         }
 
         public void RollbackTo(ITracker tracker)
@@ -1546,6 +1798,13 @@ namespace Model
         {
             DataTracker.RollbackTo(tracker.DataTracker);
             ItemsTracker.RollbackTo(tracker.ItemsTracker);
+            TeamsTracker.RollbackTo(tracker.TeamsTracker);
+            TanksTracker.RollbackTo(tracker.TanksTracker);
+            CardsTracker.RollbackTo(tracker.CardsTracker);
+            FriendsTracker.RollbackTo(tracker.FriendsTracker);
+            MissionsTracker.RollbackTo(tracker.MissionsTracker);
+            StageGradesTracker.RollbackTo(tracker.StageGradesTracker);
+            PostsTracker.RollbackTo(tracker.PostsTracker);
         }
     }
 }
