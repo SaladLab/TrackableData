@@ -173,6 +173,7 @@ module Nuget =
         | "TrackableData" -> [ ]
         | "TrackableData-Json" -> [ "TrackableData", release.NugetVersion ]
         | "TrackableData-Protobuf" -> [ "TrackableData", release.NugetVersion ]
+        | "TrackableData-MongoDB" -> [ "TrackableData", release.NugetVersion ]
         | "TrackableData-MsSql" -> [ "TrackableData", release.NugetVersion ]
         | "TrackableData.Templates" -> [ "TrackableData", release.NugetVersion ]
         | _ -> []
