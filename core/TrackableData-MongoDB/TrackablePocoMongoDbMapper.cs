@@ -19,10 +19,8 @@ namespace TrackableData.MongoDB
 
         public TrackablePocoMongoDbMapper()
         {
-            var trackableTypeName = typeof(T).Namespace + "." + ("Trackable" + typeof(T).Name.Substring(1));
-            _trackableType = typeof(T).Assembly.GetType(trackableTypeName);
-
-            RegisterMapper();
+            _trackableType = TrackableResolver.GetPocoTrackerType(typeof(T));
+            TypeMapper.RegisterTrackablePocoMap(_trackableType);
 
             var type = typeof(T);
             foreach (var property in type.GetProperties())
@@ -30,60 +28,6 @@ namespace TrackableData.MongoDB
                 if (property.Name.ToLower() == "id")
                     _idProperty = property;
             }
-        }
-
-        public bool RegisterMapper()
-        {
-            if (BsonClassMap.IsClassMapRegistered(_trackableType))
-                return false;
-
-            var classMap = new BsonClassMap(_trackableType);
-
-            // start with auto map
-            classMap.AutoMap();
-
-            // ignore extra elements for smooth schema change
-            classMap.SetIgnoreExtraElements(true);
-
-            // unmap all members which T doesn't have
-            var propertyNames = new HashSet<string>(typeof(T).GetProperties().Select(p => p.Name));
-            var deletingMembers = classMap.DeclaredMemberMaps.Where(m =>
-            {
-                var propertyInfo = m.MemberInfo as PropertyInfo;
-                return propertyInfo == null ||
-                       propertyNames.Contains(propertyInfo.Name) == false;
-            }).ToList();
-            foreach (var m in deletingMembers)
-                classMap.UnmapMember(m.MemberInfo);
-
-            // set default ignore for saving spaces
-            foreach (var memberMap in classMap.DeclaredMemberMaps)
-            {
-                var mt = memberMap.MemberType;
-                var defaultValue = mt.IsValueType ? Activator.CreateInstance(mt) : null;
-                memberMap.SetDefaultValue(defaultValue);
-                memberMap.SetIgnoreIfDefault(true);
-            }
-
-            // tell customized id to mongo-db
-            var identityColumn = typeof(T).GetProperties().FirstOrDefault(
-                p => TrackableFieldAttribute.GetParameter(p, "mongodb.identity") != null);
-            if (identityColumn != null)
-            {
-                classMap.MapIdProperty(identityColumn.Name);
-            }
-
-            try
-            {
-                BsonClassMap.RegisterClassMap(classMap);
-            }
-            catch (ArgumentException)
-            {
-                // if duplicate key exists
-                return false;
-            }
-            
-            return true;
         }
 
         // When T has id

@@ -10,6 +10,11 @@ namespace TrackableData.MongoDB
 {
     public class TrackableListMongoDbMapper<T>
     {
+        public TrackableListMongoDbMapper()
+        {
+            TypeMapper.RegisterMap(typeof(T));
+        }
+
         private string CreatePath(IEnumerable<object> keys)
         {
             return string.Join(".", keys.Select(x => x.ToString()));

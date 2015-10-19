@@ -15,6 +15,8 @@ namespace TrackableData.MongoDB
 
         public TrackableDictionaryMongoDbMapper()
         {
+            TypeMapper.RegisterMap(typeof(TValue));
+
             _updateGenerator = TrackableMongoDbMapper.CreatePocoUpdateFunc<TValue>();
         }
 

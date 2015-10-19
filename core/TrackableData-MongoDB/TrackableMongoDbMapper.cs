@@ -37,25 +37,11 @@ namespace TrackableData.MongoDB
             return null;
         }
 
-        public static Type GetPocoInterfaceType(Type trackableType)
-        {
-            if (typeof(ITrackablePoco).IsAssignableFrom(trackableType))
-            {
-                var trackerType = trackableType.GetInterfaces()
-                                               .FirstOrDefault(t => t.IsGenericType &&
-                                                                    t.GetGenericTypeDefinition() == typeof(ITrackable<>));
-                if (trackerType != null)
-                    return trackerType.GetGenericArguments()[0];
-            }
-
-            return null;
-        }
-
         public static
             Func<UpdateDefinition<BsonDocument>, TTrackablePoco, object[], UpdateDefinition<BsonDocument>>
             CreatePocoUpdateFunc<TTrackablePoco>()
         {
-            var pocoType = GetPocoInterfaceType(typeof(TTrackablePoco));
+            var pocoType = TrackableResolver.GetPocoType(typeof(TTrackablePoco));
             if (pocoType == null)
                 return null;
 
