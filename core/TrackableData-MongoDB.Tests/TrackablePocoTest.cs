@@ -18,7 +18,7 @@ namespace TrackableData.MongoDB.Tests
 
     public interface ITestPocoWithCustomId : ITrackablePoco<ITestPocoWithCustomId>
     {
-        [TrackableField("mongodb.identity")]
+        [TrackableProperty("mongodb.identity")]
         long CustomId { get; set; }
         string Name { get; set; }
         int Age { get; set; }

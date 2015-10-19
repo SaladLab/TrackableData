@@ -73,7 +73,7 @@ namespace TrackableData.MsSql
                 var primaryKey = false;
                 var isIdentity = false;
 
-                var attr = property.GetCustomAttribute<TrackableFieldAttribute>();
+                var attr = property.GetCustomAttribute<TrackablePropertyAttribute>();
                 if (attr != null)
                 {
                     if (attr["sql.ignore"] != null)

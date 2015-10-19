@@ -4,11 +4,11 @@ using System.Reflection;
 
 namespace TrackableData
 {
-    public sealed class TrackableFieldAttribute : Attribute
+    public sealed class TrackablePropertyAttribute : Attribute
     {
         public string[] Parameters;
 
-        public TrackableFieldAttribute(params string[] parameters)
+        public TrackablePropertyAttribute(params string[] parameters)
         {
             Parameters = parameters;
         }
@@ -36,7 +36,7 @@ namespace TrackableData
             if (parameter.EndsWith(":"))
             {
                 // as property
-                foreach (var property in provider.GetCustomAttributes(false).OfType<TrackableFieldAttribute>())
+                foreach (var property in provider.GetCustomAttributes(false).OfType<TrackablePropertyAttribute>())
                 {
                     var p = property.Parameters.FirstOrDefault(x => x.StartsWith(parameter));
                     if (p != null)
@@ -46,7 +46,7 @@ namespace TrackableData
             else
             {
                 // as flag
-                foreach (var property in provider.GetCustomAttributes(false).OfType<TrackableFieldAttribute>())
+                foreach (var property in provider.GetCustomAttributes(false).OfType<TrackablePropertyAttribute>())
                 {
                     if (property.Parameters.Any(p => p == parameter))
                         return "true";

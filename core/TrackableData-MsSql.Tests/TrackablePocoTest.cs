@@ -8,7 +8,7 @@ namespace TrackableData.MsSql.Tests
 {
     public interface ITestPoco : ITrackablePoco<ITestPoco>
     {
-        [TrackableField("sql.primary-key")]
+        [TrackableProperty("sql.primary-key")]
         int Id { get; set; }
         string Name { get; set; }
         int Age { get; set; }
@@ -16,7 +16,7 @@ namespace TrackableData.MsSql.Tests
 
     public interface ITestPocoWithIdentity : ITrackablePoco<ITestPocoWithIdentity>
     {
-        [TrackableField("sql.primary-key", "sql.identity")]
+        [TrackableProperty("sql.primary-key", "sql.identity")]
         int Id { get; set; }
         string Name { get; set; }
         int Age { get; set; }

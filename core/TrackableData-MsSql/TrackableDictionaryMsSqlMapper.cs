@@ -132,10 +132,10 @@ namespace TrackableData.MsSql
                 {
                     var columnName = property.Name;
 
-                    var attr = property.GetCustomAttribute<TrackableFieldAttribute>();
+                    var attr = property.GetCustomAttribute<TrackablePropertyAttribute>();
                     if (attr != null)
                     {
-                        if (attr["ignore"] != null || attr["sql.ignore"] != null)
+                        if (attr["sql.ignore"] != null)
                             continue;
                         columnName = attr["sql.column:"] ?? columnName;
                     }
