@@ -56,10 +56,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="StorageDictionaryDataTestKit.cs" />
-    <Compile Include="StorageDictionaryPocoTestKit.cs" />
     <Compile Include="StorageDictionaryValueTestKit.cs" />
     <Compile Include="StorageListDataTestKit.cs" />
-    <Compile Include="StorageListPocoTestKit.cs" />
     <Compile Include="StorageListValueTestKit.cs" />
     <Compile Include="StoragePocoTestKit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

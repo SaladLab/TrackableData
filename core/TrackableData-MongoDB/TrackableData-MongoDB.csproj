@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DocumentHelper.cs" />
     <Compile Include="TrackableDictionaryMongoDbMapper.cs" />
     <Compile Include="TrackableListMongoDbMapper.cs" />
     <Compile Include="TrackableMongoDbMapper.cs" />

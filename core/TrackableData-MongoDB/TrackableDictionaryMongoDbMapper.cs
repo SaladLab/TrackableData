@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -11,33 +10,84 @@ namespace TrackableData.MongoDB
 {
     public class TrackableDictionaryMongoDbMapper<TKey, TValue>
     {
-        private readonly Func<UpdateDefinition<BsonDocument>, TValue, object[], UpdateDefinition<BsonDocument>> _updateGenerator;
-
         public TrackableDictionaryMongoDbMapper()
         {
             TypeMapper.RegisterMap(typeof(TValue));
-
-            _updateGenerator = TrackableMongoDbMapper.CreatePocoUpdateFunc<TValue>();
         }
 
-        private string CreatePath(IEnumerable<object> keys)
+        #region Conversion between Dictionary and Bson
+
+        public BsonDocument ConvertToBsonDocument(IDictionary<TKey, TValue> dictionary)
         {
-            return string.Join(".", keys.Select(x => x.ToString()));
+            var doc = new BsonDocument();
+            foreach (var item in dictionary)
+                doc.Add(item.Key.ToString(), BsonDocumentWrapper.Create(item.Value));
+            return doc;
         }
 
-        public Tuple<FilterDefinition<BsonDocument>, UpdateDefinition<BsonDocument>>
-            GenerateUpdateBson(TrackableDictionary<TKey, TValue> trackable,
-                               TrackableDictionaryTracker<TKey, TValue> tracker,
-                               params object[] keyValues)
+        public void ConvertToDictionary(BsonDocument doc, IDictionary<TKey, TValue> dictionary)
         {
-            if (keyValues.Length == 0)
-                throw new ArgumentException("At least 1 keyValue required.");
+            foreach (var element in doc.Elements)
+            {
+                // deserialize key
 
-            // generate update command for each changes
+                TKey key;
+                try
+                {
+                    key = (TKey)Convert.ChangeType(element.Name, typeof(TKey));
+                }
+                catch (FormatException)
+                {
+                    if (element.Name == "_id")
+                        continue;
+                    throw;
+                }
 
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]);
-            var keyNamespace = keyValues.Length > 1 ? CreatePath(keyValues.Skip(1)) + "." : "";
-            UpdateDefinition<BsonDocument> update = null;
+                // deserialize value
+
+                var value = (TValue)(element.Value.IsBsonDocument
+                                         ? BsonSerializer.Deserialize(element.Value.AsBsonDocument, typeof(TValue))
+                                         : Convert.ChangeType(element.Value, typeof(TValue)));
+                dictionary.Add(key, value);
+            }
+        }
+
+        public TrackableDictionary<TKey, TValue> ConvertToTrackableDictionary(BsonDocument doc)
+        {
+            var dictionary = new TrackableDictionary<TKey, TValue>();
+            ConvertToDictionary(doc, dictionary);
+            return dictionary;
+        }
+
+        public TrackableDictionary<TKey, TValue> ConvertToTrackableDictionary(BsonDocument doc, params object[] partialKeys)
+        {
+            var partialDoc = DocumentHelper.QueryValue(doc, partialKeys);
+            if (partialDoc == null)
+                return null;
+
+            var dictionary = new TrackableDictionary<TKey, TValue>();
+            ConvertToDictionary(partialDoc.AsBsonDocument, dictionary);
+            return dictionary;
+        }
+
+        #endregion
+
+        #region MongoDB Command Builder
+
+        public UpdateDefinition<BsonDocument> BuildUpdatesForCreate(
+            UpdateDefinition<BsonDocument> update, IDictionary<TKey, TValue> dictionary, params object[] keyValues)
+        {
+            var valuePath = DocumentHelper.ToDotPath(keyValues);
+            var bson = ConvertToBsonDocument(dictionary);
+            return update == null
+                       ? Builders<BsonDocument>.Update.Set(valuePath, bson)
+                       : update.Set(valuePath, bson);
+        }
+
+        public UpdateDefinition<BsonDocument> BuildUpdatesForSave(
+            UpdateDefinition<BsonDocument> update, TrackableDictionaryTracker<TKey, TValue> tracker, params object[] keyValues)
+        {
+            var keyNamespace = DocumentHelper.ToDotPathWithTrailer(keyValues);
             foreach (var change in tracker.ChangeMap)
             {
                 switch (change.Value.Operation)
@@ -57,22 +107,39 @@ namespace TrackableData.MongoDB
                         break;
                 }
             }
+            return update;
+        }
 
-            // check each value for TrackableValue
+        #endregion
 
-            if (trackable != null && _updateGenerator != null)
+        #region Helpers
+
+        // CreateAsync
+
+        public Task CreateAsync(IMongoCollection<BsonDocument> collection, IDictionary<TKey, TValue> dictionary, params object[] keyValues)
+        {
+            if (keyValues.Length == 0)
+                throw new ArgumentException("At least 1 keyValue required.");
+
+            if (keyValues.Length == 1)
             {
-                foreach (var item in trackable)
-                {
-                    var trackableValue = (ITrackable)item.Value;
-                    if (trackableValue.Changed == false || tracker.ChangeMap.ContainsKey(item.Key))
-                        continue;
-
-                    update = _updateGenerator(update, item.Value, keyValues.Skip(1).Concat(new object[] { item.Key}).ToArray());
-                }
+                var bson = ConvertToBsonDocument(dictionary);
+                bson.InsertAt(0, new BsonElement("_id", BsonValue.Create(keyValues[0])));
+                return collection.InsertOneAsync(bson);
             }
+            else
+            {
+                var update = BuildUpdatesForCreate(null, dictionary, keyValues.Skip(1).ToArray());
+                return collection.UpdateOneAsync(
+                    Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
+                    update,
+                    new UpdateOptions { IsUpsert = true });
+            }
+        }
 
-            return Tuple.Create(filter, update);
+        public Task<int> RemoveAsync(IMongoCollection<BsonDocument> collection, params object[] keyValues)
+        {
+            return DocumentHelper.RemoveAsync(collection, keyValues);
         }
 
         public async Task<TrackableDictionary<TKey, TValue>> LoadAsync(IMongoCollection<BsonDocument> collection, params object[] keyValues)
@@ -80,7 +147,7 @@ namespace TrackableData.MongoDB
             if (keyValues.Length == 0)
                 throw new ArgumentException("At least 1 keyValue required.");
 
-            BsonDocument doc = null;
+            BsonDocument doc;
 
             if (keyValues.Length == 1)
             {
@@ -90,50 +157,18 @@ namespace TrackableData.MongoDB
             {
                 // partial query
 
-                var keyPath = keyValues.Length > 1 ? CreatePath(keyValues.Skip(1)) : "";
+                var partialKeys = keyValues.Skip(1);
+                var partialPath = DocumentHelper.ToDotPath(partialKeys);
                 var partialDoc = await collection.Find(Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]))
-                                                 .Project(Builders<BsonDocument>.Projection.Include(keyPath))
+                                                 .Project(Builders<BsonDocument>.Projection.Include(partialPath))
                                                  .FirstOrDefaultAsync();
-                if (partialDoc != null)
-                {
-                    for (int i = 1; i < keyValues.Length; i++)
-                    {
-                        BsonValue partialValue;
-                        if (partialDoc.TryGetValue(keyValues[i].ToString(), out partialValue) == false)
-                        {
-                            partialDoc = null;
-                            break;
-                        }
-                        partialDoc = (BsonDocument)partialValue;
-                    }
-                    doc = partialDoc;
-                }
+                doc = DocumentHelper.QueryValue(partialDoc, partialKeys) as BsonDocument;
             }
 
             if (doc == null)
                 return null;
 
-            var dictionary = new TrackableDictionary<TKey, TValue>();
-            foreach (var element in doc.Elements)
-            {
-                if (element.Name == "_id")
-                    continue;
-                var key = (TKey)Convert.ChangeType(element.Name, typeof(TKey));
-                var value = (TValue)(element.Value.IsBsonDocument
-                                         ? BsonSerializer.Deserialize(element.Value.AsBsonDocument, typeof(TValue))
-                                         : Convert.ChangeType(element.Value, typeof(TValue)));
-                dictionary.Add(key, value);
-            }
-            return dictionary;
-        }
-
-        public Task<UpdateResult> SaveAsync(IMongoCollection<BsonDocument> collection,
-                                            TrackableDictionary<TKey, TValue> trackable,
-                                            params object[] keyValues)
-        {
-            var ret = GenerateUpdateBson(
-                trackable, (TrackableDictionaryTracker<TKey, TValue>)trackable.Tracker, keyValues);
-            return collection.UpdateOneAsync(ret.Item1, ret.Item2, new UpdateOptions { IsUpsert = true });
+            return ConvertToTrackableDictionary(doc);
         }
 
         public Task<UpdateResult> SaveAsync(IMongoCollection<BsonDocument> collection,
@@ -147,11 +182,18 @@ namespace TrackableData.MongoDB
                                             TrackableDictionaryTracker<TKey, TValue> tracker,
                                             params object[] keyValues)
         {
-            if (tracker.HasChange == false)
-                return null;
+            if (keyValues.Length == 0)
+                throw new ArgumentException("At least 1 keyValue required.");
 
-            var ret = GenerateUpdateBson(null, tracker, keyValues);
-            return collection.UpdateOneAsync(ret.Item1, ret.Item2, new UpdateOptions { IsUpsert = true });
+            if (tracker.HasChange == false)
+                return Task.FromResult((UpdateResult)null);
+
+            return collection.UpdateOneAsync(
+                Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
+                BuildUpdatesForSave(null, tracker, keyValues.Skip(1).ToArray()),
+                new UpdateOptions { IsUpsert = true });
         }
+
+        #endregion
     }
 }

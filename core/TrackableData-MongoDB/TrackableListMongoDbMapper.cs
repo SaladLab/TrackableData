@@ -15,71 +15,135 @@ namespace TrackableData.MongoDB
             TypeMapper.RegisterMap(typeof(T));
         }
 
-        private string CreatePath(IEnumerable<object> keys)
+        #region Conversion between List and Bson
+
+        public BsonArray ConvertToBsonArray(IList<T> list)
         {
-            return string.Join(".", keys.Select(x => x.ToString()));
+            var bson = new BsonArray();
+            foreach (var item in list)
+                bson.Add(BsonDocumentWrapper.Create(typeof(T), item));
+            return bson;
         }
 
-        public Tuple<FilterDefinition<BsonDocument>, UpdateDefinition<BsonDocument>, int>
-            GenerateUpdateBson(TrackableListTracker<T> tracker, int cursor, params object[] keyValues)
+        public void ConvertToList(BsonArray bson, IList<T> list)
         {
-            if (keyValues.Length < 2)
-                throw new ArgumentException("At least 2 keyValues required.");
+            list.Clear();
+            foreach (var item in bson)
+            {
+                var value = (T)(item.IsBsonDocument
+                                    ? BsonSerializer.Deserialize(item.AsBsonDocument, typeof(T))
+                                    : Convert.ChangeType(item, typeof(T)));
+                list.Add(value);
+            }
+        }
 
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]);
-            var keyNamespace = CreatePath(keyValues.Skip(1));
-            UpdateDefinition<BsonDocument> update = null;
+        public TrackableList<T> ConvertToTrackableList(BsonArray bson)
+        {
+            var list = new TrackableList<T>();
+            ConvertToList(bson, list);
+            return list;
+        }
+
+        public TrackableList<T> ConvertToTrackableList(BsonDocument doc, params object[] partialKeys)
+        {
+            var partialDoc = DocumentHelper.QueryValue(doc, partialKeys);
+            if (partialDoc == null)
+                return null;
+
+            var list = new TrackableList<T>();
+            ConvertToList(partialDoc.AsBsonArray, list);
+            return list;
+        }
+
+        #endregion
+
+        #region MongoDB Command Builder
+
+        public UpdateDefinition<BsonDocument> BuildUpdatesForCreate(
+            UpdateDefinition<BsonDocument> update, IList<T> list, params object[] keyValues)
+        {
+            var valuePath = DocumentHelper.ToDotPath(keyValues);
+            var bson = ConvertToBsonArray(list);
+            return update == null
+                       ? Builders<BsonDocument>.Update.Set(valuePath, bson)
+                       : update.Set(valuePath, bson);
+        }
+
+        public IEnumerable<UpdateDefinition<BsonDocument>> BuildUpdatesForSave(
+            TrackableListTracker<T> tracker, params object[] keyValues)
+        {
+            var keyNamespace = DocumentHelper.ToDotPath(keyValues);
 
             // Multiple push-back batching optimization
-            if (cursor == 0 && tracker.ChangeList.Count > 1 && tracker.ChangeList.All(c => c.Operation == TrackableListOperation.PushBack))
+            if (tracker.ChangeList.Count > 1 && tracker.ChangeList.All(c => c.Operation == TrackableListOperation.PushBack))
             {
-                return Tuple.Create(
-                    filter,
-                    Builders<BsonDocument>.Update.PushEach(keyNamespace, tracker.ChangeList.Select(c => c.NewValue)),
-                    tracker.ChangeList.Count);
+                yield return Builders<BsonDocument>.Update.PushEach(
+                    keyNamespace, tracker.ChangeList.Select(c => c.NewValue));
+                yield break;
             }
 
             // Multiple push-front batching optimization
-            if (cursor == 0 && tracker.ChangeList.Count > 1 && tracker.ChangeList.All(c => c.Operation == TrackableListOperation.PushFront))
+            if (tracker.ChangeList.Count > 1 && tracker.ChangeList.All(c => c.Operation == TrackableListOperation.PushFront))
             {
-                return Tuple.Create(
-                    filter,
-                    Builders<BsonDocument>.Update.PushEach(keyNamespace, tracker.ChangeList.Select(c => c.NewValue).Reverse()),
-                    tracker.ChangeList.Count);
+                yield return Builders<BsonDocument>.Update.PushEach(
+                    keyNamespace, tracker.ChangeList.Select(c => c.NewValue).Reverse());
+                yield break;
             }
 
             // List update can process only one change each time
-            var change = tracker.ChangeList[cursor];
-            switch (change.Operation)
+            foreach (var  change in tracker.ChangeList)
             {
-                case TrackableListOperation.Insert:
-                    update = Builders<BsonDocument>.Update.PushEach(keyNamespace, new[] { change.NewValue }, position: change.Index);
-                    break;
+                switch (change.Operation)
+                {
+                    case TrackableListOperation.Insert:
+                        yield return Builders<BsonDocument>.Update.PushEach(keyNamespace, new[] { change.NewValue }, position: change.Index);
+                        break;
 
-                case TrackableListOperation.Remove:
-                    throw new Exception("Remove operation is not supported!");
+                    case TrackableListOperation.Remove:
+                        throw new Exception("Remove operation is not supported!");
 
-                case TrackableListOperation.Modify:
-                    update = Builders<BsonDocument>.Update.Set(keyNamespace + "." + change.Index, change.NewValue);
-                    break;
+                    case TrackableListOperation.Modify:
+                        yield return Builders<BsonDocument>.Update.Set(keyNamespace + "." + change.Index, change.NewValue);
+                        break;
 
-                case TrackableListOperation.PushFront:
-                    update = Builders<BsonDocument>.Update.PushEach(keyNamespace, new[] { change.NewValue }, position: 0);
-                    break;
+                    case TrackableListOperation.PushFront:
+                        yield return Builders<BsonDocument>.Update.PushEach(keyNamespace, new[] { change.NewValue }, position: 0);
+                        break;
 
-                case TrackableListOperation.PushBack:
-                    update = Builders<BsonDocument>.Update.Push(keyNamespace, change.NewValue);
-                    break;
+                    case TrackableListOperation.PushBack:
+                        yield return Builders<BsonDocument>.Update.Push(keyNamespace, change.NewValue);
+                        break;
 
-                case TrackableListOperation.PopFront:
-                    update = Builders<BsonDocument>.Update.PopFirst(keyNamespace);
-                    break;
+                    case TrackableListOperation.PopFront:
+                        yield return Builders<BsonDocument>.Update.PopFirst(keyNamespace);
+                        break;
 
-                case TrackableListOperation.PopBack:
-                    update = Builders<BsonDocument>.Update.PopLast(keyNamespace);
-                    break;
+                    case TrackableListOperation.PopBack:
+                        yield return Builders<BsonDocument>.Update.PopLast(keyNamespace);
+                        break;
+                }
             }
-            return Tuple.Create(filter, update, 1);
+        }
+
+        #endregion
+
+        #region Helpers
+
+        public Task CreateAsync(IMongoCollection<BsonDocument> collection, IList<T> list, params object[] keyValues)
+        {
+            if (keyValues.Length < 2)
+                throw new ArgumentException("At least 2 keyValue required.");
+
+            var update = BuildUpdatesForCreate(null, list, keyValues.Skip(1).ToArray());
+            return collection.UpdateOneAsync(
+                Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
+                update,
+                new UpdateOptions { IsUpsert = true });
+        }
+
+        public Task<int> RemoveAsync(IMongoCollection<BsonDocument> collection, params object[] keyValues)
+        {
+            return DocumentHelper.RemoveAsync(collection, keyValues);
         }
 
         public async Task<TrackableList<T>> LoadAsync(IMongoCollection<BsonDocument> collection, params object[] keyValues)
@@ -89,68 +153,48 @@ namespace TrackableData.MongoDB
 
             // partial query
 
-            var keyPath = keyValues.Length > 1 ? CreatePath(keyValues.Skip(1)) : "";
-            var doc = await collection.Find(Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]))
+            var keyPath = keyValues.Length > 1 ? DocumentHelper.ToDotPath(keyValues.Skip(1)) : "";
+            var partialDoc = await collection.Find(Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]))
                                                 .Project(Builders<BsonDocument>.Projection.Include(keyPath))
                                                 .FirstOrDefaultAsync();
+            if (partialDoc == null)
+                return null;
+
+            var doc = DocumentHelper.QueryValue(partialDoc, keyValues.Skip(1));
             if (doc == null)
                 return null;
 
-            BsonValue partialDoc = doc;
-            for (int i = 1; i < keyValues.Length; i++)
-            {
-                if (partialDoc.IsBsonDocument == false)
-                    return null;
-
-                BsonValue partialValue;
-                if (partialDoc.AsBsonDocument.TryGetValue(keyValues[i].ToString(), out partialValue) == false)
-                    return null;
-
-                partialDoc = partialValue;
-            }
-
-            if (partialDoc.IsBsonArray == false)
+            if (doc.IsBsonArray == false)
                 throw new Exception($"Data should be an array. ({doc.BsonType})");
 
-            var list = new TrackableList<T>();
-            foreach (var arrayValue in partialDoc.AsBsonArray)
-            {
-                var value = (T)(arrayValue.IsBsonDocument
-                                    ? BsonSerializer.Deserialize(arrayValue.AsBsonDocument, typeof(T))
-                                    : Convert.ChangeType(arrayValue, typeof(T)));
-                list.Add(value);
-            }
-            return list;
-        }
-
-        public async Task<UpdateResult> SaveAsync(IMongoCollection<BsonDocument> collection,
-                                                  TrackableList<T> trackable,
-                                                  params object[] keyValues)
-        {
-            return null;
+            return ConvertToTrackableList(doc.AsBsonArray);
         }
 
         public Task SaveAsync(IMongoCollection<BsonDocument> collection,
-                                            IListTracker<T> tracker,
-                                            params object[] keyValues)
+                              IListTracker<T> tracker,
+                              params object[] keyValues)
         {
             return SaveAsync(collection, (TrackableListTracker<T>)tracker, keyValues);
         }
 
         public async Task SaveAsync(IMongoCollection<BsonDocument> collection,
-                                            TrackableListTracker<T>tracker,
-                                            params object[] keyValues)
+                                    TrackableListTracker<T> tracker,
+                                    params object[] keyValues)
         {
+            if (keyValues.Length < 2)
+                throw new ArgumentException("At least 2 keyValue required.");
+
             if (tracker.HasChange == false)
                 return;
 
-            var cursor = 0;
-            while (cursor < tracker.ChangeList.Count)
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]);
+            foreach (var update in BuildUpdatesForSave(tracker, keyValues.Skip(1).ToArray()))
             {
-                var ret = GenerateUpdateBson(tracker, cursor, keyValues);
-                await collection.UpdateOneAsync(ret.Item1, ret.Item2, new UpdateOptions { IsUpsert = true });
-                cursor += ret.Item3;
+                await collection.UpdateOneAsync(
+                    filter, update, new UpdateOptions { IsUpsert = true });
             }
         }
+
+        #endregion
     }
 }

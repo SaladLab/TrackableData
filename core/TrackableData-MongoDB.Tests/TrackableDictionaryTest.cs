@@ -110,35 +110,4 @@ namespace TrackableData.MongoDB.Tests
         string Note { get; set; }
     }
 
-    public class TrackableDictionaryPocoTest : StorageDictionaryPocoKit<int, TrackableItem>, IClassFixture<Database>
-    {
-        private static TrackableDictionaryMongoDbMapper<int, TrackableItem> _mapper =
-            new TrackableDictionaryMongoDbMapper<int, TrackableItem>();
-
-        private Database _db;
-        private IMongoCollection<BsonDocument> _collection;
-        private ObjectId _testId = ObjectId.GenerateNewId();
-
-        public TrackableDictionaryPocoTest(Database db)
-        {
-            _db = db;
-            _db.Test.DropCollectionAsync(nameof(TrackableDictionaryPocoTest)).Wait();
-            _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackableDictionaryPocoTest));
-        }
-
-        protected override int CreateKey(int value)
-        {
-            return value;
-        }
-
-        protected override Task<TrackableDictionary<int, TrackableItem>> LoadAsync()
-        {
-            return _mapper.LoadAsync(_collection, _testId);
-        }
-
-        protected override Task SaveAsync(TrackableDictionary<int, TrackableItem> dictionary)
-        {
-            return _mapper.SaveAsync(_collection, dictionary, _testId);
-        }
-    }
 }

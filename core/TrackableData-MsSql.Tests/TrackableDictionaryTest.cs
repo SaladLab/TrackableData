@@ -121,47 +121,4 @@ namespace TrackableData.MsSql.Tests
             return _mapper.SaveAsync(_connection, (TrackableDictionaryTracker<int, ItemData>)tracker, 1, "One");
         }
     }
-
-    public interface IItem : ITrackablePoco<IItem>
-    {
-        short Kind { get; set; }
-        int Count { get; set; }
-        string Note { get; set; }
-    }
-
-    public class TrackableDictionaryPocoTest : StorageDictionaryPocoKit<int, TrackableItem>, IClassFixture<Database>, IDisposable
-    {
-        private static TrackableDictionaryMsSqlMapper<int, TrackableItem> _mapper =
-            new TrackableDictionaryMsSqlMapper<int, TrackableItem>(nameof(TrackableItem), new ColumnDefinition("Id"));
-
-        private Database _db;
-        private SqlConnection _connection;
-
-        public TrackableDictionaryPocoTest(Database db)
-        {
-            _db = db;
-            _connection = db.Connection;
-            _mapper.ResetTableAsync(_connection).Wait();
-        }
-
-        public void Dispose()
-        {
-            _connection.Dispose();
-        }
-
-        protected override int CreateKey(int value)
-        {
-            return value;
-        }
-
-        protected override Task<TrackableDictionary<int, TrackableItem>> LoadAsync()
-        {
-            return _mapper.LoadAsync(_connection);
-        }
-
-        protected override Task SaveAsync(TrackableDictionary<int, TrackableItem> dictionary)
-        {
-            return _mapper.SaveAsync(_connection, dictionary);
-        }
-    }
 }

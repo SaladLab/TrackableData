@@ -87,40 +87,4 @@ namespace TrackableData.MongoDB.Tests
             return _mapper.SaveAsync(_collection, (TrackableListTracker<JobData>)tracker, _testId, 1, "One");
         }
     }
-
-    /*
-    public interface IJob : ITrackablePoco<IJob>
-    {
-        short Kind { get; set; }
-        int Count { get; set; }
-        string Note { get; set; }
-    }
-
-    public class TrackableListPocoTest : StorageListPocoTestKit<TrackableJob>, IClassFixture<Database>
-    {
-        private static TrackableListMongoDbMapper<TrackableJob> _mapper =
-            new TrackableListMongoDbMapper<TrackableJob>();
-
-        private Database _db;
-        private IMongoCollection<BsonDocument> _collection;
-        private ObjectId _testId = ObjectId.GenerateNewId();
-
-        public TrackableListPocoTest(Database db)
-        {
-            _db = db;
-            _db.Test.DropCollectionAsync(nameof(TrackableListPocoTest)).Wait();
-            _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackableListPocoTest));
-        }
-
-        protected override Task<TrackableList<TrackableJob>> LoadAsync()
-        {
-            return _mapper.LoadAsync(_collection, _testId, "V");
-        }
-
-        protected override Task SaveAsync(TrackableList<TrackableJob> list)
-        {
-            return _mapper.SaveAsync(_collection, list, _testId, "V");
-        }
-    }
-    */
 }

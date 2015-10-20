@@ -59,7 +59,7 @@ namespace TrackableData.MongoDB
             where TTrackablePoco : ITrackable<TPoco>
         {
             return (update, trackablePoco, keyValues) =>
-                   mapper.GenerateUpdateBson(update, (TrackablePocoTracker<TPoco>)trackablePoco.Tracker, keyValues);
+                   mapper.BuildUpdatesForSave(update, (TrackablePocoTracker<TPoco>)trackablePoco.Tracker, keyValues);
         }
     }
 }

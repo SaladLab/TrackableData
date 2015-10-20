@@ -1,5 +1,14 @@
 ## TODO SOON
 
+### Dictionary, List 에서 Nested Poco 제거
+
+  괜히 코드 복잡도만 높아졌다.
+  차라리 Dictionary 와 List 에 Modify Helper 를 넣자.
+
+### Dictionary, List 에 대해서도 Create/Remove 테스트 코드 넣기
+
+  넣자!
+
 ### 유니티에서 잘 동작하는지 확인
 
   json, protobuf 모두 확인 (Editor 는 잘 되네? Android 랑 iOS 보자.)
