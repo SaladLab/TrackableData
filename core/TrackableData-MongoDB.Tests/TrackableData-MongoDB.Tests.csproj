@@ -78,6 +78,7 @@
   <ItemGroup>
     <Compile Include="Database.cs" />
     <Compile Include="Properties\TrackableData.CodeGen.cs" />
+    <Compile Include="TrackableContainerTest.cs" />
     <Compile Include="TrackableDictionaryTest.cs" />
     <Compile Include="TrackableListTest.cs" />
     <Compile Include="TrackablePocoTest.cs" />

@@ -55,6 +55,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="StorageContainerTestKit.cs" />
     <Compile Include="StorageDictionaryDataTestKit.cs" />
     <Compile Include="StorageDictionaryValueTestKit.cs" />
     <Compile Include="StorageListDataTestKit.cs" />

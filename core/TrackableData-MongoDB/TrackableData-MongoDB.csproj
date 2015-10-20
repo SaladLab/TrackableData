@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DocumentHelper.cs" />
+    <Compile Include="TrackableContainerMongoDbMapper.cs" />
     <Compile Include="TrackableDictionaryMongoDbMapper.cs" />
     <Compile Include="TrackableListMongoDbMapper.cs" />
     <Compile Include="TrackableMongoDbMapper.cs" />
