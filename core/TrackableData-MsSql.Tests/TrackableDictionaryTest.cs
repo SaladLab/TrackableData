@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using TrackableData.MsSql;
@@ -11,8 +12,9 @@ namespace TrackableData.MsSql.Tests
     {
         private static readonly ColumnDefinition SingleValueColumnDef = new ColumnDefinition("Value", typeof(string));
 
-        private static TrackableDictionaryMsSqlMapper<int, string> _mapper =
-            new TrackableDictionaryMsSqlMapper<int, string>("String", new ColumnDefinition("Id"), SingleValueColumnDef, null);
+        private static TrackableDictionaryMsSqlMapper<int, string> _mapper = 
+            new TrackableDictionaryMsSqlMapper<int, string>(
+                nameof(TrackableDictionaryStringTest), new ColumnDefinition("Id"), SingleValueColumnDef, null);
 
         private Database _db;
         private SqlConnection _connection;
@@ -34,6 +36,16 @@ namespace TrackableData.MsSql.Tests
             return value;
         }
 
+        protected override Task CreateAsync(IDictionary<int, string> dictionary)
+        {
+            return _mapper.CreateAsync(_connection, dictionary);
+        }
+
+        protected override Task<int> DeleteAsync()
+        {
+            return _mapper.DeleteAsync(_connection);
+        }
+
         protected override Task<TrackableDictionary<int, string>> LoadAsync()
         {
             return _mapper.LoadAsync(_connection);
@@ -48,7 +60,8 @@ namespace TrackableData.MsSql.Tests
     public class TrackableDictionaryDataTest : StorageDictionaryDataTestKit<int>, IClassFixture<Database>, IDisposable
     {
         private static TrackableDictionaryMsSqlMapper<int, ItemData> _mapper =
-            new TrackableDictionaryMsSqlMapper<int, ItemData>(nameof(ItemData), new ColumnDefinition("Id"));
+            new TrackableDictionaryMsSqlMapper<int, ItemData>(
+                nameof(TrackableDictionaryDataTest), new ColumnDefinition("Id"));
 
         private Database _db;
         private SqlConnection _connection;
@@ -70,6 +83,16 @@ namespace TrackableData.MsSql.Tests
             return value;
         }
 
+        protected override Task CreateAsync(IDictionary<int, ItemData> dictionary)
+        {
+            return _mapper.CreateAsync(_connection, dictionary);
+        }
+
+        protected override Task<int> DeleteAsync()
+        {
+            return _mapper.DeleteAsync(_connection);
+        }
+
         protected override Task<TrackableDictionary<int, ItemData>> LoadAsync()
         {
             return _mapper.LoadAsync(_connection);
@@ -89,7 +112,8 @@ namespace TrackableData.MsSql.Tests
             new ColumnDefinition("Head2", typeof(string), 100)
         };
         private static TrackableDictionaryMsSqlMapper<int, ItemData> _mapper =
-            new TrackableDictionaryMsSqlMapper<int, ItemData>(nameof(ItemData), new ColumnDefinition("Id"), HeadKeyColumnDefs);
+            new TrackableDictionaryMsSqlMapper<int, ItemData>(
+                nameof(TrackableDictionaryDataWithHeadKeysTest), new ColumnDefinition("Id"), HeadKeyColumnDefs);
 
         private Database _db;
         private SqlConnection _connection;
@@ -109,6 +133,16 @@ namespace TrackableData.MsSql.Tests
         protected override int CreateKey(int value)
         {
             return value;
+        }
+
+        protected override Task CreateAsync(IDictionary<int, ItemData> dictionary)
+        {
+            return _mapper.CreateAsync(_connection, dictionary, 1, "One");
+        }
+
+        protected override Task<int> DeleteAsync()
+        {
+            return _mapper.DeleteAsync(_connection, 1, "One");
         }
 
         protected override Task<TrackableDictionary<int, ItemData>> LoadAsync()

@@ -113,7 +113,7 @@ namespace TrackableData.MsSql
             _allColumnStringExceptHead = string.Join(",", _valueColumns.Select(c => c.Name));
         }
 
-        // SQL Friendly Methods
+        #region MSSQL SQL Builder
 
         private void BuildWhereClauses(StringBuilder sb, params object[] keyValues)
         {
@@ -126,7 +126,7 @@ namespace TrackableData.MsSql
                 keyValues.Zip(_primaryKeyColumns, (v, c) => $"{c.Name} = {c.ConvertToSqlValue(v)}")));
         }
 
-        public string GenerateCreateTableSql(bool includeDropIfExists = false)
+        public string BuildCreateTableSql(bool includeDropIfExists = false)
         {
             var columnDef = string.Join(
                 ",\n",
@@ -158,7 +158,7 @@ namespace TrackableData.MsSql
             return sb.ToString();
         }
 
-        public string GenerateInsertSql(T poco, params object[] keyValues)
+        public string BuildSqlForCreate(T poco, params object[] keyValues)
         {
             if (keyValues.Length != _headKeyColumns.Length)
                 throw new ArgumentException("Head key value required");
@@ -195,7 +195,7 @@ namespace TrackableData.MsSql
             return sb.ToString();
         }
 
-        public string GenerateDeleteSql(params object[] keyValues)
+        public string BuildSqlForDelete(params object[] keyValues)
         {
             var sb = new StringBuilder();
             sb.Append($"DELETE FROM {_tableName}");
@@ -203,7 +203,7 @@ namespace TrackableData.MsSql
             return sb.ToString();
         }
 
-        public string GenerateSelectSql(params object[] keyValues)
+        public string BuildSqlForLoad(params object[] keyValues)
         {
             var sb = new StringBuilder();
             sb.Append($"SELECT {_allColumnStringExceptHead} FROM {_tableName}");
@@ -211,7 +211,7 @@ namespace TrackableData.MsSql
             return sb.ToString();
         }
 
-        public string GenerateUpdateSql(TrackablePocoTracker<T> tracker, params object[] keyValues)
+        public string BuildSqlForSave(TrackablePocoTracker<T> tracker, params object[] keyValues)
         {
             if (tracker.HasChange == false)
                 return string.Empty;
@@ -243,11 +243,13 @@ namespace TrackableData.MsSql
             return sb.ToString();
         }
 
-        // POCO Friendly Methods
+        #endregion
+
+        #region Helpers
 
         public async Task<int> ResetTableAsync(SqlConnection connection)
         {
-            var sql = GenerateCreateTableSql(true);
+            var sql = BuildCreateTableSql(true);
             using (var command = new SqlCommand(sql, connection))
             {
                 return await command.ExecuteNonQueryAsync();
@@ -256,7 +258,7 @@ namespace TrackableData.MsSql
 
         public async Task<int> CreateAsync(SqlConnection connection, T value, params object[] keyValues)
         {
-            var sql = GenerateInsertSql(value, keyValues);
+            var sql = BuildSqlForCreate(value, keyValues);
             using (var command = new SqlCommand(sql, connection))
             {
                 if (_identityColumn != null)
@@ -280,7 +282,7 @@ namespace TrackableData.MsSql
 
         public async Task<int> DeleteAsync(SqlConnection connection, params object[] keyValues)
         {
-            var sql = GenerateDeleteSql(keyValues);
+            var sql = BuildSqlForDelete(keyValues);
             using (var command = new SqlCommand(sql, connection))
             {
                 return await command.ExecuteNonQueryAsync();
@@ -289,7 +291,7 @@ namespace TrackableData.MsSql
 
         public async Task<T> LoadAsync(SqlConnection connection, params object[] keyValues)
         {
-            var sql = GenerateSelectSql(keyValues);
+            var sql = BuildSqlForLoad(keyValues);
             using (var command = new SqlCommand(sql, connection))
             {
                 using (var reader = command.ExecuteReader())
@@ -305,7 +307,7 @@ namespace TrackableData.MsSql
 
         public async Task<List<T>> LoadAllAsync(SqlConnection connection, params object[] keyValues)
         {
-            var sql = GenerateSelectSql(keyValues);
+            var sql = BuildSqlForLoad(keyValues);
             var list = new List<T>();
             using (var command = new SqlCommand(sql, connection))
             {
@@ -343,11 +345,13 @@ namespace TrackableData.MsSql
             if (tracker.HasChange == false)
                 return 0;
 
-            var sql = GenerateUpdateSql(tracker, keyValues);
+            var sql = BuildSqlForSave(tracker, keyValues);
             using (var command = new SqlCommand(sql, connection))
             {
                 return await command.ExecuteNonQueryAsync();
             }
         }
+
+        #endregion
     }
 }

@@ -25,7 +25,7 @@ namespace TrackableData.MsSql.Tests
     public class TrackablePocoTest : TestKits.StoragePocoTestKit<TrackableTestPoco, int>, IClassFixture<Database>, IDisposable
     {
         private static TrackablePocoMsSqlMapper<ITestPoco> _mapper =
-            new TrackablePocoMsSqlMapper<ITestPoco>(nameof(ITestPoco));
+            new TrackablePocoMsSqlMapper<ITestPoco>(nameof(TrackablePocoTest));
 
         private Database _db;
         private SqlConnection _connection;
@@ -71,7 +71,7 @@ namespace TrackableData.MsSql.Tests
             new ColumnDefinition("Head2", typeof(string), 100)
         };
         private static TrackablePocoMsSqlMapper<ITestPoco> _mapper =
-            new TrackablePocoMsSqlMapper<ITestPoco>(nameof(ITestPoco), HeadKeyColumnDefs);
+            new TrackablePocoMsSqlMapper<ITestPoco>(nameof(TrackablePocoWithHeadKeysTest), HeadKeyColumnDefs);
 
         private Database _db;
         private SqlConnection _connection;
@@ -112,7 +112,7 @@ namespace TrackableData.MsSql.Tests
     public class TrackablePocoWithAutoIdTest : TestKits.StoragePocoWithAutoIdTestKit<TrackableTestPocoWithIdentity, int>, IClassFixture<Database>, IDisposable
     {
         private static TrackablePocoMsSqlMapper<ITestPocoWithIdentity> _mapper =
-            new TrackablePocoMsSqlMapper<ITestPocoWithIdentity>(nameof(ITestPocoWithIdentity));
+            new TrackablePocoMsSqlMapper<ITestPocoWithIdentity>(nameof(TrackablePocoWithAutoIdTest));
 
         private Database _db;
         private SqlConnection _connection;

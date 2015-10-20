@@ -16,6 +16,8 @@ namespace TrackableData.TestKits
 
     public abstract class StorageListDataTestKit
     {
+        protected abstract Task CreateAsync(IList<JobData> list);
+        protected abstract Task<int> DeleteAsync();
         protected abstract Task<TrackableList<JobData>> LoadAsync();
         protected abstract Task SaveAsync(ITracker tracker);
 
@@ -81,11 +83,24 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_CreateAndLoad()
         {
-            var list = CreateTestList(true);
-            await SaveAsync(list.Tracker);
+            var list = CreateTestList(false);
+            await CreateAsync(list);
 
             var list2 = await LoadAsync();
             AssertEqualDictionary(list, list2);
+        }
+
+        [Fact]
+        public async Task Test_Delete()
+        {
+            var list = CreateTestList(false);
+            await CreateAsync(list);
+
+            var count = await DeleteAsync();
+            var list2 = await LoadAsync();
+
+            Assert.Equal(1, count);
+            Assert.Equal(null, list2);
         }
 
         [Fact]

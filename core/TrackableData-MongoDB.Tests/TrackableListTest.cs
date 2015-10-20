@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -21,6 +22,16 @@ namespace TrackableData.MongoDB.Tests
             _db = db;
             _db.Test.DropCollectionAsync(nameof(TrackableListStringTest)).Wait();
             _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackableListStringTest));
+        }
+
+        protected override Task CreateAsync(IList<string> list)
+        {
+            return _mapper.CreateAsync(_collection, list, _testId, "V");
+        }
+
+        protected override Task<int> DeleteAsync()
+        {
+            return _mapper.DeleteAsync(_collection, _testId, "V");
         }
 
         protected override Task<TrackableList<string>> LoadAsync()
@@ -50,6 +61,16 @@ namespace TrackableData.MongoDB.Tests
             _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackableListDataTest));
         }
 
+        protected override Task CreateAsync(IList<JobData> list)
+        {
+            return _mapper.CreateAsync(_collection, list, _testId, "V");
+        }
+
+        protected override Task<int> DeleteAsync()
+        {
+            return _mapper.DeleteAsync(_collection, _testId, "V");
+        }
+
         protected override Task<TrackableList<JobData>> LoadAsync()
         {
             return _mapper.LoadAsync(_collection, _testId, "V");
@@ -75,6 +96,16 @@ namespace TrackableData.MongoDB.Tests
             _db = db;
             _db.Test.DropCollectionAsync(nameof(TrackableListDataWithHeadKeysTest)).Wait();
             _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackableListDataWithHeadKeysTest));
+        }
+
+        protected override Task CreateAsync(IList<JobData> list)
+        {
+            return _mapper.CreateAsync(_collection, list, _testId, 1, "One");
+        }
+
+        protected override Task<int> DeleteAsync()
+        {
+            return _mapper.DeleteAsync(_collection, _testId, 1, "One");
         }
 
         protected override Task<TrackableList<JobData>> LoadAsync()

@@ -4,6 +4,7 @@ using System;
 using System.Threading.Tasks;
 using TrackableData.TestKits;
 using Xunit;
+using System.Collections.Generic;
 
 namespace TrackableData.MongoDB.Tests
 {
@@ -26,6 +27,16 @@ namespace TrackableData.MongoDB.Tests
         protected override int CreateKey(int value)
         {
             return value;
+        }
+
+        protected override Task CreateAsync(IDictionary<int, string> dictionary)
+        {
+            return _mapper.CreateAsync(_collection, dictionary, _testId);
+        }
+
+        protected override Task<int> DeleteAsync()
+        {
+            return _mapper.DeleteAsync(_collection, _testId);
         }
 
         protected override Task<TrackableDictionary<int, string>> LoadAsync()
@@ -60,6 +71,16 @@ namespace TrackableData.MongoDB.Tests
             return value;
         }
 
+        protected override Task CreateAsync(IDictionary<int, ItemData> dictionary)
+        {
+            return _mapper.CreateAsync(_collection, dictionary, _testId);
+        }
+
+        protected override Task<int> DeleteAsync()
+        {
+            return _mapper.DeleteAsync(_collection, _testId);
+        }
+
         protected override Task<TrackableDictionary<int, ItemData>> LoadAsync()
         {
             return _mapper.LoadAsync(_collection, _testId);
@@ -75,7 +96,7 @@ namespace TrackableData.MongoDB.Tests
     {
         private static TrackableDictionaryMongoDbMapper<int, ItemData> _mapper =
             new TrackableDictionaryMongoDbMapper<int, ItemData>();
-        
+
         private Database _db;
         private IMongoCollection<BsonDocument> _collection;
         private ObjectId _testId = ObjectId.GenerateNewId();
@@ -92,6 +113,16 @@ namespace TrackableData.MongoDB.Tests
             return value;
         }
 
+        protected override Task CreateAsync(IDictionary<int, ItemData> dictionary)
+        {
+            return _mapper.CreateAsync(_collection, dictionary, _testId, 1, "One");
+        }
+
+        protected override Task<int> DeleteAsync()
+        {
+            return _mapper.DeleteAsync(_collection, _testId, 1, "One");
+        }
+
         protected override Task<TrackableDictionary<int, ItemData>> LoadAsync()
         {
             return _mapper.LoadAsync(_collection, _testId, 1, "One");
@@ -102,12 +133,4 @@ namespace TrackableData.MongoDB.Tests
             return _mapper.SaveAsync(_collection, (TrackableDictionaryTracker<int, ItemData>)tracker, _testId, 1, "One");
         }
     }
-
-    public interface IItem : ITrackablePoco<IItem>
-    {
-        short Kind { get; set; }
-        int Count { get; set; }
-        string Note { get; set; }
-    }
-
 }

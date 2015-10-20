@@ -10,6 +10,8 @@ namespace TrackableData.TestKits
     public abstract class StorageDictionaryValueTestKit<TKey>
     {
         protected abstract TKey CreateKey(int value);
+        protected abstract Task CreateAsync(IDictionary<TKey, string> dictionary);
+        protected abstract Task<int> DeleteAsync();
         protected abstract Task<TrackableDictionary<TKey, string>> LoadAsync();
         protected abstract Task SaveAsync(ITracker tracker);
 
@@ -26,15 +28,29 @@ namespace TrackableData.TestKits
         public async Task Test_CreateAndLoad()
         {
             var dict = new TrackableDictionary<TKey, string>();
-            dict.SetDefaultTracker();
             dict.Add(CreateKey(1), "One");
             dict.Add(CreateKey(2), "Two");
             dict.Add(CreateKey(3), "Three");
 
-            await SaveAsync(dict.Tracker);
+            await CreateAsync(dict);
 
             var dict2 = await LoadAsync();
             AssertEqualDictionary(dict, dict2);
+        }
+
+        [Fact]
+        public async Task Test_Delete()
+        {
+            var dict = new TrackableDictionary<TKey, string>();
+            dict.Add(CreateKey(1), "One");
+
+            await CreateAsync(dict);
+
+            var count = await DeleteAsync();
+            var dict2 = await LoadAsync();
+
+            Assert.True(count > 0);
+            Assert.True(dict2 == null || dict2.Count == 0);
         }
 
         [Fact]
