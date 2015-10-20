@@ -5,7 +5,7 @@ using TrackableData;
 namespace Model
 {
     [ProtoContract]
-    public interface IUserData : ITrackablePoco
+    public interface IUserData : ITrackablePoco<IUserData>
     {
         [ProtoMember(1)]
         string Name { get; set; }

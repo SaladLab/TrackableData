@@ -20,7 +20,7 @@ using System.Linq;
 namespace Model
 {
     [ProtoContract]
-    public class TrackableUserData : IUserData, ITrackable<IUserData>
+    public partial class TrackableUserData : IUserData
     {
         [IgnoreDataMember]
         public IPocoTracker<IUserData> Tracker { get; set; }
@@ -1351,7 +1351,7 @@ namespace Model
 namespace Model
 {
     [ProtoContract]
-    public class TrackableUserContext : IUserContext, ITrackable<IUserContext>
+    public partial class TrackableUserContext : IUserContext
     {
         [IgnoreDataMember]
         private TrackableUserContextTracker _tracker;
@@ -1394,6 +1394,19 @@ namespace Model
         }
 
         ITracker<IUserContext> ITrackable<IUserContext>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackableUserContextTracker)value;
+                Tracker = t;
+            }
+        }
+
+        IContainerTracker<IUserContext> ITrackableContainer<IUserContext>.Tracker
         {
             get
             {

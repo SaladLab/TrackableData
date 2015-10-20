@@ -86,7 +86,12 @@
   <ItemGroup>
     <Compile Include="Model\UserContext.cs" />
     <Compile Include="Model\UserData.cs" />
+    <Compile Include="Model\UserFriend.cs" />
     <Compile Include="Model\UserItem.cs" />
+    <Compile Include="Model\UserMission.cs" />
+    <Compile Include="Model\UserPost.cs" />
+    <Compile Include="Model\UserTank.cs" />
+    <Compile Include="Model\UserTeam.cs" />
     <Compile Include="Model\UserTypes.cs" />
     <Compile Include="MongoDbDriver.cs" />
     <Compile Include="MsSqlDriver.cs" />
