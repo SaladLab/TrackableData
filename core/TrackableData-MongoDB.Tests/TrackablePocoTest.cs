@@ -50,9 +50,9 @@ namespace TrackableData.MongoDB.Tests
             return (TrackableTestPoco)(await _mapper.LoadAsync(_collection, id));
         }
 
-        protected override Task<int> RemoveAsync(ObjectId id)
+        protected override Task<int> DeleteAsync(ObjectId id)
         {
-            return _mapper.RemoveAsync(_collection, id);
+            return _mapper.DeleteAsync(_collection, id);
         }
 
         protected override Task SaveAsync(ITracker tracker, ObjectId id)
@@ -87,9 +87,9 @@ namespace TrackableData.MongoDB.Tests
             return (TrackableTestPoco)(await _mapper.LoadAsync(_collection, _testId, "One", id));
         }
 
-        protected override Task<int> RemoveAsync(ObjectId id)
+        protected override Task<int> DeleteAsync(ObjectId id)
         {
-            return _mapper.RemoveAsync(_collection, _testId, "One", id);
+            return _mapper.DeleteAsync(_collection, _testId, "One", id);
         }
 
         protected override Task SaveAsync(ITracker tracker, ObjectId id)

@@ -132,9 +132,9 @@ namespace TrackableData.MongoDB
             }
         }
 
-        public Task<int> RemoveAsync(IMongoCollection<BsonDocument> collection, params object[] keyValues)
+        public Task<int> DeleteAsync(IMongoCollection<BsonDocument> collection, params object[] keyValues)
         {
-            return DocumentHelper.RemoveAsync(collection, keyValues);
+            return DocumentHelper.DeleteAsync(collection, keyValues);
         }
 
         public async Task<T> LoadAsync(IMongoCollection<BsonDocument> collection, params object[] keyValues)

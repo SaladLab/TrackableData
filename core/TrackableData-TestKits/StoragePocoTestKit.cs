@@ -11,7 +11,7 @@ namespace TrackableData.TestKits
         where TTrackablePoco : ITrackablePoco, new()
     {
         protected abstract Task CreateAsync(TTrackablePoco person);
-        protected abstract Task<int> RemoveAsync(TId id);
+        protected abstract Task<int> DeleteAsync(TId id);
         protected abstract Task<TTrackablePoco> LoadAsync(TId id);
         protected abstract Task SaveAsync(ITracker tracker, TId id);
         
@@ -38,7 +38,7 @@ namespace TrackableData.TestKits
 
             await CreateAsync(person);
 
-            var count = await RemoveAsync(person.Id);
+            var count = await DeleteAsync(person.Id);
             var person2 = await LoadAsync(person.Id);
 
             Assert.Equal(1, count);

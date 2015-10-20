@@ -63,7 +63,7 @@ namespace TrackableData.MongoDB
             return curDoc;
         }
 
-        public static async Task<int> RemoveAsync(IMongoCollection<BsonDocument> collection, params object[] keyValues)
+        public static async Task<int> DeleteAsync(IMongoCollection<BsonDocument> collection, params object[] keyValues)
         {
             if (keyValues.Length == 0)
                 throw new ArgumentException("At least 1 keyValue required.");

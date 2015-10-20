@@ -52,9 +52,9 @@ namespace TrackableData.MsSql.Tests
             return (TrackableTestPoco)(await _mapper.LoadAsync(_connection, id));
         }
 
-        protected override Task<int> RemoveAsync(int id)
+        protected override Task<int> DeleteAsync(int id)
         {
-            return _mapper.RemoveAsync(_connection, id);
+            return _mapper.DeleteAsync(_connection, id);
         }
 
         protected override Task SaveAsync(ITracker tracker, int id)
@@ -98,9 +98,9 @@ namespace TrackableData.MsSql.Tests
             return (TrackableTestPoco)(await _mapper.LoadAsync(_connection, 1, "One", id));
         }
 
-        protected override Task<int> RemoveAsync(int id)
+        protected override Task<int> DeleteAsync(int id)
         {
-            return _mapper.RemoveAsync(_connection, 1, "One", id);
+            return _mapper.DeleteAsync(_connection, 1, "One", id);
         }
 
         protected override Task SaveAsync(ITracker tracker, int id)
@@ -139,9 +139,9 @@ namespace TrackableData.MsSql.Tests
             return (TrackableTestPocoWithIdentity)(await _mapper.LoadAsync(_connection, id));
         }
 
-        protected override Task<int> RemoveAsync(int id)
+        protected override Task<int> DeleteAsync(int id)
         {
-            return _mapper.RemoveAsync(_connection, id);
+            return _mapper.DeleteAsync(_connection, id);
         }
 
         protected override Task SaveAsync(ITracker tracker, int id)

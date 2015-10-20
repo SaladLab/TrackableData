@@ -278,7 +278,7 @@ namespace TrackableData.MsSql
             }
         }
 
-        public async Task<int> RemoveAsync(SqlConnection connection, params object[] keyValues)
+        public async Task<int> DeleteAsync(SqlConnection connection, params object[] keyValues)
         {
             var sql = GenerateDeleteSql(keyValues);
             using (var command = new SqlCommand(sql, connection))
