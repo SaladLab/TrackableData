@@ -234,6 +234,7 @@ namespace TrackableData.MsSql
             var sb = new StringBuilder();
             sb.Append($"DELETE FROM {_tableName}");
             BuildWhereClauses(sb, keyValues);
+            sb.Append(";\n");
             return sb.ToString();
         }
 
@@ -242,18 +243,15 @@ namespace TrackableData.MsSql
             var sb = new StringBuilder();
             sb.Append($"SELECT {_allColumnStringExceptHead} FROM {_tableName}");
             BuildWhereClauses(sb, keyValues);
+            sb.Append(";\n");
             return sb.ToString();
         }
 
-        public string BuildSqlForSave(TrackableDictionary<TKey, TValue> trackable,
-                                      TrackableDictionaryTracker<TKey, TValue> tracker,
+        public string BuildSqlForSave(TrackableDictionaryTracker<TKey, TValue> tracker,
                                       params object[] keyValues)
         {
             if (keyValues.Length != _headKeyColumns.Length)
                 throw new ArgumentException("Number of keyValues should be same with the number of head columns");
-
-            if (trackable == null && tracker.ChangeMap.Any() == false)
-                return string.Empty;
 
             var sqlAdd = new StringBuilder();
             var sqlModify = new StringBuilder();
@@ -431,17 +429,6 @@ namespace TrackableData.MsSql
             }
 
             return new KeyValuePair<TKey, TValue>(key, value);
-        }
-
-        public async Task<int> SaveAsync(SqlConnection connection, TrackableDictionary<TKey, TValue> trackable,
-                                         params object[] keyValues)
-        {
-            var sql = BuildSqlForSave(trackable, (TrackableDictionaryTracker<TKey, TValue>)trackable.Tracker,
-                                        keyValues);
-            using (var command = new SqlCommand(sql, connection))
-            {
-                return await command.ExecuteNonQueryAsync();
-            }
         }
 
         public Task<int> SaveAsync(SqlConnection connection, IDictionaryTracker<TKey, TValue> tracker,

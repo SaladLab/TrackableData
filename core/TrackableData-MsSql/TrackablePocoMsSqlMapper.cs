@@ -191,7 +191,7 @@ namespace TrackableData.MsSql
                 }
             }
 
-            sb.Append(")");
+            sb.Append(");\n");
             return sb.ToString();
         }
 
@@ -200,6 +200,7 @@ namespace TrackableData.MsSql
             var sb = new StringBuilder();
             sb.Append($"DELETE FROM {_tableName}");
             BuildWhereClauses(sb, keyValues);
+            sb.Append(";\n");
             return sb.ToString();
         }
 
@@ -208,6 +209,7 @@ namespace TrackableData.MsSql
             var sb = new StringBuilder();
             sb.Append($"SELECT {_allColumnStringExceptHead} FROM {_tableName}");
             BuildWhereClauses(sb, keyValues);
+            sb.Append(";\n");
             return sb.ToString();
         }
 
@@ -240,6 +242,7 @@ namespace TrackableData.MsSql
                 return string.Empty;
 
             BuildWhereClauses(sb, keyValues);
+            sb.Append(";\n");
             return sb.ToString();
         }
 

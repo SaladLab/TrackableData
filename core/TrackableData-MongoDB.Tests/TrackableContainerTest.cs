@@ -1,6 +1,5 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
-using System;
 using System.Threading.Tasks;
 using TrackableData.TestKits;
 using Xunit;
@@ -33,6 +32,7 @@ namespace TrackableData.MongoDB.Tests
         private ObjectId _testId = ObjectId.GenerateNewId();
 
         public TrackableContainerTest(Database db)
+            : base(true)
         {
             _db = db;
             _db.Test.DropCollectionAsync(nameof(TrackableContainerTest)).Wait();
@@ -72,6 +72,7 @@ namespace TrackableData.MongoDB.Tests
         private ObjectId _testId = ObjectId.GenerateNewId();
 
         public TrackableContainerTestWithHeadKeysTest(Database db)
+            : base(true)
         {
             _db = db;
             _db.Test.DropCollectionAsync(nameof(TrackableContainerTestWithHeadKeysTest)).Wait();

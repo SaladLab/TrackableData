@@ -33,6 +33,8 @@ namespace TrackableData.MongoDB
             PropertyItems = ConstructPropertyItems();
         }
 
+        #region Property Accessor
+
         private static PropertyItem[] ConstructPropertyItems()
         {
             var trackerType = TrackerResolver.GetDefaultTracker(typeof(T));
@@ -78,7 +80,7 @@ namespace TrackableData.MongoDB
             return propertyItems.ToArray();
         }
 
-        static void BuildTrackablePocoProperty<TPoco>(PropertyItem item)
+        private static void BuildTrackablePocoProperty<TPoco>(PropertyItem item)
               where TPoco : ITrackablePoco<TPoco>
         {
             var mapper = new TrackablePocoMongoDbMapper<TPoco>();
@@ -108,7 +110,7 @@ namespace TrackableData.MongoDB
             };
         }
 
-        static void BuildTrackableDictionaryProperty<TKey, TValue>(PropertyItem item)
+        private static void BuildTrackableDictionaryProperty<TKey, TValue>(PropertyItem item)
         {
             var mapper = new TrackableDictionaryMongoDbMapper<TKey, TValue>();
             item.Mapper = mapper;
@@ -170,6 +172,8 @@ namespace TrackableData.MongoDB
                 return update;
             };
         }
+
+        #endregion
 
         #region Helpers
 

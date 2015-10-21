@@ -24,11 +24,18 @@ namespace TrackableData.TestKits
         where TTrackableContainer : ITrackableContainer, new()
         where TTrackablePerson : ITrackablePoco, new()
     {
+        private bool _useList;
+
         protected abstract Task CreateAsync(TTrackableContainer person);
         protected abstract Task<int> DeleteAsync();
         protected abstract Task<TTrackableContainer> LoadAsync();
         protected abstract Task SaveAsync(IContainerTracker tracker);
-        
+
+        protected StorageContainerTestKit(bool useList)
+        {
+            _useList = useList;
+        }
+
         private TTrackableContainer CreateTestContainer(bool withTracker)
         {
             dynamic container = new TTrackableContainer();
@@ -37,8 +44,12 @@ namespace TrackableData.TestKits
             container.Person = person;
             var missions = new TrackableDictionary<int, MissionData>();
             container.Missions = missions;
+
             var tags = new TrackableList<TagData>();
-            container.Tags = tags;
+            if (_useList)
+            {
+                container.Tags = tags;
+            }
 
             if (withTracker)
                 ((ITrackable)container).SetDefaultTracker();
@@ -64,6 +75,7 @@ namespace TrackableData.TestKits
             }
 
             // Tags
+            if (_useList)
             {
                 tags.Add(new TagData { Text = "Hello", Priority = 1 });
                 tags.Add(new TagData { Text = "World", Priority = 2 });
@@ -108,7 +120,8 @@ namespace TrackableData.TestKits
             Assert.Equal(container.Person.Age, container2.Person.Age);
             Assert.Equal(container.Missions.Count, container2.Missions.Count);
             AssertEqualDictionary(container.Missions, container2.Missions);
-            AssertEqualDictionary(container.Tags, container2.Tags);
+            if (_useList)
+                AssertEqualDictionary(container.Tags, container2.Tags);
         }
 
         [Fact]
@@ -118,10 +131,10 @@ namespace TrackableData.TestKits
             await CreateAsync(container);
 
             var count = await DeleteAsync();
-            var container2 = await LoadAsync();
+            dynamic container2 = await LoadAsync();
 
             Assert.True(count > 0);
-            Assert.True(container2 == null);
+            Assert.True(container2 == null || container2.Person == null);
         }
 
         [Fact]
@@ -154,7 +167,8 @@ namespace TrackableData.TestKits
 
             // modify tags
 
-            container.Tags.Add(new TagData { Text = "Data", Priority = 3 });
+            if (_useList)
+                container.Tags.Add(new TagData { Text = "Data", Priority = 3 });
 
             // save modification
 
@@ -165,7 +179,8 @@ namespace TrackableData.TestKits
 
             dynamic container2 = await LoadAsync();
             AssertEqualDictionary(container.Missions, container2.Missions);
-            AssertEqualDictionary(container.Tags, container2.Tags);
+            if (_useList)
+                AssertEqualDictionary(container.Tags, container2.Tags);
         }
     }
 }
