@@ -146,7 +146,8 @@ namespace TrackableData.MongoDB
 
             if (keyValues.Length == 1)
             {
-                doc = await collection.Find(Builders<BsonDocument>.Filter.Eq("_id", keyValues[0])).FirstOrDefaultAsync();
+                doc = await collection.Find(Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]))
+                                      .FirstOrDefaultAsync();
             }
             else
             {

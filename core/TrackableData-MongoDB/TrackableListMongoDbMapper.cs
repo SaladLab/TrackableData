@@ -91,7 +91,7 @@ namespace TrackableData.MongoDB
             }
 
             // List update can process only one change each time
-            foreach (var  change in tracker.ChangeList)
+            foreach (var change in tracker.ChangeList)
             {
                 switch (change.Operation)
                 {

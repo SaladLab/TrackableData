@@ -32,17 +32,24 @@ namespace TrackableData.TestKits
         private TTrackableContainer CreateTestContainer(bool withTracker)
         {
             dynamic container = new TTrackableContainer();
-            if (withTracker)
-                container.SetDefaultTracker();
 
             dynamic person = new TTrackablePerson();
+            container.Person = person;
+            var missions = new TrackableDictionary<int, MissionData>();
+            container.Missions = missions;
+            var tags = new TrackableList<TagData>();
+            container.Tags = tags;
+
+            if (withTracker)
+                ((ITrackable)container).SetDefaultTracker();
+
+            // Person
             {
                 person.Name = "Testor";
                 person.Age = 10;
             }
-            container.Person = person;
 
-            var missions = new TrackableDictionary<int, MissionData>();
+            // Missions
             {
                 var value1 = new MissionData();
                 value1.Kind = 101;
@@ -55,14 +62,12 @@ namespace TrackableData.TestKits
                 value2.Note = "Lord of Ring";
                 missions.Add(2, value2);
             }
-            container.Missions = missions;
 
-            var tags = new TrackableList<TagData>();
+            // Tags
             {
                 tags.Add(new TagData { Text = "Hello", Priority = 1 });
                 tags.Add(new TagData { Text = "World", Priority = 2 });
             }
-            container.Tags = tags;
 
             return container;
         }
@@ -102,7 +107,7 @@ namespace TrackableData.TestKits
             Assert.Equal(container.Person.Name, container2.Person.Name);
             Assert.Equal(container.Person.Age, container2.Person.Age);
             Assert.Equal(container.Missions.Count, container2.Missions.Count);
-            AssertEqualDictionary(container.Missions, container2.Missions2);
+            AssertEqualDictionary(container.Missions, container2.Missions);
             AssertEqualDictionary(container.Tags, container2.Tags);
         }
 
@@ -123,11 +128,14 @@ namespace TrackableData.TestKits
         public async Task Test_Save()
         {
             dynamic container = CreateTestContainer(true);
-
             await SaveAsync(container.Tracker);
             container.Tracker.Clear();
 
-            // modify dictionary
+            // modify person
+
+            container.Person.Age += 1;
+
+            // modify missions
 
             container.Missions.Remove(1);
 
@@ -143,6 +151,10 @@ namespace TrackableData.TestKits
             value3.Count = 3;
             value3.Note = "Just Arrived";
             container.Missions.Add(1, value3);
+
+            // modify tags
+
+            container.Tags.Add(new TagData { Text = "Data", Priority = 3 });
 
             // save modification
 

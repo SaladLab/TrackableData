@@ -232,7 +232,7 @@ namespace CodeGen
 
                 var propertyName = p.Identifier.ToString();
                 var trackerName = Utility.GetTrackerClassName(p.Type);
-                sb.AppendLine($"public {trackerName} {propertyName}Tracker = new {trackerName}();");
+                sb.AppendLine($"public {trackerName} {propertyName}Tracker {{ get; set; }} = new {trackerName}();");
             }
 
             // ITracker.HasChange

@@ -1,13 +1,24 @@
 ## TODO SOON
 
-### Dictionary, List 에서 Nested Poco 제거
+### TrackableDictionary Modify Helper 추가
 
-  괜히 코드 복잡도만 높아졌다.
-  차라리 Dictionary 와 List 에 Modify Helper 를 넣자.
+  Modify 가 딱 실수하기 좋게 생겼다. 
+  - Functor 정도를 넣어서 자동 clone 을 해주는건 어떨까?
+  - Clone 이 일반적이지 않다면 before, after 가 같으면 오류 내주는 것 정도를 넣어줘도 좋을 듯
+  
+  `dict.Update(key, (key, value) => return make_new_value)) => TrackModify(key, value, newValue)`
+  `AddOrUpdate (TKey, TValue, Func<TKey, TValue, TValue>)` 를 넣어줘도 되겠다.
 
-### Dictionary, List 에 대해서도 Create/Remove 테스트 코드 넣기
+넣으면서 Upsert 를 넣어줘도 될 듯 
 
-  넣자!
+### Upsert 처리 정리
+
+  Mongo 는 지금 대충 Upsert 하게 해놨는데 CRUD 시맨틱을 지키도록 잘 정리하자.
+
+  - Create : 이미 존재하면 오류.
+  - Delete : 삭제가 되던 말던 OK. 결과만 리턴
+  - Load   : 없으면 NULL. (선택적으로 empty container 가 나올 수도 있다.)
+  - Save   : 이미 존재할 경우만 UPDATE. 없으면 무시.
 
 ### 유니티에서 잘 동작하는지 확인
 

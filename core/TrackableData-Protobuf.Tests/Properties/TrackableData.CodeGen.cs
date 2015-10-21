@@ -655,9 +655,9 @@ namespace TrackableData.Protobuf.Tests
     [ProtoContract]
     public class TrackableDataContainerTracker : IContainerTracker<IDataContainer>
     {
-        [ProtoMember(1)] public TrackablePocoTracker<IPerson> PersonTracker = new TrackablePocoTracker<IPerson>();
-        [ProtoMember(2)] public TrackableDictionaryTracker<int, string> DictionaryTracker = new TrackableDictionaryTracker<int, string>();
-        [ProtoMember(3)] public TrackableListTracker<string> ListTracker = new TrackableListTracker<string>();
+        [ProtoMember(1)] public TrackablePocoTracker<IPerson> PersonTracker { get; set; } = new TrackablePocoTracker<IPerson>();
+        [ProtoMember(2)] public TrackableDictionaryTracker<int, string> DictionaryTracker { get; set; } = new TrackableDictionaryTracker<int, string>();
+        [ProtoMember(3)] public TrackableListTracker<string> ListTracker { get; set; } = new TrackableListTracker<string>();
 
         public bool HasChange
         {

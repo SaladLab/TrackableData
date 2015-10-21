@@ -553,9 +553,9 @@ namespace TrackableData.MongoDB.Tests
 
     public class TrackableTestContainerTracker : IContainerTracker<ITestContainer>
     {
-        public TrackablePocoTracker<ITestPocoForContainer> PersonTracker = new TrackablePocoTracker<ITestPocoForContainer>();
-        public TrackableDictionaryTracker<int, MissionData> MissionsTracker = new TrackableDictionaryTracker<int, MissionData>();
-        public TrackableListTracker<TagData> TagsTracker = new TrackableListTracker<TagData>();
+        public TrackablePocoTracker<ITestPocoForContainer> PersonTracker { get; set; } = new TrackablePocoTracker<ITestPocoForContainer>();
+        public TrackableDictionaryTracker<int, MissionData> MissionsTracker { get; set; } = new TrackableDictionaryTracker<int, MissionData>();
+        public TrackableListTracker<TagData> TagsTracker { get; set; } = new TrackableListTracker<TagData>();
 
         public bool HasChange
         {

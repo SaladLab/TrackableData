@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using System.Reflection;
 
@@ -12,41 +11,164 @@ namespace TrackableData.MongoDB
     public class TrackableContainerMongoDbMapper<T>
         where T : ITrackableContainer<T>
     {
+        private readonly Type _trackableType;
+
         private class PropertyItem
         {
             public string Name;
             public PropertyInfo Property;
+            public PropertyInfo TrackerProperty;
             public object Mapper;
-            public Func<T, BsonValue> ConvertToBson;
-            public Func<BsonValue, T> ConvertToTrackable;
-            public Func<UpdateDefinition<BsonDocument>, T, UpdateDefinition<BsonDocument>> SaveChanges;
+            public Action<T, BsonDocument> ExportToBson;
+            public Action<BsonDocument, T> ImportFromBson;
+            public Func<UpdateDefinition<BsonDocument>, IContainerTracker<T>, IEnumerable<object>, UpdateDefinition<BsonDocument>> SaveChanges;
         }
 
-        private static PropertyItem[] PropertyData;
-
-        static TrackableContainerMongoDbMapper()
-        {
-            var propertyItems = new List<PropertyItem>();
-            foreach (var property in typeof(T).GetProperties())
-            {
-                propertyItems.Add(new PropertyItem
-                {
-                    Name = property.Name,
-                    Property = property,
-                    Mapper = null,
-                    ConvertToBson = null,
-                    ConvertToTrackable = null,
-                    SaveChanges = null,
-                });
-            }
-
-            // TODO: Get Mapper
-            // if (tracker.DataTracker.HasChange)
-            //    update = _userDataMapper.BuildUpdatesForSave(update, tracker.DataTracker, "Data");
-        }
+        private readonly PropertyItem[] PropertyItems;
 
         public TrackableContainerMongoDbMapper()
         {
+            _trackableType = TrackableResolver.GetContainerTrackerType(typeof(T));
+
+            PropertyItems = ConstructPropertyItems();
+        }
+
+        private static PropertyItem[] ConstructPropertyItems()
+        {
+            var trackerType = TrackerResolver.GetDefaultTracker(typeof(T));
+
+            var propertyItems = new List<PropertyItem>();
+            foreach (var property in typeof(T).GetProperties())
+            {
+                var item = new PropertyItem
+                {
+                    Name = property.Name,
+                    Property = property,
+                    TrackerProperty = trackerType.GetProperty(property.Name + "Tracker")
+                };
+
+                if (TrackableResolver.IsTrackablePoco(property.PropertyType))
+                {
+                    typeof(TrackableContainerMongoDbMapper<T>)
+                        .GetMethod("BuildTrackablePocoProperty", BindingFlags.Static | BindingFlags.NonPublic)
+                        .MakeGenericMethod(TrackableResolver.GetPocoType(property.PropertyType))
+                        .Invoke(null, new object[] { item });
+                }
+                else if (TrackableResolver.IsTrackableDictionary(property.PropertyType))
+                {
+                    typeof(TrackableContainerMongoDbMapper<T>)
+                        .GetMethod("BuildTrackableDictionaryProperty", BindingFlags.Static | BindingFlags.NonPublic)
+                        .MakeGenericMethod(property.PropertyType.GetGenericArguments())
+                        .Invoke(null, new object[] { item });
+                }
+                else if (TrackableResolver.IsTrackableList(property.PropertyType))
+                {
+                    typeof(TrackableContainerMongoDbMapper<T>)
+                        .GetMethod("BuildTrackableListProperty", BindingFlags.Static | BindingFlags.NonPublic)
+                        .MakeGenericMethod(property.PropertyType.GetGenericArguments())
+                        .Invoke(null, new object[] { item });
+                }
+                else
+                {
+                    throw new InvalidOperationException("Cannot resolve property: " + property.Name);
+                }
+
+                propertyItems.Add(item);
+            }
+            return propertyItems.ToArray();
+        }
+
+        static void BuildTrackablePocoProperty<TPoco>(PropertyItem item)
+              where TPoco : ITrackablePoco<TPoco>
+        {
+            var mapper = new TrackablePocoMongoDbMapper<TPoco>();
+            item.Mapper = mapper;
+
+            item.ExportToBson = (container, doc) =>
+            {
+                var value = (TPoco)item.Property.GetValue(container);
+                if (value != null)
+                    doc.Add(item.Property.Name, mapper.ConvertToBsonDocument(value));
+            };
+            item.ImportFromBson = (doc, container) =>
+            {
+                var value = mapper.ConvertToTrackablePoco(doc, item.Property.Name);
+                item.Property.SetValue(container, value);
+            };
+            item.SaveChanges = (update, tracker, keyValues) =>
+            {
+                var valueTracker = (TrackablePocoTracker<TPoco>)item.TrackerProperty.GetValue(tracker);
+                if (valueTracker.HasChange)
+                {
+                    update = mapper.BuildUpdatesForSave(
+                        update, valueTracker,
+                        keyValues.Concat(new object[] { item.Property.Name }).ToArray());
+                }
+                return update;
+            };
+        }
+
+        static void BuildTrackableDictionaryProperty<TKey, TValue>(PropertyItem item)
+        {
+            var mapper = new TrackableDictionaryMongoDbMapper<TKey, TValue>();
+            item.Mapper = mapper;
+
+            item.ExportToBson = (container, doc) =>
+            {
+                var value = (IDictionary<TKey, TValue>)item.Property.GetValue(container);
+                if (value != null)
+                    doc.Add(item.Property.Name, mapper.ConvertToBsonDocument(value));
+            };
+            item.ImportFromBson = (doc, container) =>
+            {
+                var value = mapper.ConvertToTrackableDictionary(doc, item.Property.Name);
+                item.Property.SetValue(container, value);
+            };
+            item.SaveChanges = (update, tracker, keyValues) =>
+            {
+                var valueTracker = (TrackableDictionaryTracker<TKey, TValue>)item.TrackerProperty.GetValue(tracker);
+                if (valueTracker.HasChange)
+                {
+                    update = mapper.BuildUpdatesForSave(
+                        update, valueTracker,
+                        keyValues.Concat(new object[] { item.Property.Name }).ToArray());
+                }
+                return update;
+            };
+        }
+
+        private static void BuildTrackableListProperty<TValue>(PropertyItem item)
+        {
+            var mapper = new TrackableListMongoDbMapper<TValue>();
+            item.Mapper = mapper;
+
+            item.ExportToBson = (container, doc) =>
+            {
+                var value = (IList<TValue>)item.Property.GetValue(container);
+                if (value != null)
+                    doc.Add(item.Property.Name, mapper.ConvertToBsonArray(value));
+            };
+            item.ImportFromBson = (doc, container) =>
+            {
+                var value = mapper.ConvertToTrackableList(doc, item.Property.Name);
+                item.Property.SetValue(container, value);
+            };
+            item.SaveChanges = (update, tracker, keyValues) =>
+            {
+                var valueTracker = (TrackableListTracker<TValue>)item.TrackerProperty.GetValue(tracker);
+                if (valueTracker.HasChange)
+                {
+                    var listUpdates = mapper.BuildUpdatesForSave(
+                        valueTracker,
+                        keyValues.Concat(new object[] { item.Property.Name }).ToArray()).ToList();
+                    if (listUpdates.Count > 1)
+                        throw new InvalidOperationException("Container cannot save multiple changes from list.");
+                    update = update == null
+                                 ? listUpdates[0]
+                                 : Builders<BsonDocument>.Update.Combine(update, listUpdates[0]);
+                }
+                return update;
+            };
         }
 
         #region Helpers
@@ -56,29 +178,28 @@ namespace TrackableData.MongoDB
             if (keyValues.Length == 0)
                 throw new ArgumentException("At least 1 keyValue required.");
 
-            // TODO:
-            /*
             var bson = new BsonDocument();
-            bson.Add("_id", uid);
-            bson.Add("Data", _userDataMapper.ConvertToBsonDocument(user.Data));
-            bson.Add("Items", _userItemMapper.ConvertToBsonDocument(user.Items));
-            bson.Add("Teams", _userTeamMapper.ConvertToBsonDocument(user.Teams));
-            bson.Add("Tanks", _userTankMapper.ConvertToBsonDocument(user.Tanks));
-            bson.Add("Cards", _userCardMapper.ConvertToBsonDocument(user.Cards));
-            bson.Add("Friends", _userFriendMapper.ConvertToBsonDocument(user.Friends));
-            bson.Add("Missions", _userMissionMapper.ConvertToBsonDocument(user.Missions));
-            bson.Add("StageGrades", _userStageGradeMapper.ConvertToBsonDocument(user.StageGrades));
-            bson.Add("Posts", _userPostMapper.ConvertToBsonDocument(user.Posts));
-
-            await this["User"].InsertOneAsync(bson);
-            */
+            foreach (var pi in PropertyItems)
+            {
+                pi.ExportToBson(value, bson);
+            }
+            if (keyValues.Length == 1)
+            {
+                bson.InsertAt(0, new BsonElement("_id", BsonValue.Create(keyValues[0])));
+                await collection.InsertOneAsync(bson);
+            }
+            else
+            {
+                var setPath = DocumentHelper.ToDotPath(keyValues.Skip(1));
+                await collection.UpdateOneAsync(
+                    Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
+                    Builders<BsonDocument>.Update.Set(setPath, bson));
+            }
         }
 
         public Task<int> DeleteAsync(IMongoCollection<BsonDocument> collection, params object[] keyValues)
         {
             return DocumentHelper.DeleteAsync(collection, keyValues);
-            //             await this["User"].DeleteOneAsync(Builders<BsonDocument>.Filter.Eq("_id", uid));
-
         }
 
         public async Task<T> LoadAsync(IMongoCollection<BsonDocument> collection, params object[] keyValues)
@@ -86,35 +207,34 @@ namespace TrackableData.MongoDB
             if (keyValues.Length == 0)
                 throw new ArgumentException("At least 1 keyValue required.");
 
-            // TODO:
-            /*
-            var doc = await this["User"].Find(Builders<BsonDocument>.Filter.Eq("_id", uid))
-                                        .FirstOrDefaultAsync();
+            BsonDocument doc;
+
+            if (keyValues.Length == 1)
+            {
+                doc = await collection.Find(Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]))
+                                      .FirstOrDefaultAsync();
+            }
+            else
+            {
+                // partial query
+
+                var partialKeys = keyValues.Skip(1);
+                var partialPath = DocumentHelper.ToDotPath(partialKeys);
+                var partialDoc = await collection.Find(Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]))
+                                                 .Project(Builders<BsonDocument>.Projection.Include(partialPath))
+                                                 .FirstOrDefaultAsync();
+                doc = DocumentHelper.QueryValue(partialDoc, keyValues.Skip(1)) as BsonDocument;
+            }
+
             if (doc == null)
-                return null;
+                return default(T);
 
-            var user = new TrackableUserContext();
-            user.Data = (TrackableUserData)_userDataMapper.ConvertToTrackablePoco(doc, "Data") ?? new TrackableUserData();
-            user.Items = _userItemMapper.ConvertToTrackableDictionary(doc, "Items")
-                         ?? new TrackableDictionary<int, UserItem>();
-            user.Teams = _userTeamMapper.ConvertToTrackableDictionary(doc, "Teams")
-                         ?? new TrackableDictionary<byte, UserTeam>();
-            user.Tanks = _userTankMapper.ConvertToTrackableDictionary(doc, "Tanks")
-                         ?? new TrackableDictionary<int, UserTank>();
-            user.Cards = _userCardMapper.ConvertToTrackableDictionary(doc, "Cards")
-                         ?? new TrackableDictionary<byte, long>();
-            user.Friends = _userFriendMapper.ConvertToTrackableDictionary(doc, "Friends")
-                           ?? new TrackableDictionary<int, UserFriend>();
-            user.Missions = _userMissionMapper.ConvertToTrackableDictionary(doc, "Missions")
-                            ?? new TrackableDictionary<byte, UserMission>();
-            user.StageGrades = _userStageGradeMapper.ConvertToTrackableDictionary(doc, "StageGrades")
-                               ?? new TrackableDictionary<byte, long>();
-            user.Posts = _userPostMapper.ConvertToTrackableDictionary(doc, "Posts")
-                         ?? new TrackableDictionary<int, UserPost>();
-            return user;
-
-            */
-            return default(T);
+            var container = (T)Activator.CreateInstance(_trackableType);
+            foreach (var pi in PropertyItems)
+            {
+                pi.ImportFromBson(doc, container);
+            }
+            return container;
         }
 
         public Task<UpdateResult> SaveAsync(IMongoCollection<BsonDocument> collection,
@@ -131,34 +251,16 @@ namespace TrackableData.MongoDB
             if (keyValues.Length == 0)
                 throw new ArgumentException("At least 1 keyValue required.");
 
-            // TODO:
-            /*
+            var partialKeys = keyValues.Skip(1).ToArray();
             UpdateDefinition<BsonDocument> update = null;
-            if (tracker.DataTracker.HasChange)
-                update = _userDataMapper.BuildUpdatesForSave(update, tracker.DataTracker, "Data");
-            if (tracker.ItemsTracker.HasChange)
-                update = _userItemMapper.BuildUpdatesForSave(update, tracker.ItemsTracker, "Items");
-            if (tracker.TeamsTracker.HasChange)
-                update = _userTeamMapper.BuildUpdatesForSave(update, tracker.TeamsTracker, "Teams");
-            if (tracker.TanksTracker.HasChange)
-                update = _userTankMapper.BuildUpdatesForSave(update, tracker.TanksTracker, "Tanks");
-            if (tracker.CardsTracker.HasChange)
-                update = _userCardMapper.BuildUpdatesForSave(update, tracker.CardsTracker, "Cards");
-            if (tracker.FriendsTracker.HasChange)
-                update = _userFriendMapper.BuildUpdatesForSave(update, tracker.FriendsTracker, "Friends");
-            if (tracker.MissionsTracker.HasChange)
-                update = _userMissionMapper.BuildUpdatesForSave(update, tracker.MissionsTracker, "Missions");
-            if (tracker.StageGradesTracker.HasChange)
-                update = _userStageGradeMapper.BuildUpdatesForSave(update, tracker.StageGradesTracker, "StageGrades");
-            if (tracker.PostsTracker.HasChange)
-                update = _userPostMapper.BuildUpdatesForSave(update, tracker.PostsTracker, "Posts");
-
-            await this["User"].UpdateOneAsync(
-                Builders<BsonDocument>.Filter.Eq("_id", uid),
-                update);
-
-            */
-            return null;
+            foreach (var pi in PropertyItems)
+            {
+                update = pi.SaveChanges(update, tracker, partialKeys);
+            }
+            return collection.UpdateOneAsync(
+                Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
+                update,
+                new UpdateOptions { IsUpsert = true });
         }
 
         #endregion

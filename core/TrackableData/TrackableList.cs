@@ -89,10 +89,10 @@ namespace TrackableData
         {
             if (Tracker != null)
             {
-                if (index == 0)
-                    Tracker.TrackPushFront(item);
-                else if (index == _list.Count)
+                if (index == _list.Count)
                     Tracker.TrackPushBack(item);
+                else if (index == 0)
+                    Tracker.TrackPushFront(item);
                 else
                     Tracker.TrackInsert(index, item);
             }
@@ -104,10 +104,10 @@ namespace TrackableData
         {
             if (Tracker != null)
             {
-                if (index == 0)
-                    Tracker.TrackPopFront(_list[index]);
-                else if (index == _list.Count - 1)
+                if (index == _list.Count - 1)
                     Tracker.TrackPopBack(_list[index]);
+                else if (index == 0)
+                    Tracker.TrackPopFront(_list[index]);
                 else
                     Tracker.TrackRemove(index, _list[index]);
             }

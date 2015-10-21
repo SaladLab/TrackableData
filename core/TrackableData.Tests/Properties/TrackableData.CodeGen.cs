@@ -514,9 +514,9 @@ namespace TrackableData.Tests
 
     public class TrackableDataContainerTracker : IContainerTracker<IDataContainer>
     {
-        public TrackablePocoTracker<IPerson> PersonTracker = new TrackablePocoTracker<IPerson>();
-        public TrackableDictionaryTracker<int, string> DictionaryTracker = new TrackableDictionaryTracker<int, string>();
-        public TrackableListTracker<string> ListTracker = new TrackableListTracker<string>();
+        public TrackablePocoTracker<IPerson> PersonTracker { get; set; } = new TrackablePocoTracker<IPerson>();
+        public TrackableDictionaryTracker<int, string> DictionaryTracker { get; set; } = new TrackableDictionaryTracker<int, string>();
+        public TrackableListTracker<string> ListTracker { get; set; } = new TrackableListTracker<string>();
 
         public bool HasChange
         {

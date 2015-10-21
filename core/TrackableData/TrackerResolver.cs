@@ -12,14 +12,22 @@ namespace TrackableData
 
         public static Type GetDefaultTracker(Type trackableType)
         {
-            if (typeof(ITrackablePoco).IsAssignableFrom(trackableType))
+            // ITrackablePoco -> TrackablePocoTracker
+            var pocoType = TrackableResolver.GetPocoType(trackableType);
+            if (pocoType != null)
+                return typeof(TrackablePocoTracker<>).MakeGenericType(pocoType);
+
+            // ITrackableContainer -> TrackableContainerTracker
+            var containerType = TrackableResolver.GetContainerType(trackableType);
+            if (containerType != null)
             {
-                var trackerType = trackableType.GetInterfaces()
-                                               .FirstOrDefault(t => t.IsGenericType &&
-                                                                    t.GetGenericTypeDefinition() == typeof(ITrackable<>));
-                if (trackerType != null)
-                    return typeof(TrackablePocoTracker<>).MakeGenericType(trackerType.GetGenericArguments()[0]);
+                var trackerTypeName = containerType.Namespace + "." +
+                                      "Trackable" + containerType.Name.Substring(1) + "Tracker";
+                return containerType?.Assembly.GetType(trackerTypeName);
             }
+
+            // TrackableDictionary -> TrackableDictionaryTracker
+            // TrackableList -> TrackableListTracker
             if (trackableType.IsGenericType)
             {
                 var genericType = trackableType.GetGenericTypeDefinition();
@@ -34,7 +42,7 @@ namespace TrackableData
                         trackableType.GetGenericArguments());
                 }
             }
-            // TODO: TrackableContainer ?
+
             return null;
         }
 
