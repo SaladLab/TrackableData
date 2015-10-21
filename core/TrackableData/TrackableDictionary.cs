@@ -12,15 +12,55 @@ namespace TrackableData
 
         public IDictionaryTracker<TKey, TValue> Tracker { get; set; }
 
-        // Hacky API. It's for intrusive modification of dictionary. (like dict[2].Count += 1)
-        // If you want to have gentle code, use dict[2] = new TValue or use TrackableValue for TValue.
-        public void MarkModify(TKey key)
+        // Safe update. It can detect that references of value and new updated value are same.
+        // Rollback will be broken if references are same. 
+        // To prevent this problem, it checks reference equality.
+        public bool Update(TKey key, Func<TKey, TValue, TValue> updateValueFactory)
         {
-            if (Tracker != null)
+            TValue value;
+            if (_dictionary.TryGetValue(key, out value) == false)
+                return false;
+
+            TValue newValue = updateValueFactory(key, value);
+            _dictionary[key] = newValue;
+
+            if (typeof(TValue).IsValueType == false)
             {
-                var currentValue = _dictionary[key];
-                Tracker.TrackModify(key, currentValue, currentValue);
+                // TODO: Improve this by immutability check
+                if (Object.ReferenceEquals(value, newValue))
+                    throw new InvalidOperationException("TrackableDictionary update need you to clone value.");
             }
+
+            if (Tracker != null)
+                Tracker.TrackModify(key, value, newValue);
+
+            return true;
+        }
+
+        // It doens't provide atomic operation like ConcurrentDictionary.
+        public TValue AddOrUpdate(TKey key, TValue addValue, Func<TKey, TValue, TValue> updateValueFactory)
+        {
+            TValue value;
+            if (_dictionary.TryGetValue(key, out value) == false)
+            {
+                Add(key, addValue);
+                return addValue;
+            }
+
+            TValue newValue = updateValueFactory(key, value);
+            _dictionary[key] = newValue;
+
+            if (typeof(TValue).IsValueType == false)
+            {
+                // TODO: Improve this by immutability check
+                if (Object.ReferenceEquals(value, newValue))
+                    throw new InvalidOperationException("TrackableDictionary update need you to clone value.");
+            }
+
+            if (Tracker != null)
+                Tracker.TrackModify(key, value, newValue);
+
+            return newValue;
         }
 
         // ITrackable

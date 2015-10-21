@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -21,6 +22,43 @@ namespace TrackableData.Tests
             var dict = CreateTestDictionary();
             dict.SetDefaultTrackerDeep();
             return dict;
+        }
+
+        [Fact]
+        public void TestDictionary_Update_Detect_Value_Changed_Ok()
+        {
+            var dict = new TrackableDictionary<int, int>();
+            dict[1] = 100;
+            dict.Update(1, (key, value) => value + 1);
+        }
+
+        [Fact]
+        public void TestDictionary_Update_Detect_Value_Equal_Ok()
+        {
+            var dict = new TrackableDictionary<int, int>();
+            dict[1] = 100;
+            var a = "!";
+            var b = a.Clone();
+            dict.Update(1, (key, value) => value);
+        }
+
+        [Fact]
+        public void TestDictionary_Update_Detect_Reference_Cloned_Ok()
+        {
+            var dict = new TrackableDictionary<int, string>();
+            dict[1] = "one";
+            dict.Update(1, (key, value) => value + "!");
+        }
+
+        [Fact]
+        public void TestDictionary_Update_Detect_Reference_Equal_Error()
+        {
+            var dict = new TrackableDictionary<int, string>();
+            dict[1] = "one";
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                dict.Update(1, (key, value) => value);
+            });
         }
 
         [Fact]
