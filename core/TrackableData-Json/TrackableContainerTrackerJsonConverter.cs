@@ -24,10 +24,10 @@ namespace TrackableData.Json
                 if (reader.TokenType != JsonToken.PropertyName)
                     break;
 
-                var pi = objectType.GetField((string)reader.Value + "Tracker");
+                var pi = objectType.GetProperty((string)reader.Value + "Tracker");
                 reader.Read();
 
-                var subTracker = serializer.Deserialize(reader, pi.FieldType);
+                var subTracker = serializer.Deserialize(reader, pi.PropertyType);
                 reader.Read();
 
                 pi.SetValue(tracker, subTracker);
@@ -42,15 +42,15 @@ namespace TrackableData.Json
 
             writer.WriteStartObject();
 
-            foreach (var fieldType in value.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
+            foreach (var pi in value.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                if (typeof(ITracker).IsAssignableFrom(fieldType.FieldType) == false)
+                if (typeof(ITracker).IsAssignableFrom(pi.PropertyType) == false)
                     continue;
 
-                var subTracker = (ITracker)fieldType.GetValue(value);
+                var subTracker = (ITracker)pi.GetValue(value);
                 if (subTracker != null && subTracker.HasChange)
                 {
-                    writer.WritePropertyName(fieldType.Name.Substring(0, fieldType.Name.Length - 7));
+                    writer.WritePropertyName(pi.Name.Substring(0, pi.Name.Length - 7));
                     serializer.Serialize(writer, subTracker);
                 }
             }
