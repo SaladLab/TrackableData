@@ -29,13 +29,13 @@ namespace MigrationTest
 
         static async Task DumpUser(int uid)
         {
-            var user = await _sqlDriver.LoadUser(uid);
+            var user = await _sqlDriver.LoadUserAsync(uid);
             Console.WriteLine(JsonConvert.SerializeObject(user, Formatting.Indented));
         }
 
         static async Task LoadAndSave(int uid)
         {
-            var user = await _sqlDriver.LoadUser(uid);
+            var user = await _sqlDriver.LoadUserAsync(uid);
             await _mongoDriver.CreateUserAsync(1, user);
 
             var user2 = await _mongoDriver.LoadUserAsync(1);

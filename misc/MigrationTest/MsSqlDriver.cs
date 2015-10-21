@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Model;
@@ -8,60 +9,70 @@ namespace MigrationTest
 {
     public class MsSqlDriver
     {
-        private static TrackablePocoMsSqlMapper<IUserData> _userDataMapper =
-            new TrackablePocoMsSqlMapper<IUserData>(
-                "tblUser",
-                new[] { new ColumnDefinition("Uid", typeof(int)) });
+        private static readonly ColumnDefinition[] HeadKeyColumnDefs =
+        {
+            new ColumnDefinition("Uid", typeof(int)),
+        };
 
-        private static TrackableDictionaryMsSqlMapper<int, UserItem> _userItemMapper =
-            new TrackableDictionaryMsSqlMapper<int, UserItem>(
-                "tblItem",
-                new ColumnDefinition("ItemId"),
-                new[] { new ColumnDefinition("Uid", typeof(int)) });
-
-        private static TrackableDictionaryMsSqlMapper<byte, UserTeam> _userTeamMapper =
-            new TrackableDictionaryMsSqlMapper<byte, UserTeam>(
-                "tblTeam",
-                new ColumnDefinition("TeamId"),
-                new[] { new ColumnDefinition("Uid", typeof(int)) });
-
-        private static TrackableDictionaryMsSqlMapper<int, UserTank> _userTanksMapper =
-            new TrackableDictionaryMsSqlMapper<int, UserTank>(
-                "tblTank",
-                new ColumnDefinition("TankId"),
-                new[] { new ColumnDefinition("Uid", typeof(int)) });
-
-        private static TrackableDictionaryMsSqlMapper<byte, long> _userCardMapper =
-            new TrackableDictionaryMsSqlMapper<byte, long>(
-                "tblCard",
-                new ColumnDefinition("GroupNo"),
-                new ColumnDefinition("States"),
-                new[] { new ColumnDefinition("Uid", typeof(int)) });
-
-        private static TrackableDictionaryMsSqlMapper<int, UserFriend> _userFriendMapper =
-            new TrackableDictionaryMsSqlMapper<int, UserFriend>(
-                "tblFriend",
-                new ColumnDefinition("FriendUid"),
-                new[] { new ColumnDefinition("Uid", typeof(int)) });
-
-        private static TrackableDictionaryMsSqlMapper<byte, UserMission> _userMissionMapper =
-            new TrackableDictionaryMsSqlMapper<byte, UserMission>(
-                "tblMission",
-                new ColumnDefinition("SlotId"),
-                new[] { new ColumnDefinition("Uid", typeof(int)) });
-
-        private static TrackableDictionaryMsSqlMapper<byte, long> _userStageGradeMapper =
-            new TrackableDictionaryMsSqlMapper<byte, long>(
-                "tblStageGrade",
-                new ColumnDefinition("GroupNo"),
-                new ColumnDefinition("Grades"),
-                new[] { new ColumnDefinition("Uid", typeof(int)) });
-
-        private static TrackableDictionaryMsSqlMapper<int, UserPost> _userPostMapper =
-            new TrackableDictionaryMsSqlMapper<int, UserPost>(
-                "tblPost",
-                new ColumnDefinition("PostId"),
-                new[] { new ColumnDefinition("Uid", typeof(int)) });
+        private static TrackableContainerMsSqlMapper<IUserContext> _userMapper =
+            new TrackableContainerMsSqlMapper<IUserContext>(new[]
+            {
+                Tuple.Create("Data", new object[]
+                {
+                    "tblUser",
+                    HeadKeyColumnDefs
+                }),
+                Tuple.Create("Items", new object[]
+                {
+                    "tblItem",
+                    new ColumnDefinition("ItemId"),
+                    HeadKeyColumnDefs
+                }),
+                Tuple.Create("Teams", new object[]
+                {
+                    "tblTeam",
+                    new ColumnDefinition("TeamId"),
+                    HeadKeyColumnDefs
+                }),
+                Tuple.Create("Tanks", new object[]
+                {
+                    "tblTank",
+                    new ColumnDefinition("TankId"),
+                    HeadKeyColumnDefs
+                }),
+                Tuple.Create("Cards", new object[]
+                {
+                    "tblCard",
+                    new ColumnDefinition("GroupNo"),
+                    new ColumnDefinition("States"),
+                    HeadKeyColumnDefs
+                }),
+                Tuple.Create("Friends", new object[]
+                {
+                    "tblFriend",
+                    new ColumnDefinition("FriendUid"),
+                    HeadKeyColumnDefs
+                }),
+                Tuple.Create("Missions", new object[]
+                {
+                    "tblMission",
+                    new ColumnDefinition("SlotId"),
+                    HeadKeyColumnDefs
+                }),
+                Tuple.Create("StageGrades", new object[]
+                {
+                    "tblStageGrade",
+                    new ColumnDefinition("GroupNo"),
+                    new ColumnDefinition("Grades"),
+                    HeadKeyColumnDefs
+                }),
+                Tuple.Create("Posts", new object[]
+                {
+                    "tblPost",
+                    new ColumnDefinition("PostId"),
+                    HeadKeyColumnDefs
+                }),
+            });
 
         private readonly SqlConnection _connection;
 
@@ -71,20 +82,24 @@ namespace MigrationTest
             _connection.Open();
         }
 
-        public async Task<TrackableUserContext> LoadUser(int uid)
+        public Task CreateUserAsync(int uid, TrackableUserContext user)
         {
-            return new TrackableUserContext
-            {
-                Data = (TrackableUserData)(await _userDataMapper.LoadAsync(_connection, uid)),
-                Items = await _userItemMapper.LoadAsync(_connection, uid),
-                Teams = await _userTeamMapper.LoadAsync(_connection, uid),
-                Tanks = await _userTanksMapper.LoadAsync(_connection, uid),
-                Cards = await _userCardMapper.LoadAsync(_connection, uid),
-                Friends = await _userFriendMapper.LoadAsync(_connection, uid),
-                Missions = await _userMissionMapper.LoadAsync(_connection, uid),
-                StageGrades = await _userStageGradeMapper.LoadAsync(_connection, uid),
-                Posts = await _userPostMapper.LoadAsync(_connection, uid),
-            };
+            return _userMapper.CreateAsync(_connection, user, uid);
+        }
+
+        public Task DeleteUserAsync(int uid)
+        {
+            return _userMapper.DeleteAsync(_connection, uid);
+        }
+
+        public async Task<TrackableUserContext> LoadUserAsync(int uid)
+        {
+            return (TrackableUserContext)(await _userMapper.LoadAsync(_connection, uid));
+        }
+
+        public Task SaveUserAsync(int uid, TrackableUserContextTracker tracker)
+        {
+            return _userMapper.SaveAsync(_connection, tracker, uid);
         }
     }
 }
