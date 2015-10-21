@@ -1697,15 +1697,15 @@ namespace Model
     [ProtoContract]
     public class TrackableUserContextTracker : IContainerTracker<IUserContext>
     {
-        [ProtoMember(1)] public TrackablePocoTracker<IUserData> DataTracker = new TrackablePocoTracker<IUserData>();
-        [ProtoMember(2)] public TrackableDictionaryTracker<int, UserItem> ItemsTracker = new TrackableDictionaryTracker<int, UserItem>();
-        [ProtoMember(3)] public TrackableDictionaryTracker<byte, UserTeam> TeamsTracker = new TrackableDictionaryTracker<byte, UserTeam>();
-        [ProtoMember(4)] public TrackableDictionaryTracker<int, UserTank> TanksTracker = new TrackableDictionaryTracker<int, UserTank>();
-        [ProtoMember(5)] public TrackableDictionaryTracker<byte, long> CardsTracker = new TrackableDictionaryTracker<byte, long>();
-        [ProtoMember(6)] public TrackableDictionaryTracker<int, UserFriend> FriendsTracker = new TrackableDictionaryTracker<int, UserFriend>();
-        [ProtoMember(7)] public TrackableDictionaryTracker<byte, UserMission> MissionsTracker = new TrackableDictionaryTracker<byte, UserMission>();
-        [ProtoMember(8)] public TrackableDictionaryTracker<byte, long> StageGradesTracker = new TrackableDictionaryTracker<byte, long>();
-        [ProtoMember(9)] public TrackableDictionaryTracker<int, UserPost> PostsTracker = new TrackableDictionaryTracker<int, UserPost>();
+        [ProtoMember(1)] public TrackablePocoTracker<IUserData> DataTracker { get; set; } = new TrackablePocoTracker<IUserData>();
+        [ProtoMember(2)] public TrackableDictionaryTracker<int, UserItem> ItemsTracker { get; set; } = new TrackableDictionaryTracker<int, UserItem>();
+        [ProtoMember(3)] public TrackableDictionaryTracker<byte, UserTeam> TeamsTracker { get; set; } = new TrackableDictionaryTracker<byte, UserTeam>();
+        [ProtoMember(4)] public TrackableDictionaryTracker<int, UserTank> TanksTracker { get; set; } = new TrackableDictionaryTracker<int, UserTank>();
+        [ProtoMember(5)] public TrackableDictionaryTracker<byte, long> CardsTracker { get; set; } = new TrackableDictionaryTracker<byte, long>();
+        [ProtoMember(6)] public TrackableDictionaryTracker<int, UserFriend> FriendsTracker { get; set; } = new TrackableDictionaryTracker<int, UserFriend>();
+        [ProtoMember(7)] public TrackableDictionaryTracker<byte, UserMission> MissionsTracker { get; set; } = new TrackableDictionaryTracker<byte, UserMission>();
+        [ProtoMember(8)] public TrackableDictionaryTracker<byte, long> StageGradesTracker { get; set; } = new TrackableDictionaryTracker<byte, long>();
+        [ProtoMember(9)] public TrackableDictionaryTracker<int, UserPost> PostsTracker { get; set; } = new TrackableDictionaryTracker<int, UserPost>();
 
         public bool HasChange
         {
