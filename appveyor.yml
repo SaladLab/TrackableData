@@ -7,4 +7,5 @@ services:
 before_build:
 - cmd: nuget restore
 build:
+  project: TrackableData.sln
   verbosity: minimal
