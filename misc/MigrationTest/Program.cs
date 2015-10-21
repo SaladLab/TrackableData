@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Model;
@@ -17,24 +20,17 @@ namespace MigrationTest
 
         static void Main(string[] args)
         {
-            // TypeMapper.RegisterClassMap(typeof(UserItem));
-            // var ui = new UserItem();
-
             _sqlDriver = new MsSqlDriver(ConfigurationManager.ConnectionStrings["SourceDb"].ConnectionString);
             _mongoDriver = new MongoDbDriver(ConfigurationManager.ConnectionStrings["TargetDb"].ConnectionString);
+            MigrateAsync().Wait();
+        }
+
+        static async Task TestAsync()
+        {
             _mongoDriver.Database.DropCollectionAsync("User").Wait();
-            // DumpUser(2).Wait();
-            LoadAndSave(2).Wait();
-        }
 
-        static async Task DumpUser(int uid)
-        {
-            var user = await _sqlDriver.LoadUserAsync(uid);
-            Console.WriteLine(JsonConvert.SerializeObject(user, Formatting.Indented));
-        }
+            var uid = 2;
 
-        static async Task LoadAndSave(int uid)
-        {
             var user = await _sqlDriver.LoadUserAsync(uid);
             await _mongoDriver.CreateUserAsync(1, user);
 
@@ -49,6 +45,54 @@ namespace MigrationTest
 
             await _mongoDriver.SaveUserAsync(2, user2.Tracker);
             user2.Tracker.Clear();
+        }
+
+        static async Task MigrateAsync()
+        {
+            _mongoDriver.Database.DropCollectionAsync("User").Wait();
+
+            for (int i = 0; i < 128; i++)
+            {
+                var uid0 = i * 0x1000000;
+                var uid1 = uid0 + 0xFFFFFF;
+
+                var uids = new List<int>();
+                var sql = $"SELECT [Uid] FROM tblUser WHERE [Uid] BETWEEN ${uid0} AND ${uid1}";
+                using (var command = new SqlCommand(sql, _sqlDriver.Connection))
+                {
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var uid = (int)reader.GetValue(0);
+                            uids.Add(uid);
+                        }
+                    }
+                }
+                //if (uids.Count > 100)
+                //    uids.RemoveRange(100, uids.Count - 100);
+
+                var timer = new Stopwatch();
+                timer.Start();
+                Console.Write($"[Step ({i+1}/128)] Count:{uids.Count} ");
+                foreach (var uid in uids)
+                {
+                    var user = await _sqlDriver.LoadUserAsync(uid);
+                    await _mongoDriver.CreateUserAsync(uid, user);
+                }
+                timer.Stop();
+
+                var elapsed = timer.Elapsed.TotalSeconds;
+                if (uids.Count > 0 && elapsed > 0)
+                {
+                    var rowPerSec = uids.Count / timer.Elapsed.TotalSeconds;
+                    Console.WriteLine($"Elapsed: {(int)elapsed}s RowPerSec: {(int)rowPerSec}");
+                }
+                else
+                {
+                    Console.WriteLine();
+                }
+            }
         }
     }
 }

@@ -82,6 +82,8 @@ namespace MigrationTest
             _connection.Open();
         }
 
+        public SqlConnection Connection => _connection;
+
         public Task CreateUserAsync(int uid, TrackableUserContext user)
         {
             return _userMapper.CreateAsync(_connection, user, uid);
