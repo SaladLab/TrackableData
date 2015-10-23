@@ -40,6 +40,14 @@ namespace MigrationTest
             return _userMapper.CreateAsync(this[_collectionName], user, uid);
         }
 
+        public async Task ReplaceUserAsync(int uid, TrackableUserContext user)
+        {
+            var bson = _userMapper.ConvertToBsonDocument(user);
+            await Collection.ReplaceOneAsync(
+                Builders<BsonDocument>.Filter.Eq("_id", uid),
+                bson);
+        }
+
         public Task DeleteUserAsync(int uid)
         {
             return _userMapper.DeleteAsync(this[_collectionName], uid);

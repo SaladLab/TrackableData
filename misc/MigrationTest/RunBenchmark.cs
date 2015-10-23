@@ -102,7 +102,7 @@ namespace MigrationTest
             Console.WriteLine($"Elapsed: {(int)elapsed}s RowPerSec: {(int)rowPerSec}");
         }
 
-        public static async Task RewriteAsync(bool parallel)
+        public static async Task ReplaceAsync(bool parallel)
         {
             var mongoDriver2 = new MongoDbDriver(
                 ConfigurationManager.ConnectionStrings["MongoDb"].ConnectionString, "User2");
@@ -116,7 +116,7 @@ namespace MigrationTest
                 foreach (var uid in uids)
                 {
                     var user = await mongoDriver2.LoadUserAsync(uid);
-                    // TODO: await mongoDriver2
+                    await mongoDriver2.ReplaceUserAsync(uid, user);
                 }
                 return uids.Count;
             });
@@ -128,7 +128,7 @@ namespace MigrationTest
             Console.WriteLine($"Elapsed: {(int)elapsed}s RowPerSec: {(int)rowPerSec}");
         }
 
-        public static async Task SaveAsync(bool parallel)
+        public static async Task SaveSimpleAsync(bool parallel)
         {
             var mongoDriver2 = new MongoDbDriver(
                 ConfigurationManager.ConnectionStrings["MongoDb"].ConnectionString, "User2");
@@ -145,6 +145,52 @@ namespace MigrationTest
                     user.SetDefaultTracker();
                     user.Data.Gold += 1;
                     user.Data.Gold -= 1;
+                    await mongoDriver2.SaveUserAsync(uid, user.Tracker);
+                }
+                return uids.Count;
+            });
+
+            var totalCount = await WaitForComplete(tasks, parallel);
+
+            var elapsed = timer.Elapsed.TotalSeconds;
+            var rowPerSec = totalCount / timer.Elapsed.TotalSeconds;
+            Console.WriteLine($"Elapsed: {(int)elapsed}s RowPerSec: {(int)rowPerSec}");
+        }
+
+        public static async Task SaveComplexAsync(bool parallel, bool full)
+        {
+            var mongoDriver2 = new MongoDbDriver(
+                ConfigurationManager.ConnectionStrings["MongoDb"].ConnectionString, "User2");
+
+            var timer = new Stopwatch();
+            timer.Start();
+
+            var tasks = Enumerable.Range(0, 128).Select(async i =>
+            {
+                var uids = await LoadUids(mongoDriver2.Collection, i);
+                foreach (var uid in uids)
+                {
+                    var user = await mongoDriver2.LoadUserAsync(uid);
+                    user.SetDefaultTracker();
+                    user.Data.Gold += 1;
+                    user.Data.Gold -= 1;
+
+                    foreach (var key in user.Items.Keys.ToList())
+                    {
+                        var item = user.Items[key];
+                        user.Items[key] = item;
+                        if (full == false)
+                            break;
+                    }
+
+                    foreach (var key in user.Teams.Keys.ToList())
+                    {
+                        var team = user.Teams[key];
+                        user.Teams[key] = team;
+                        if (full == false)
+                            break;
+                    }
+
                     await mongoDriver2.SaveUserAsync(uid, user.Tracker);
                 }
                 return uids.Count;

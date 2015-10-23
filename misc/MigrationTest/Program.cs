@@ -34,7 +34,7 @@ namespace MigrationTest
             }
 
             Console.WriteLine(options.Job);
-            switch (options.Job)
+            switch (options.Job.ToLower())
             {
                 case "migrate":
                     RunMigration.MigrateAsync().Wait();
@@ -48,12 +48,20 @@ namespace MigrationTest
                     RunBenchmark.DuplicateAsync(options.Parallel).Wait();
                     break;
 
-                case "rewrite":
-                    RunBenchmark.RewriteAsync(options.Parallel).Wait();
+                case "replace":
+                    RunBenchmark.ReplaceAsync(options.Parallel).Wait();
                     break;
 
-                case "save":
-                    RunBenchmark.SaveAsync(options.Parallel).Wait();
+                case "savesimple":
+                    RunBenchmark.SaveSimpleAsync(options.Parallel).Wait();
+                    break;
+
+                case "savecomplex":
+                    RunBenchmark.SaveComplexAsync(options.Parallel, false).Wait();
+                    break;
+
+                case "savecomplexfull":
+                    RunBenchmark.SaveComplexAsync(options.Parallel, true).Wait();
                     break;
 
                 default:
