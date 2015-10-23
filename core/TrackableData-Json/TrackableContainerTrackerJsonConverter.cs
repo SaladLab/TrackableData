@@ -30,7 +30,7 @@ namespace TrackableData.Json
                 var subTracker = serializer.Deserialize(reader, pi.PropertyType);
                 reader.Read();
 
-                pi.SetValue(tracker, subTracker);
+                pi.SetValue(tracker, subTracker, null);
             }
 
             return tracker;
@@ -47,7 +47,7 @@ namespace TrackableData.Json
                 if (typeof(ITracker).IsAssignableFrom(pi.PropertyType) == false)
                     continue;
 
-                var subTracker = (ITracker)pi.GetValue(value);
+                var subTracker = (ITracker)pi.GetValue(value, null);
                 if (subTracker != null && subTracker.HasChange)
                 {
                     writer.WritePropertyName(pi.Name.Substring(0, pi.Name.Length - 7));
