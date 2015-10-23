@@ -175,18 +175,48 @@ namespace TrackableData.MongoDB
 
         #endregion
 
+        #region Conversion between T and Bson
+
+        public BsonDocument ConvertToBsonDocument(T container)
+        {
+            var bson = new BsonDocument();
+            foreach (var pi in PropertyItems)
+            {
+                pi.ExportToBson(container, bson);
+            }
+            return bson;
+        }
+
+        public T ConvertToTrackableContainer(BsonDocument doc)
+        {
+            var container = (T)Activator.CreateInstance(_trackableType);
+            foreach (var pi in PropertyItems)
+            {
+                pi.ImportFromBson(doc, container);
+            }
+            return container;
+        }
+
+        public T ConvertToTrackableContainer(BsonDocument doc, params object[] partialKeys)
+        {
+            var partialDoc = DocumentHelper.QueryValue(doc, partialKeys);
+            if (partialDoc == null)
+                return default(T);
+
+            return ConvertToTrackableContainer(partialDoc.AsBsonDocument);
+        }
+
+        #endregion
+
+
         #region Helpers
 
-        public async Task CreateAsync(IMongoCollection<BsonDocument> collection, T value, params object[] keyValues)
+        public async Task CreateAsync(IMongoCollection<BsonDocument> collection, T container, params object[] keyValues)
         {
             if (keyValues.Length == 0)
                 throw new ArgumentException("At least 1 keyValue required.");
 
-            var bson = new BsonDocument();
-            foreach (var pi in PropertyItems)
-            {
-                pi.ExportToBson(value, bson);
-            }
+            var bson = ConvertToBsonDocument(container);
             if (keyValues.Length == 1)
             {
                 bson.InsertAt(0, new BsonElement("_id", BsonValue.Create(keyValues[0])));
@@ -230,15 +260,7 @@ namespace TrackableData.MongoDB
                 doc = DocumentHelper.QueryValue(partialDoc, keyValues.Skip(1)) as BsonDocument;
             }
 
-            if (doc == null)
-                return default(T);
-
-            var container = (T)Activator.CreateInstance(_trackableType);
-            foreach (var pi in PropertyItems)
-            {
-                pi.ImportFromBson(doc, container);
-            }
-            return container;
+            return doc != null ? ConvertToTrackableContainer(doc) : default(T);
         }
 
         public Task<UpdateResult> SaveAsync(IMongoCollection<BsonDocument> collection,
