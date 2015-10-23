@@ -8,6 +8,8 @@ public class TestScene : MonoBehaviour
 
     void Start()
     {
+        Il2cppWorkaround.Initialize();
+
         LogText.text = "";
         Log.OnLog = OnLog;
         Log.WriteLine("Started!");
