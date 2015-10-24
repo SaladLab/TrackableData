@@ -71,6 +71,7 @@
   <ItemGroup>
     <Compile Include="ItemData.cs" />
     <Compile Include="Properties\TrackableData.CodeGen.cs" />
+    <Compile Include="ProtobufPrecompileDirectives.cs" />
     <Compile Include="UserData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -95,6 +96,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)core\CodeGenerator-Templates\TrackableData.Templates.targets" Condition="Exists('$(SolutionDir)core\CodeGenerator-Templates\TrackableData.Templates.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>"$(SolutionDir)tools\protobuf-net\precompile.exe" "$(TargetPath)" -o:DataProtobufSerializer.dll -t:DataProtobufSerializer "-f:.NETFramework\v3.5\Profile\Unity Subset v3.5"
+COPY /Y "$(TargetDir)DataProtobufSerializer.dll" "$(SolutionDir)examples\Unity\Program\Assets\Scripts\Shared"
+COPY /Y "$(TargetPath)" "$(SolutionDir)examples\Unity\Program\Assets\Scripts\Shared"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

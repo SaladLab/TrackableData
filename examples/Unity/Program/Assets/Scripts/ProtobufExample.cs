@@ -1,8 +1,11 @@
-﻿using System;
+﻿#define USE_PRECOMPILED_PROTOBUF_TYPEMODEL
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ProtoBuf;
 using ProtoBuf.Meta;
 using TrackableData;
 using TrackableData.Protobuf;
@@ -20,7 +23,9 @@ namespace Basic
             {
                 if (_protobufTypeModel != null)
                     return _protobufTypeModel;
-
+#if USE_PRECOMPILED_PROTOBUF_TYPEMODEL
+                var model = new DataProtobufSerializer();
+#else
                 var model = TypeModel.Create();
                 model.Add(typeof(TrackablePocoTracker<IUserData>), false)
                      .SetSurrogate(typeof(TrackableUserDataTrackerSurrogate));
@@ -28,6 +33,7 @@ namespace Basic
                      .SetSurrogate(typeof(TrackableDictionaryTrackerSurrogate<int, string>));
                 model.Add(typeof(TrackableListTracker<string>), false)
                      .SetSurrogate(typeof(TrackableListTrackerSurrogate<string>));
+#endif
                 return _protobufTypeModel = model;
             }
         }

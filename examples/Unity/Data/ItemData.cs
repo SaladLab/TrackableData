@@ -10,8 +10,8 @@ namespace Unity.Data
     [ProtoContract]
     public class ItemData
     {
-        [ProtoMember(1)] int Kind { get; set; }
-        [ProtoMember(2)] int Count { get; set; }
-        [ProtoMember(3)] string Note { get; set; }
+        [ProtoMember(1)] public int Kind { get; set; }
+        [ProtoMember(2)] public int Count { get; set; }
+        [ProtoMember(3)] public string Note { get; set; }
     }
 }
