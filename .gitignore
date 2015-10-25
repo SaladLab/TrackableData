@@ -212,3 +212,6 @@ ModelManifest.xml
 
 # Fake
 .fake/
+
+# No APK
+*.apk
