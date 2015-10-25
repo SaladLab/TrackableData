@@ -73,6 +73,7 @@
     <Compile Include="TrackableJsonExtentions.cs" />
     <Compile Include="TrackableListTrackerJsonConverter.cs" />
     <Compile Include="TrackablePocoTrackerJsonConverter.cs" />
+    <Compile Include="TrackerJsonConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TrackableData\TrackableData.csproj">
