@@ -443,7 +443,7 @@ namespace TrackableData.MsSql
             if (tracker.HasChange == false)
                 return 0;
 
-            var sql = BuildSqlForSave(null, tracker, keyValues);
+            var sql = BuildSqlForSave(tracker, keyValues);
             using (var command = new SqlCommand(sql, connection))
             {
                 return await command.ExecuteNonQueryAsync();

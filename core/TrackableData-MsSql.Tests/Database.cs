@@ -51,19 +51,6 @@ namespace TrackableData.MsSql.Tests
 
         public void Dispose()
         {
-            /*
-            var connectionString = ConfigurationManager.ConnectionStrings["TestDb"].ConnectionString;
-            using (var conn = new SqlConnection(connectionString))
-            using (var cmd = new SqlCommand())
-            {
-                conn.Open();
-                cmd.CommandText = @"
-                    IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'EventJournal') BEGIN DELETE FROM dbo.EventJournal END;
-                    IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'SnapshotStore') BEGIN DELETE FROM dbo.SnapshotStore END";
-                cmd.Connection = conn;
-                cmd.ExecuteNonQuery();
-            }
-            */
         }
     }
 }
