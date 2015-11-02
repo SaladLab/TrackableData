@@ -97,7 +97,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)core\CodeGenerator-Templates\TrackableData.Templates.targets" Condition="Exists('$(SolutionDir)core\CodeGenerator-Templates\TrackableData.Templates.targets')" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release-Unity3D|AnyCPU'">
-    <PostBuildEvent>"$(SolutionDir)tools\protobuf-net\precompile.exe" "$(TargetPath)" -o:DataProtobufSerializer.dll -t:DataProtobufSerializer "-f:.NETFramework\v3.5\Profile\Unity Subset v3.5"
+    <PostBuildEvent>"$(SolutionDir)tools\protobuf-net\precompile.exe" "$(TargetPath)" -o:DataProtobufSerializer.dll -t:DataProtobufSerializer "-f:.NETFramework\v3.5\Profile\Unity Subset v3.5" -autosurrogate
 COPY /Y "$(TargetDir)DataProtobufSerializer.dll" "$(SolutionDir)examples\Unity\Program\Assets\Scripts\Shared"
 COPY /Y "$(TargetPath)" "$(SolutionDir)examples\Unity\Program\Assets\Scripts\Shared"</PostBuildEvent>
   </PropertyGroup>
