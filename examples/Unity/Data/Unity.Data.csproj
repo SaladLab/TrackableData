@@ -71,7 +71,7 @@
   <ItemGroup>
     <Compile Include="ItemData.cs" />
     <Compile Include="Properties\TrackableData.CodeGen.cs" />
-    <Compile Include="ProtobufPrecompileDirectives.cs" />
+    <Compile Include="ProtobufSurrogateDirectives.cs" />
     <Compile Include="UserData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

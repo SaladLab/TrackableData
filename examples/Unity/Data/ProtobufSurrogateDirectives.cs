@@ -8,8 +8,8 @@ using TrackableData.Protobuf;
 
 namespace Unity.Data
 {
-    [ProtoContract(ImplicitFields = ImplicitFields.AllFields)]
-    public class ProtobufPrecompileDirectives
+    [ProtoContract]
+    public class ProtobufSurrogateDirectives
     {
         public TrackableDictionaryTrackerSurrogate<int, ItemData> T1;
         public TrackableDictionaryTrackerSurrogate<int, string> T2;
