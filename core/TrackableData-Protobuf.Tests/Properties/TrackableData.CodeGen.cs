@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Linq;
+using System.Text;
 using TrackableData;
 
 #region IPerson
@@ -579,7 +580,7 @@ namespace TrackableData.Protobuf.Tests
                 yield return new KeyValuePair<object, ITrackable>("List", trackableList);
         }
 
-        private TrackablePerson _Person;
+        private TrackablePerson _Person = new TrackablePerson();
 
         [ProtoMember(1)] public TrackablePerson Person
         {
@@ -603,7 +604,7 @@ namespace TrackableData.Protobuf.Tests
             set { _Person = (TrackablePerson)value; }
         }
 
-        private TrackableDictionary<int, string> _Dictionary;
+        private TrackableDictionary<int, string> _Dictionary = new TrackableDictionary<int, string>();
 
         [ProtoMember(2)] public TrackableDictionary<int, string> Dictionary
         {
@@ -627,7 +628,7 @@ namespace TrackableData.Protobuf.Tests
             set { _Dictionary = (TrackableDictionary<int, string>)value; }
         }
 
-        private TrackableList<string> _List;
+        private TrackableList<string> _List = new TrackableList<string>();
 
         [ProtoMember(3)] public TrackableList<string> List
         {
@@ -659,23 +660,62 @@ namespace TrackableData.Protobuf.Tests
         [ProtoMember(2)] public TrackableDictionaryTracker<int, string> DictionaryTracker { get; set; } = new TrackableDictionaryTracker<int, string>();
         [ProtoMember(3)] public TrackableListTracker<string> ListTracker { get; set; } = new TrackableListTracker<string>();
 
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append("{ ");
+            var first = true;
+            if (PersonTracker != null && PersonTracker.HasChange)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(", ");
+                sb.Append("Person:");
+                sb.Append(PersonTracker);
+            }
+            if (DictionaryTracker != null && DictionaryTracker.HasChange)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(", ");
+                sb.Append("Dictionary:");
+                sb.Append(DictionaryTracker);
+            }
+            if (ListTracker != null && ListTracker.HasChange)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(", ");
+                sb.Append("List:");
+                sb.Append(ListTracker);
+            }
+            sb.Append(" }");
+            return sb.ToString();
+        }
+
         public bool HasChange
         {
             get
             {
                 return
-                    PersonTracker.HasChange ||
-                    DictionaryTracker.HasChange ||
-                    ListTracker.HasChange ||
+                    (PersonTracker != null && PersonTracker.HasChange) ||
+                    (DictionaryTracker != null && DictionaryTracker.HasChange) ||
+                    (ListTracker != null && ListTracker.HasChange) ||
                     false;
             }
         }
 
         public void Clear()
         {
-            PersonTracker.Clear();
-            DictionaryTracker.Clear();
-            ListTracker.Clear();
+            if (PersonTracker != null)
+                PersonTracker.Clear();
+            if (DictionaryTracker != null)
+                DictionaryTracker.Clear();
+            if (ListTracker != null)
+                ListTracker.Clear();
         }
 
         public void ApplyTo(object trackable)
@@ -685,9 +725,12 @@ namespace TrackableData.Protobuf.Tests
 
         public void ApplyTo(IDataContainer trackable)
         {
-            PersonTracker.ApplyTo(trackable.Person);
-            DictionaryTracker.ApplyTo(trackable.Dictionary);
-            ListTracker.ApplyTo(trackable.List);
+            if (PersonTracker != null)
+                PersonTracker.ApplyTo(trackable.Person);
+            if (DictionaryTracker != null)
+                DictionaryTracker.ApplyTo(trackable.Dictionary);
+            if (ListTracker != null)
+                ListTracker.ApplyTo(trackable.List);
         }
 
         public void ApplyTo(ITracker tracker)
@@ -702,9 +745,12 @@ namespace TrackableData.Protobuf.Tests
 
         public void ApplyTo(TrackableDataContainerTracker tracker)
         {
-            PersonTracker.ApplyTo(tracker.PersonTracker);
-            DictionaryTracker.ApplyTo(tracker.DictionaryTracker);
-            ListTracker.ApplyTo(tracker.ListTracker);
+            if (PersonTracker != null)
+                PersonTracker.ApplyTo(tracker.PersonTracker);
+            if (DictionaryTracker != null)
+                DictionaryTracker.ApplyTo(tracker.DictionaryTracker);
+            if (ListTracker != null)
+                ListTracker.ApplyTo(tracker.ListTracker);
         }
 
         public void RollbackTo(object trackable)
@@ -714,9 +760,12 @@ namespace TrackableData.Protobuf.Tests
 
         public void RollbackTo(IDataContainer trackable)
         {
-            PersonTracker.RollbackTo(trackable.Person);
-            DictionaryTracker.RollbackTo(trackable.Dictionary);
-            ListTracker.RollbackTo(trackable.List);
+            if (PersonTracker != null)
+                PersonTracker.RollbackTo(trackable.Person);
+            if (DictionaryTracker != null)
+                DictionaryTracker.RollbackTo(trackable.Dictionary);
+            if (ListTracker != null)
+                ListTracker.RollbackTo(trackable.List);
         }
 
         public void RollbackTo(ITracker tracker)
@@ -731,9 +780,12 @@ namespace TrackableData.Protobuf.Tests
 
         public void RollbackTo(TrackableDataContainerTracker tracker)
         {
-            PersonTracker.RollbackTo(tracker.PersonTracker);
-            DictionaryTracker.RollbackTo(tracker.DictionaryTracker);
-            ListTracker.RollbackTo(tracker.ListTracker);
+            if (PersonTracker != null)
+                PersonTracker.RollbackTo(tracker.PersonTracker);
+            if (DictionaryTracker != null)
+                DictionaryTracker.RollbackTo(tracker.DictionaryTracker);
+            if (ListTracker != null)
+                ListTracker.RollbackTo(tracker.ListTracker);
         }
     }
 }

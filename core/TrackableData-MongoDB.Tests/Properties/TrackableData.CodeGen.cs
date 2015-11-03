@@ -18,6 +18,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Text;
 using TrackableData;
 
 #region ITestPocoForContainer
@@ -478,7 +479,7 @@ namespace TrackableData.MongoDB.Tests
                 yield return new KeyValuePair<object, ITrackable>("Tags", trackableTags);
         }
 
-        private TrackableTestPocoForContainer _Person;
+        private TrackableTestPocoForContainer _Person = new TrackableTestPocoForContainer();
 
         public TrackableTestPocoForContainer Person
         {
@@ -502,7 +503,7 @@ namespace TrackableData.MongoDB.Tests
             set { _Person = (TrackableTestPocoForContainer)value; }
         }
 
-        private TrackableDictionary<int, MissionData> _Missions;
+        private TrackableDictionary<int, MissionData> _Missions = new TrackableDictionary<int, MissionData>();
 
         public TrackableDictionary<int, MissionData> Missions
         {
@@ -526,7 +527,7 @@ namespace TrackableData.MongoDB.Tests
             set { _Missions = (TrackableDictionary<int, MissionData>)value; }
         }
 
-        private TrackableList<TagData> _Tags;
+        private TrackableList<TagData> _Tags = new TrackableList<TagData>();
 
         public TrackableList<TagData> Tags
         {
@@ -557,23 +558,62 @@ namespace TrackableData.MongoDB.Tests
         public TrackableDictionaryTracker<int, MissionData> MissionsTracker { get; set; } = new TrackableDictionaryTracker<int, MissionData>();
         public TrackableListTracker<TagData> TagsTracker { get; set; } = new TrackableListTracker<TagData>();
 
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append("{ ");
+            var first = true;
+            if (PersonTracker != null && PersonTracker.HasChange)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(", ");
+                sb.Append("Person:");
+                sb.Append(PersonTracker);
+            }
+            if (MissionsTracker != null && MissionsTracker.HasChange)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(", ");
+                sb.Append("Missions:");
+                sb.Append(MissionsTracker);
+            }
+            if (TagsTracker != null && TagsTracker.HasChange)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(", ");
+                sb.Append("Tags:");
+                sb.Append(TagsTracker);
+            }
+            sb.Append(" }");
+            return sb.ToString();
+        }
+
         public bool HasChange
         {
             get
             {
                 return
-                    PersonTracker.HasChange ||
-                    MissionsTracker.HasChange ||
-                    TagsTracker.HasChange ||
+                    (PersonTracker != null && PersonTracker.HasChange) ||
+                    (MissionsTracker != null && MissionsTracker.HasChange) ||
+                    (TagsTracker != null && TagsTracker.HasChange) ||
                     false;
             }
         }
 
         public void Clear()
         {
-            PersonTracker.Clear();
-            MissionsTracker.Clear();
-            TagsTracker.Clear();
+            if (PersonTracker != null)
+                PersonTracker.Clear();
+            if (MissionsTracker != null)
+                MissionsTracker.Clear();
+            if (TagsTracker != null)
+                TagsTracker.Clear();
         }
 
         public void ApplyTo(object trackable)
@@ -583,9 +623,12 @@ namespace TrackableData.MongoDB.Tests
 
         public void ApplyTo(ITestContainer trackable)
         {
-            PersonTracker.ApplyTo(trackable.Person);
-            MissionsTracker.ApplyTo(trackable.Missions);
-            TagsTracker.ApplyTo(trackable.Tags);
+            if (PersonTracker != null)
+                PersonTracker.ApplyTo(trackable.Person);
+            if (MissionsTracker != null)
+                MissionsTracker.ApplyTo(trackable.Missions);
+            if (TagsTracker != null)
+                TagsTracker.ApplyTo(trackable.Tags);
         }
 
         public void ApplyTo(ITracker tracker)
@@ -600,9 +643,12 @@ namespace TrackableData.MongoDB.Tests
 
         public void ApplyTo(TrackableTestContainerTracker tracker)
         {
-            PersonTracker.ApplyTo(tracker.PersonTracker);
-            MissionsTracker.ApplyTo(tracker.MissionsTracker);
-            TagsTracker.ApplyTo(tracker.TagsTracker);
+            if (PersonTracker != null)
+                PersonTracker.ApplyTo(tracker.PersonTracker);
+            if (MissionsTracker != null)
+                MissionsTracker.ApplyTo(tracker.MissionsTracker);
+            if (TagsTracker != null)
+                TagsTracker.ApplyTo(tracker.TagsTracker);
         }
 
         public void RollbackTo(object trackable)
@@ -612,9 +658,12 @@ namespace TrackableData.MongoDB.Tests
 
         public void RollbackTo(ITestContainer trackable)
         {
-            PersonTracker.RollbackTo(trackable.Person);
-            MissionsTracker.RollbackTo(trackable.Missions);
-            TagsTracker.RollbackTo(trackable.Tags);
+            if (PersonTracker != null)
+                PersonTracker.RollbackTo(trackable.Person);
+            if (MissionsTracker != null)
+                MissionsTracker.RollbackTo(trackable.Missions);
+            if (TagsTracker != null)
+                TagsTracker.RollbackTo(trackable.Tags);
         }
 
         public void RollbackTo(ITracker tracker)
@@ -629,9 +678,12 @@ namespace TrackableData.MongoDB.Tests
 
         public void RollbackTo(TrackableTestContainerTracker tracker)
         {
-            PersonTracker.RollbackTo(tracker.PersonTracker);
-            MissionsTracker.RollbackTo(tracker.MissionsTracker);
-            TagsTracker.RollbackTo(tracker.TagsTracker);
+            if (PersonTracker != null)
+                PersonTracker.RollbackTo(tracker.PersonTracker);
+            if (MissionsTracker != null)
+                MissionsTracker.RollbackTo(tracker.MissionsTracker);
+            if (TagsTracker != null)
+                TagsTracker.RollbackTo(tracker.TagsTracker);
         }
     }
 }

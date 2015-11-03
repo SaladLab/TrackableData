@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Linq;
+using System.Text;
 using TrackableData;
 
 #region ITestPocoForContainer
@@ -437,7 +438,7 @@ namespace TrackableData.MsSql.Tests
                 yield return new KeyValuePair<object, ITrackable>("Missions", trackableMissions);
         }
 
-        private TrackableTestPocoForContainer _Person;
+        private TrackableTestPocoForContainer _Person = new TrackableTestPocoForContainer();
 
         public TrackableTestPocoForContainer Person
         {
@@ -461,7 +462,7 @@ namespace TrackableData.MsSql.Tests
             set { _Person = (TrackableTestPocoForContainer)value; }
         }
 
-        private TrackableDictionary<int, MissionData> _Missions;
+        private TrackableDictionary<int, MissionData> _Missions = new TrackableDictionary<int, MissionData>();
 
         public TrackableDictionary<int, MissionData> Missions
         {
@@ -491,21 +492,50 @@ namespace TrackableData.MsSql.Tests
         public TrackablePocoTracker<ITestPocoForContainer> PersonTracker { get; set; } = new TrackablePocoTracker<ITestPocoForContainer>();
         public TrackableDictionaryTracker<int, MissionData> MissionsTracker { get; set; } = new TrackableDictionaryTracker<int, MissionData>();
 
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append("{ ");
+            var first = true;
+            if (PersonTracker != null && PersonTracker.HasChange)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(", ");
+                sb.Append("Person:");
+                sb.Append(PersonTracker);
+            }
+            if (MissionsTracker != null && MissionsTracker.HasChange)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(", ");
+                sb.Append("Missions:");
+                sb.Append(MissionsTracker);
+            }
+            sb.Append(" }");
+            return sb.ToString();
+        }
+
         public bool HasChange
         {
             get
             {
                 return
-                    PersonTracker.HasChange ||
-                    MissionsTracker.HasChange ||
+                    (PersonTracker != null && PersonTracker.HasChange) ||
+                    (MissionsTracker != null && MissionsTracker.HasChange) ||
                     false;
             }
         }
 
         public void Clear()
         {
-            PersonTracker.Clear();
-            MissionsTracker.Clear();
+            if (PersonTracker != null)
+                PersonTracker.Clear();
+            if (MissionsTracker != null)
+                MissionsTracker.Clear();
         }
 
         public void ApplyTo(object trackable)
@@ -515,8 +545,10 @@ namespace TrackableData.MsSql.Tests
 
         public void ApplyTo(ITestContainer trackable)
         {
-            PersonTracker.ApplyTo(trackable.Person);
-            MissionsTracker.ApplyTo(trackable.Missions);
+            if (PersonTracker != null)
+                PersonTracker.ApplyTo(trackable.Person);
+            if (MissionsTracker != null)
+                MissionsTracker.ApplyTo(trackable.Missions);
         }
 
         public void ApplyTo(ITracker tracker)
@@ -531,8 +563,10 @@ namespace TrackableData.MsSql.Tests
 
         public void ApplyTo(TrackableTestContainerTracker tracker)
         {
-            PersonTracker.ApplyTo(tracker.PersonTracker);
-            MissionsTracker.ApplyTo(tracker.MissionsTracker);
+            if (PersonTracker != null)
+                PersonTracker.ApplyTo(tracker.PersonTracker);
+            if (MissionsTracker != null)
+                MissionsTracker.ApplyTo(tracker.MissionsTracker);
         }
 
         public void RollbackTo(object trackable)
@@ -542,8 +576,10 @@ namespace TrackableData.MsSql.Tests
 
         public void RollbackTo(ITestContainer trackable)
         {
-            PersonTracker.RollbackTo(trackable.Person);
-            MissionsTracker.RollbackTo(trackable.Missions);
+            if (PersonTracker != null)
+                PersonTracker.RollbackTo(trackable.Person);
+            if (MissionsTracker != null)
+                MissionsTracker.RollbackTo(trackable.Missions);
         }
 
         public void RollbackTo(ITracker tracker)
@@ -558,8 +594,10 @@ namespace TrackableData.MsSql.Tests
 
         public void RollbackTo(TrackableTestContainerTracker tracker)
         {
-            PersonTracker.RollbackTo(tracker.PersonTracker);
-            MissionsTracker.RollbackTo(tracker.MissionsTracker);
+            if (PersonTracker != null)
+                PersonTracker.RollbackTo(tracker.PersonTracker);
+            if (MissionsTracker != null)
+                MissionsTracker.RollbackTo(tracker.MissionsTracker);
         }
     }
 }
