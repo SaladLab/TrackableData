@@ -133,6 +133,7 @@ namespace CodeGen
                 usingDirectives.Add("System.Reflection");
                 usingDirectives.Add("System.Runtime.Serialization");
                 usingDirectives.Add("System.Linq");
+                usingDirectives.Add("System.Text");
                 usingDirectives.Add("TrackableData");
                 foreach (var usingDirective in usingDirectives)
                     writer.AddUsing(usingDirective);

@@ -168,7 +168,7 @@ namespace CodeGen
                 var propertyName = p.Identifier.ToString();
 
                 sb.AppendLine("");
-                sb.AppendLine($"\tprivate {propertyType} _{propertyName};");
+                sb.AppendLine($"\tprivate {propertyType} _{propertyName} = new {propertyType}();");
                 sb.AppendLine("");
 
                 var protoMemberAttr = p.AttributeLists.GetAttribute("ProtoMemberAttribute");
@@ -235,6 +235,31 @@ namespace CodeGen
                 sb.AppendLine($"public {trackerName} {propertyName}Tracker {{ get; set; }} = new {trackerName}();");
             }
 
+            // ToString()
+
+            sb.AppendLine("");
+            sb.AppendLine("\tpublic override string ToString()");
+            sb.AppendLine("\t{");
+            sb.AppendLine("\t\tvar sb = new StringBuilder();");
+            sb.AppendLine("\t\tsb.Append(\"{ \");");
+            sb.AppendLine("\t\tvar first = true;");
+            foreach (var p in properties)
+            {
+                var propertyName = p.Identifier.ToString();
+                sb.AppendLine($"\t\tif ({propertyName}Tracker != null && {propertyName}Tracker.HasChange)");
+                sb.AppendLine("\t\t{");
+                sb.AppendLine("\t\t\tif (first)");
+                sb.AppendLine("\t\t\t\tfirst = false;");
+                sb.AppendLine("\t\t\telse");
+                sb.AppendLine("\t\t\t\tsb.Append(\", \");");
+                sb.AppendLine($"\t\t\tsb.Append(\"{propertyName}:\");");
+                sb.AppendLine($"\t\t\tsb.Append({propertyName}Tracker);");
+                sb.AppendLine("\t\t}");
+            }
+            sb.AppendLine("\t\tsb.Append(\" }\");");
+            sb.AppendLine("\t\treturn sb.ToString();");
+            sb.AppendLine("\t}");
+
             // ITracker.HasChange
 
             sb.AppendLine("");
@@ -246,7 +271,7 @@ namespace CodeGen
             foreach (var p in properties)
             {
                 var propertyName = p.Identifier.ToString();
-                sb.AppendLine($"\t\t\t\t{propertyName}Tracker.HasChange ||");
+                sb.AppendLine($"\t\t\t\t({propertyName}Tracker != null && {propertyName}Tracker.HasChange) ||");
             }
             sb.AppendLine("\t\t\t\tfalse;");
             sb.AppendLine("\t\t}");
@@ -260,7 +285,8 @@ namespace CodeGen
             foreach (var p in properties)
             {
                 var propertyName = p.Identifier.ToString();
-                sb.AppendLine($"\t\t{propertyName}Tracker.Clear();");
+                sb.AppendLine($"\t\tif ({propertyName}Tracker != null)");
+                sb.AppendLine($"\t\t\t{propertyName}Tracker.Clear();");
             }
             sb.AppendLine("\t}");
 
@@ -278,7 +304,8 @@ namespace CodeGen
             foreach (var p in properties)
             {
                 var propertyName = p.Identifier.ToString();
-                sb.AppendLine($"\t\t{propertyName}Tracker.ApplyTo(trackable.{propertyName});");
+                sb.AppendLine($"\t\tif ({propertyName}Tracker != null)");
+                sb.AppendLine($"\t\t\t{propertyName}Tracker.ApplyTo(trackable.{propertyName});");
             }
             sb.AppendLine("\t}");
 
@@ -302,11 +329,12 @@ namespace CodeGen
             foreach (var p in properties)
             {
                 var propertyName = p.Identifier.ToString();
-                sb.AppendLine($"\t\t{propertyName}Tracker.ApplyTo(tracker.{propertyName}Tracker);");
+                sb.AppendLine($"\t\tif ({propertyName}Tracker != null)");
+                sb.AppendLine($"\t\t\t{propertyName}Tracker.ApplyTo(tracker.{propertyName}Tracker);");
             }
             sb.AppendLine("\t}");
 
-            // RollbackTo.RollbackTo(Trackable)
+            // ITracker.RollbackTo(Trackable)
 
             sb.AppendLine("");
             sb.AppendLine("\tpublic void RollbackTo(object trackable)");
@@ -320,11 +348,12 @@ namespace CodeGen
             foreach (var p in properties)
             {
                 var propertyName = p.Identifier.ToString();
-                sb.AppendLine($"\t\t{propertyName}Tracker.RollbackTo(trackable.{propertyName});");
+                sb.AppendLine($"\t\tif ({propertyName}Tracker != null)");
+                sb.AppendLine($"\t\t\t{propertyName}Tracker.RollbackTo(trackable.{propertyName});");
             }
             sb.AppendLine("\t}");
 
-            // RollbackTo.RollbackTo(Tracker)
+            // ITracker.RollbackTo(Tracker)
 
             sb.AppendLine("");
             sb.AppendLine("\tpublic void RollbackTo(ITracker tracker)");
@@ -344,7 +373,8 @@ namespace CodeGen
             foreach (var p in properties)
             {
                 var propertyName = p.Identifier.ToString();
-                sb.AppendLine($"\t\t{propertyName}Tracker.RollbackTo(tracker.{propertyName}Tracker);");
+                sb.AppendLine($"\t\tif ({propertyName}Tracker != null)");
+                sb.AppendLine($"\t\t\t{propertyName}Tracker.RollbackTo(tracker.{propertyName}Tracker);");
             }
             sb.AppendLine("\t}");
 
