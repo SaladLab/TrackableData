@@ -6,11 +6,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6FC26014-DDB1-47B8-9F21-874F18926ABC}</ProjectGuid>
+    <ProjectGuid>{CE8A572A-1465-4EEE-B828-176F9F44F43A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TrackableData.Protobuf.Tests</RootNamespace>
-    <AssemblyName>TrackableData-Protobuf.Tests</AssemblyName>
+    <RootNamespace>TrackableData.MsSql.Tests</RootNamespace>
+    <AssemblyName>TrackableData-MsSql.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -20,7 +20,6 @@
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
     <NuGetPackageImportStamp>b0edf53b</NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -40,11 +39,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
@@ -68,24 +65,29 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="DataContainer.cs" />
-    <Compile Include="Person.cs" />
+    <Compile Include="Database.cs" />
     <Compile Include="Properties\TrackableData.CodeGen.cs" />
     <Compile Include="TrackableContainerTest.cs" />
     <Compile Include="TrackableDictionaryTest.cs" />
-    <Compile Include="TrackableListTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TrackablePocoTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TrackableData-Protobuf\TrackableData-Protobuf.csproj">
-      <Project>{182f783a-ed38-4245-89d1-20086c98a372}</Project>
-      <Name>TrackableData-Protobuf</Name>
+    <ProjectReference Include="..\TrackableData-MsSql\TrackableData-MsSql.csproj">
+      <Project>{505edf72-41f9-499d-b213-9fc9b8932489}</Project>
+      <Name>TrackableData-MsSql</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TrackableData\TrackableData.csproj">
+    <ProjectReference Include="..\..\core\TrackableData-TestKits\TrackableData-TestKits.csproj">
+      <Project>{5d955da9-66ae-458e-8fd4-d6c0c5630d10}</Project>
+      <Name>TrackableData-TestKits</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\core\TrackableData\TrackableData.csproj">
       <Project>{c2c3a8ca-62f9-4c5a-8b2b-5091e5a41c54}</Project>
       <Name>TrackableData</Name>
     </ProjectReference>

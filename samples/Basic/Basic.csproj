@@ -84,11 +84,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\core\TrackableData-Json\TrackableData-Json.csproj">
+    <ProjectReference Include="..\..\plugins\TrackableData-Json\TrackableData-Json.csproj">
       <Project>{f4185a6a-b952-4ea5-9b23-5c7af6ae7712}</Project>
       <Name>TrackableData-Json</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\core\TrackableData-Protobuf\TrackableData-Protobuf.csproj">
+    <ProjectReference Include="..\..\plugins\TrackableData-Protobuf\TrackableData-Protobuf.csproj">
       <Project>{182f783a-ed38-4245-89d1-20086c98a372}</Project>
       <Name>TrackableData-Protobuf</Name>
     </ProjectReference>

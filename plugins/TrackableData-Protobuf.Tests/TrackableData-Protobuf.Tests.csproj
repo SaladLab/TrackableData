@@ -6,11 +6,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{34645A27-2FCF-42E0-B93D-0E5A6685FE3D}</ProjectGuid>
+    <ProjectGuid>{6FC26014-DDB1-47B8-9F21-874F18926ABC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TrackableData.Json.Tests</RootNamespace>
-    <AssemblyName>TrackableData-Json.Tests</AssemblyName>
+    <RootNamespace>TrackableData.Protobuf.Tests</RootNamespace>
+    <AssemblyName>TrackableData-Protobuf.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -40,8 +40,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -68,26 +68,24 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="ContainerTest.cs" />
     <Compile Include="DataContainer.cs" />
-    <Compile Include="DictionaryTrackerTest.cs" />
-    <Compile Include="ListTrackerTest.cs" />
-    <Compile Include="NestedTrackerTest.cs" />
     <Compile Include="Person.cs" />
-    <Compile Include="PocoTrackerTest.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\TrackableData.CodeGen.cs" />
-    <Compile Include="TrackerJsonConverterTest.cs" />
+    <Compile Include="TrackableContainerTest.cs" />
+    <Compile Include="TrackableDictionaryTest.cs" />
+    <Compile Include="TrackableListTest.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TrackablePocoTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TrackableData-Json\TrackableData-Json.csproj">
-      <Project>{f4185a6a-b952-4ea5-9b23-5c7af6ae7712}</Project>
-      <Name>TrackableData-Json</Name>
+    <ProjectReference Include="..\TrackableData-Protobuf\TrackableData-Protobuf.csproj">
+      <Project>{182f783a-ed38-4245-89d1-20086c98a372}</Project>
+      <Name>TrackableData-Protobuf</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TrackableData\TrackableData.csproj">
+    <ProjectReference Include="..\..\core\TrackableData\TrackableData.csproj">
       <Project>{c2c3a8ca-62f9-4c5a-8b2b-5091e5a41c54}</Project>
       <Name>TrackableData</Name>
     </ProjectReference>
