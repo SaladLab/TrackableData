@@ -83,7 +83,7 @@
       <Project>{505edf72-41f9-499d-b213-9fc9b8932489}</Project>
       <Name>TrackableData-MsSql</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\core\TrackableData-TestKits\TrackableData-TestKits.csproj">
+    <ProjectReference Include="..\TrackableData-TestKits\TrackableData-TestKits.csproj">
       <Project>{5d955da9-66ae-458e-8fd4-d6c0c5630d10}</Project>
       <Name>TrackableData-TestKits</Name>
     </ProjectReference>

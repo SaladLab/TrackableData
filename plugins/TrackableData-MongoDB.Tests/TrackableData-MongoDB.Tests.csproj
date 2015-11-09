@@ -93,7 +93,7 @@
       <Project>{db0ae3ea-11a6-466c-ad6f-652d64e5d6e1}</Project>
       <Name>TrackableData-MongoDB</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\core\TrackableData-TestKits\TrackableData-TestKits.csproj">
+    <ProjectReference Include="..\TrackableData-TestKits\TrackableData-TestKits.csproj">
       <Project>{5d955da9-66ae-458e-8fd4-d6c0c5630d10}</Project>
       <Name>TrackableData-TestKits</Name>
     </ProjectReference>
