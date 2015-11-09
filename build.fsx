@@ -49,27 +49,27 @@ let projects = ([
     };    
     // Plugin Libraries
     {   emptyProject with
-        Name="TrackableData-Json";
-        Folder="./plugins/TrackableData-Json";
+        Name="TrackableData.Json";
+        Folder="./plugins/TrackableData.Json";
         Dependencies=[("TrackableData", "");
                       ("Newtonsoft.Json", "7.0.1")];
     };
     {   emptyProject with
-        Name="TrackableData-MongoDB";
-        Folder="./plugins/TrackableData-MongoDB";
+        Name="TrackableData.MongoDB";
+        Folder="./plugins/TrackableData.MongoDB";
         Dependencies=[("TrackableData", "");
                       ("MongoDB.Bson", "2.1.0");
                       ("MongoDB.Driver", "2.1.0");
                       ("MongoDB.Driver.Core", "2.1.0");];
     };
     {   emptyProject with
-        Name="TrackableData-MsSql";
-        Folder="./plugins/TrackableData-MsSql";
+        Name="TrackableData.MsSql";
+        Folder="./plugins/TrackableData.MsSql";
         Dependencies=[("TrackableData", "");];
     };
     {   emptyProject with
-        Name="TrackableData-Protobuf";
-        Folder="./plugins/TrackableData-Protobuf";
+        Name="TrackableData.Protobuf";
+        Folder="./plugins/TrackableData.Protobuf";
         Dependencies=[("TrackableData", "");
                       ("protobuf-net", "2.0.0.668")];
     };]

@@ -34,7 +34,7 @@
 ### 타입 지원
 
   주요 타입 IO 가 잘되나 보자.
-  - TrackableData-MsSql 이 Nullable 을 잘 지원하는지 보자.
+  - TrackableData.MsSql 이 Nullable 을 잘 지원하는지 보자.
 
 ## TODO LATER
 

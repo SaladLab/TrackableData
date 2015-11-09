@@ -1,18 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <Import Project="$(SolutionDir)core\CodeGenerator-Templates\TrackableData.Templates.props" Condition="Exists('$(SolutionDir)core\CodeGenerator-Templates\TrackableData.Templates.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4CBC48CE-1DBC-4ED4-B62D-8DED45D459B5}</ProjectGuid>
+    <ProjectGuid>{182F783A-ED38-4245-89D1-20086C98A372}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Unity.Data</RootNamespace>
-    <AssemblyName>Unity.Data</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <RootNamespace>TrackableData.Protobuf</RootNamespace>
+    <AssemblyName>TrackableData.Protobuf</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,47 +31,33 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\protobuf-net.2.0.0.668\lib\net35\protobuf-net.dll</HintPath>
+      <HintPath>..\..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ItemData.cs" />
-    <Compile Include="Properties\TrackableData.CodeGen.cs" />
-    <Compile Include="ProtobufSurrogateDirectives.cs" />
-    <Compile Include="UserData.cs" />
+    <Compile Include="Properties\AssemblyInfoGenerated.cs" />
+    <Compile Include="TrackableDictionaryTrackerSurrogate.cs" />
+    <Compile Include="TrackableListTrackerSurrogate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="EnvelopedObject.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
+    <ProjectReference Include="..\..\core\TrackableData\TrackableData.csproj">
+      <Project>{c2c3a8ca-62f9-4c5a-8b2b-5091e5a41c54}</Project>
+      <Name>TrackableData</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\core\TrackableData.Net35\TrackableData.Net35.csproj">
-      <Project>{78305397-0ba1-4b8a-ad39-bab72ffe37ab}</Project>
-      <Name>TrackableData.Net35</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\plugins\TrackableData.Protobuf.Net35\TrackableData.Protobuf.Net35.csproj">
-      <Project>{2fbb3fca-1348-410c-96d7-9aa24b79d09c}</Project>
-      <Name>TrackableData.Protobuf.Net35</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)core\CodeGenerator-Templates\TrackableData.Templates.targets" Condition="Exists('$(SolutionDir)core\CodeGenerator-Templates\TrackableData.Templates.targets')" />
-  <PropertyGroup>
-    <PostBuildEvent>"$(ProtobufNetPrecompileExe)" "$(TargetPath)" -o:Unity.Data.ProtobufSerializer.dll -t:DataProtobufSerializer "-f:.NETFramework\v3.5\Profile\Unity Subset v3.5" -autosurrogate
-COPY /Y "$(TargetDir)Unity.Data.ProtobufSerializer.dll" "$(ProjectDir)..\Program\Assets\Scripts"
-COPY /Y "$(TargetPath)" "$(ProjectDir)..\Program\Assets\Scripts"
-</PostBuildEvent>
-  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

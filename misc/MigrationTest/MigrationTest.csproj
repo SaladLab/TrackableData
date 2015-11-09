@@ -75,16 +75,16 @@
       <HintPath>packages\TrackableData.0.1.0.0-dev20151021\lib\net45\TrackableData.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TrackableData-MongoDB, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\TrackableData-MongoDB.0.1.0.0-dev20151021\lib\net45\TrackableData-MongoDB.dll</HintPath>
+    <Reference Include="TrackableData.MongoDB, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\TrackableData.MongoDB.0.1.0.0-dev20151021\lib\net45\TrackableData.MongoDB.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TrackableData-MsSql, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\TrackableData-MsSql.0.1.0.0-dev20151021\lib\net45\TrackableData-MsSql.dll</HintPath>
+    <Reference Include="TrackableData.MsSql, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\TrackableData.MsSql.0.1.0.0-dev20151021\lib\net45\TrackableData.MsSql.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="TrackableData-Protobuf, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\TrackableData-Protobuf.0.1.0.0-dev20151021\lib\net45\TrackableData-Protobuf.dll</HintPath>
+    <Reference Include="TrackableData.Protobuf, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\TrackableData.Protobuf.0.1.0.0-dev20151021\lib\net45\TrackableData.Protobuf.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
