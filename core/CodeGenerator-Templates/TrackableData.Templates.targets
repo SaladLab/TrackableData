@@ -11,7 +11,7 @@
     <!-- Internal build within TrackableData solution -->
     <When Condition="Exists('$(MSBuildThisFileDirectory)..\CodeGenerator')">
       <PropertyGroup>
-        <TrackableDataCodeGenToolExeDir>$(MSBuildThisFileDirectory)..\..\output\CodeGenerator\bin\Debug</TrackableDataCodeGenToolExeDir>
+        <TrackableDataCodeGenToolExeDir>$(MSBuildThisFileDirectory)..\CodeGenerator\bin\$(ConfigurationName)</TrackableDataCodeGenToolExeDir>
       </PropertyGroup>
     </When>
   </Choose>

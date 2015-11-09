@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C2C3A8CA-62F9-4C5A-8B2B-5091E5A41C54}</ProjectGuid>
+    <ProjectGuid>{78305397-0BA1-4B8A-AD39-BAB72FFE37AB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TrackableData</RootNamespace>
     <AssemblyName>TrackableData</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;NET35</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -25,7 +25,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NET35</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -33,25 +33,52 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ITrackable.cs" />
-    <Compile Include="ITracker.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\AssemblyInfoGenerated.cs" />
-    <Compile Include="TrackableDictionary.cs" />
-    <Compile Include="TrackableDictionaryTracker.cs" />
-    <Compile Include="TrackableExtentions.cs" />
-    <Compile Include="TrackablePropertyAttribute.cs" />
-    <Compile Include="TrackableList.cs" />
-    <Compile Include="TrackableListTracker.cs" />
-    <Compile Include="TrackablePocoTracker.cs" />
-    <Compile Include="TrackableResolver.cs" />
-    <Compile Include="TrackerResolver.cs" />
+    <Compile Include="..\TrackableData\ITrackable.cs">
+      <Link>ITrackable.cs</Link>
+    </Compile>
+    <Compile Include="..\TrackableData\ITracker.cs">
+      <Link>ITracker.cs</Link>
+    </Compile>
+    <Compile Include="..\TrackableData\Properties\AssemblyInfoGenerated.cs">
+      <Link>Properties\AssemblyInfoGenerated.cs</Link>
+    </Compile>
+    <Compile Include="..\TrackableData\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\TrackableData\TrackableDictionary.cs">
+      <Link>TrackableDictionary.cs</Link>
+    </Compile>
+    <Compile Include="..\TrackableData\TrackableDictionaryTracker.cs">
+      <Link>TrackableDictionaryTracker.cs</Link>
+    </Compile>
+    <Compile Include="..\TrackableData\TrackableExtentions.cs">
+      <Link>TrackableExtentions.cs</Link>
+    </Compile>
+    <Compile Include="..\TrackableData\TrackableList.cs">
+      <Link>TrackableList.cs</Link>
+    </Compile>
+    <Compile Include="..\TrackableData\TrackableListTracker.cs">
+      <Link>TrackableListTracker.cs</Link>
+    </Compile>
+    <Compile Include="..\TrackableData\TrackablePocoTracker.cs">
+      <Link>TrackablePocoTracker.cs</Link>
+    </Compile>
+    <Compile Include="..\TrackableData\TrackablePropertyAttribute.cs">
+      <Link>TrackablePropertyAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\TrackableData\TrackableResolver.cs">
+      <Link>TrackableResolver.cs</Link>
+    </Compile>
+    <Compile Include="..\TrackableData\TrackerResolver.cs">
+      <Link>TrackerResolver.cs</Link>
+    </Compile>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

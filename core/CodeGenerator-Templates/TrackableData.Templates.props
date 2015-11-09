@@ -1,3 +1,18 @@
 <?xml version="1.0" encoding="us-ascii"?>
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Work out the path to protobuf-net precompile -->
+  <Choose>
+    <!-- Using NuGet packages -->
+    <When Condition="Exists('$(MSBuildThisFileDirectory)..\tools')">
+      <PropertyGroup>
+        <ProtobufNetPrecompileExe>$(MSBuildThisFileDirectory)..\tools\protobuf-net\precompile.exe</ProtobufNetPrecompileExe>
+      </PropertyGroup>
+    </When>
+    <!-- Internal build within Akka.Interfaced solution -->
+    <When Condition="Exists('$(MSBuildThisFileDirectory)..\CodeGenerator-Templates')">
+      <PropertyGroup>
+        <ProtobufNetPrecompileExe>$(MSBuildThisFileDirectory)..\CodeGenerator-Templates\protobuf-net\precompile.exe</ProtobufNetPrecompileExe>
+      </PropertyGroup>
+    </When>
+  </Choose>
 </Project>
