@@ -58,9 +58,9 @@ let projects = ([
         Name="TrackableData.MongoDB";
         Folder="./plugins/TrackableData.MongoDB";
         Dependencies=[("TrackableData", "");
-                      ("MongoDB.Bson", "2.1.0");
-                      ("MongoDB.Driver", "2.1.0");
-                      ("MongoDB.Driver.Core", "2.1.0");];
+                      ("MongoDB.Bson", "2.1.1");
+                      ("MongoDB.Driver", "2.1.1");
+                      ("MongoDB.Driver.Core", "2.1.1");];
     };
     {   emptyProject with
         Name="TrackableData.MsSql";
