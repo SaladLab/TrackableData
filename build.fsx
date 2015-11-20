@@ -143,7 +143,7 @@ Target "Test" (fun _ ->
 )
 
 Target "UnityPackage" (fun _ ->
-    Shell.Exec(".\core\UnityPackage\UpdateTrackableDataDll.bat")
+    Shell.Exec(".\core\UnityPackage\UpdateDll.bat")
     Unity (Path.GetFullPath "core/UnityPackage") "-executeMethod PackageBuilder.BuildPackage"
     Unity (Path.GetFullPath "core/UnityPackage") "-executeMethod PackageBuilder.BuildPackageFull"
     (!! "core/UnityPackage/*.unitypackage") |> Seq.iter (fun p -> MoveFile binDir p)
