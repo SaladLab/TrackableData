@@ -30,8 +30,8 @@
 
   <!-- Code Generation Task -->
   <Target Name="TrackableDataPreprocessing"
-          AfterTargets="BeforeCompile;ResolveReferences;AkkaInterfacedPreprocessing"
-          BeforeTargets="CoreCompile"
+          AfterTargets="BeforeCompile;ResolveReferences"
+          BeforeTargets="CoreCompile;AkkaInterfacedPreprocessing"
           Inputs="@(Compile);@(ReferencePath)"
           Outputs="$(ProjectDir)$(IntermediateOutputPath)$(TargetName)$(TargetExt)">
     <Message Text="[TrackableDataPreprocessing] - Project=$(ProjectName)" Importance="high"/>
