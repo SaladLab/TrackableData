@@ -17,6 +17,8 @@ namespace TrackableData
 
         public void TrackSet(PropertyInfo pi, object oldValue, object newValue)
         {
+            var hasChangedBefore = HasChange;
+
             Change change;
             if (ChangeMap.TryGetValue(pi, out change))
             {
@@ -26,11 +28,16 @@ namespace TrackableData
             {
                 ChangeMap[pi] = new Change { OldValue = oldValue, NewValue = newValue };
             }
+
+            if (HasChangeSet != null && hasChangedBefore == false)
+                HasChangeSet(this);
         }
 
         // ITracker
 
         public bool HasChange => ChangeMap.Any();
+
+        public event TrackerHasChangeSet HasChangeSet;
 
         public void Clear()
         {

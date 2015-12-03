@@ -30,7 +30,7 @@ namespace TrackableData
 
         public void TrackInsert(int index, T newValue)
         {
-            ChangeList.Add(new Change
+            AddChange(new Change
             {
                 Operation = TrackableListOperation.Insert,
                 Index = index,
@@ -40,17 +40,18 @@ namespace TrackableData
 
         public void TrackRemove(int index, T oldValue)
         {
-            ChangeList.Add(new Change
+            AddChange(new Change
             {
                 Operation = TrackableListOperation.Remove,
                 Index = index,
                 OldValue = oldValue,
             });
+
         }
 
         public void TrackModify(int index, T oldValue, T newValue)
         {
-            ChangeList.Add(new Change
+            AddChange(new Change
             {
                 Operation = TrackableListOperation.Modify,
                 Index = index,
@@ -61,7 +62,7 @@ namespace TrackableData
 
         public void TrackPushFront(T newValue)
         {
-            ChangeList.Add(new Change
+            AddChange(new Change
             {
                 Operation = TrackableListOperation.PushFront,
                 NewValue = newValue
@@ -70,7 +71,7 @@ namespace TrackableData
 
         public void TrackPushBack(T newValue)
         {
-            ChangeList.Add(new Change
+            AddChange(new Change
             {
                 Operation = TrackableListOperation.PushBack,
                 NewValue = newValue
@@ -79,7 +80,7 @@ namespace TrackableData
 
         public void TrackPopFront(T oldValue)
         {
-            ChangeList.Add(new Change
+            AddChange(new Change
             {
                 Operation = TrackableListOperation.PopFront,
                 OldValue = oldValue
@@ -88,11 +89,19 @@ namespace TrackableData
 
         public void TrackPopBack(T oldValue)
         {
-            ChangeList.Add(new Change
+            AddChange(new Change
             {
                 Operation = TrackableListOperation.PopBack,
                 OldValue = oldValue
             });
+        }
+
+        private void AddChange(Change change)
+        {
+            ChangeList.Add(change);
+
+            if (HasChangeSet != null && ChangeList.Count == 1)
+                HasChangeSet(this);
         }
 
         // ITracker
@@ -101,6 +110,8 @@ namespace TrackableData
         {
             get { return ChangeList.Count > 0; }
         }
+
+        public event TrackerHasChangeSet HasChangeSet;
 
         public void Clear()
         {

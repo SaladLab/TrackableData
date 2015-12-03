@@ -89,6 +89,16 @@ namespace TrackableData.Tests
         }
 
         [Fact]
+        public void TestDictionary_HasChangedSetEvent_Work()
+        {
+            var changed = false;
+            var dict = CreateTestDictionaryWithTracker();
+            dict.Tracker.HasChangeSet += _ => { changed = true; };
+            dict[1] = "OneModified";
+            Assert.Equal(true, changed);
+        }
+
+        [Fact]
         public void TestDictionary_ApplyToTrackable_Work()
         {
             var dict = CreateTestDictionaryWithTracker();

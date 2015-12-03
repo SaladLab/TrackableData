@@ -3,10 +3,15 @@ using System.Reflection;
 
 namespace TrackableData
 {
+    public delegate void TrackerHasChangeSet(ITracker tracker);
+
     public interface ITracker
     {
         // has change
         bool HasChange { get; }
+
+        // when HasChanged set true, this event will be notified
+        event TrackerHasChangeSet HasChangeSet;
 
         // clear all change (not affect trackable)
         void Clear();

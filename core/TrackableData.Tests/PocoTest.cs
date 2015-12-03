@@ -46,6 +46,16 @@ namespace TrackableData.Tests
         }
 
         [Fact]
+        public void TestPoco_HasChangedSetEvent_Work()
+        {
+            var changed = false;
+            var person = CreateTestPersonWithTracker();
+            person.Tracker.HasChangeSet += _ => { changed = true; };
+            person.Name = "Bob";
+            Assert.Equal(true, changed);
+        }
+
+        [Fact]
         public void TestPoco_OverlappedTracking_Work()
         {
             var person = CreateTestPersonWithTracker();

@@ -36,11 +36,11 @@ namespace TrackableData
             switch (prevChange.Operation)
             {
                 case TrackableDictionaryOperation.None:
-                    ChangeMap[key] = new Change
+                    SetChange(key, new Change
                     {
                         Operation = TrackableDictionaryOperation.Add,
                         NewValue = newValue
-                    };
+                    });
                     break;
 
                 case TrackableDictionaryOperation.Add:
@@ -48,16 +48,16 @@ namespace TrackableData
 
                 case TrackableDictionaryOperation.Modify:
                     prevChange.NewValue = newValue;
-                    ChangeMap[key] = prevChange;
+                    SetChange(key,  prevChange);
                     break;
 
                 case TrackableDictionaryOperation.Remove:
-                    ChangeMap[key] = new Change
+                    SetChange(key, new Change
                     {
                         Operation = TrackableDictionaryOperation.Modify,
                         OldValue = prevChange.OldValue,
                         NewValue = newValue
-                    };
+                    });
                     break;
             }
         }
@@ -70,23 +70,25 @@ namespace TrackableData
             switch (prevChange.Operation)
             {
                 case TrackableDictionaryOperation.None:
-                    ChangeMap[key] = new Change
+                    SetChange(key, new Change
                     {
                         Operation = TrackableDictionaryOperation.Remove,
                         OldValue = oldValue
-                    };
+                    });
                     break;
 
                 case TrackableDictionaryOperation.Add:
+                    // Because this operation doesn't fire HasChangeSet at all,
+                    // it's ok to modify ChangeMap directly.
                     ChangeMap.Remove(key);
                     break;
 
                 case TrackableDictionaryOperation.Modify:
-                    ChangeMap[key] = new Change
+                    SetChange(key, new Change
                     {
                         Operation = TrackableDictionaryOperation.Remove,
                         OldValue = prevChange.OldValue
-                    };
+                    });
                     break;
 
                 case TrackableDictionaryOperation.Remove:
@@ -102,31 +104,41 @@ namespace TrackableData
             switch (prevChange.Operation)
             {
                 case TrackableDictionaryOperation.None:
-                    ChangeMap[key] = new Change
+                    SetChange(key, new Change
                     {
                         Operation = TrackableDictionaryOperation.Modify,
                         OldValue = oldValue,
                         NewValue = newValue
-                    };
+                    });
                     break;
 
                 case TrackableDictionaryOperation.Add:
                     prevChange.NewValue = newValue;
-                    ChangeMap[key] = prevChange;
+                    SetChange(key, prevChange);
                     break;
 
                 case TrackableDictionaryOperation.Remove:
                     throw new InvalidOperationException("Modify after remove is impossible.");
 
                 case TrackableDictionaryOperation.Modify:
-                    ChangeMap[key] = new Change
+                    SetChange(key, new Change
                     {
                         Operation = TrackableDictionaryOperation.Modify,
                         OldValue = prevChange.OldValue,
                         NewValue = newValue
-                    };
+                    });
                     break;
             }
+        }
+
+        private void SetChange(TKey key, Change change)
+        {
+            var hasChangedBefore = HasChange;
+
+            ChangeMap[key] = change;
+
+            if (HasChangeSet != null && hasChangedBefore == false)
+                HasChangeSet(this);
         }
 
         public IEnumerable<KeyValuePair<TKey, TValue>> AddItems
@@ -171,6 +183,8 @@ namespace TrackableData
         {
             get { return ChangeMap.Any(); }
         }
+
+        public event TrackerHasChangeSet HasChangeSet;
 
         public void Clear()
         {

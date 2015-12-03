@@ -567,6 +567,8 @@ namespace TrackableData.Json.Tests
             }
         }
 
+        public event TrackerHasChangeSet HasChangeSet;
+
         public void Clear()
         {
             if (PersonTracker != null)

@@ -277,6 +277,11 @@ namespace CodeGen
             sb.AppendLine("\t\t}");
             sb.AppendLine("\t}");
 
+            // ITracker.HasChange
+
+            sb.AppendLine("");
+            sb.AppendLine("\tpublic event TrackerHasChangeSet HasChangeSet;");
+
             // ITracker.Clear
 
             sb.AppendLine("");

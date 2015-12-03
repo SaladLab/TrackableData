@@ -606,6 +606,8 @@ namespace TrackableData.MongoDB.Tests
             }
         }
 
+        public event TrackerHasChangeSet HasChangeSet;
+
         public void Clear()
         {
             if (PersonTracker != null)

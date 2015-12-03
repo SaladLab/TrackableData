@@ -530,6 +530,8 @@ namespace TrackableData.MsSql.Tests
             }
         }
 
+        public event TrackerHasChangeSet HasChangeSet;
+
         public void Clear()
         {
             if (PersonTracker != null)

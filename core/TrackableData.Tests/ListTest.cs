@@ -78,6 +78,16 @@ namespace TrackableData.Tests
         }
 
         [Fact]
+        public void TestList_HasChangedSetEvent_Work()
+        {
+            var changed = false;
+            var list = CreateTestListWithTracker();
+            list.Tracker.HasChangeSet += _ => { changed = true; };
+            list.Add("Test");
+            Assert.Equal(true, changed);
+        }
+
+        [Fact]
         public void TestList_ApplyToTrackable_Work()
         {
             var list = CreateTestListWithTracker();

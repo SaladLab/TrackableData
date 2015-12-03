@@ -708,6 +708,8 @@ namespace TrackableData.Protobuf.Tests
             }
         }
 
+        public event TrackerHasChangeSet HasChangeSet;
+
         public void Clear()
         {
             if (PersonTracker != null)
