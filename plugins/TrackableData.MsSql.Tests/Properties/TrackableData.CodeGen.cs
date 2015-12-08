@@ -530,7 +530,11 @@ namespace TrackableData.MsSql.Tests
             }
         }
 
-        public event TrackerHasChangeSet HasChangeSet;
+        public event TrackerHasChangeSet HasChangeSet
+        {
+            add { throw new NotImplementedException(); }
+            remove { throw new NotImplementedException(); }
+        }
 
         public void Clear()
         {

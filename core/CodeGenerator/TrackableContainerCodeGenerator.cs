@@ -280,7 +280,11 @@ namespace CodeGen
             // ITracker.HasChange
 
             sb.AppendLine("");
-            sb.AppendLine("\tpublic event TrackerHasChangeSet HasChangeSet;");
+            sb.AppendLine("\tpublic event TrackerHasChangeSet HasChangeSet");
+            sb.AppendLine("\t{");
+            sb.AppendLine("\t\tadd { throw new NotImplementedException(); }");
+            sb.AppendLine("\t\tremove { throw new NotImplementedException(); }");
+            sb.AppendLine("\t}");
 
             // ITracker.Clear
 
