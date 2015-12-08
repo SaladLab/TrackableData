@@ -52,15 +52,15 @@ let projects = ([
         Name="TrackableData.Json";
         Folder="./plugins/TrackableData.Json";
         Dependencies=[("TrackableData", "");
-                      ("Newtonsoft.Json", "7.0.1")];
+                      ("Newtonsoft.Json", "")];
     };
     {   emptyProject with
         Name="TrackableData.MongoDB";
         Folder="./plugins/TrackableData.MongoDB";
         Dependencies=[("TrackableData", "");
-                      ("MongoDB.Bson", "2.1.1");
-                      ("MongoDB.Driver", "2.1.1");
-                      ("MongoDB.Driver.Core", "2.1.1");];
+                      ("MongoDB.Bson", "");
+                      ("MongoDB.Driver", "");
+                      ("MongoDB.Driver.Core", "");];
     };
     {   emptyProject with
         Name="TrackableData.MsSql";
@@ -71,7 +71,7 @@ let projects = ([
         Name="TrackableData.Protobuf";
         Folder="./plugins/TrackableData.Protobuf";
         Dependencies=[("TrackableData", "");
-                      ("protobuf-net", "2.0.0.668")];
+                      ("protobuf-net", "")];
     };]
     |> List.map (fun p -> 
         let parsedReleases =
@@ -86,10 +86,12 @@ let projects = ([
 let project name =
     List.filter (fun p -> p.Name = name) projects |> List.head
 
-let dependencies p =
+let dependencies p deps =
     p.Dependencies |>
     List.map (fun d -> match d with 
-                       | (id, "") -> (id, (project id).PackageVersion)
+                       | (id, "") -> (id, match List.tryFind (fun (x, ver) -> x = id) deps with
+                                          | Some (_, ver) -> ver
+                                          | None -> ((project id).PackageVersion))
                        | (id, ver) -> (id, ver))
     
 // ---------------------------------------------------------------------------- Variables
@@ -172,12 +174,15 @@ let createNugetPackages _ =
         let isSrc f = (hasExt ".cs" f) && not (isAssemblyInfo f)
         CopyDir (workDir @@ "src") project.Folder isSrc
 
+        let packageFile = project.Folder @@ "packages.config"
+        let packageDependencies = if (fileExists packageFile) then (getDependencies packageFile) else []
+
         NuGet (fun p -> 
             {p with
                 Project = project.Name
                 OutputPath = nugetDir
                 WorkingDir = workDir
-                Dependencies = dependencies project
+                Dependencies = dependencies project packageDependencies
                 SymbolPackage = (if (project.Name.Contains("Templates")) then NugetSymbolPackage.None else NugetSymbolPackage.Nuspec)
                 Version = project.PackageVersion 
                 ReleaseNotes = (List.head project.Releases).Notes |> String.concat "\n"
