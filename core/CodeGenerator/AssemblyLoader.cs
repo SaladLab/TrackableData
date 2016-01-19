@@ -15,13 +15,11 @@ namespace CodeGen
         public static Assembly BuildAndLoad(string[] sourcePaths, string[] referencePaths, string[] defines)
         {
             var assemblyName = Path.GetRandomFileName();
-            var syntaxTrees =
-                sourcePaths.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file)).ToArray();
+            var parseOption = new CSharpParseOptions(LanguageVersion.CSharp6, DocumentationMode.Parse, SourceCodeKind.Regular, defines);
+            var syntaxTrees = sourcePaths.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file), parseOption, file)).ToArray();
             var references = referencePaths.Select(file => MetadataReference.CreateFromFile(file)).ToArray();
 
-            // TODO: how to handle defines option?
-
-            CSharpCompilation compilation = CSharpCompilation.Create(
+            var compilation = CSharpCompilation.Create(
                 assemblyName,
                 syntaxTrees: syntaxTrees,
                 references: references,
