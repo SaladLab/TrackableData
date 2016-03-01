@@ -63,6 +63,33 @@ namespace TrackableData
             return newValue;
         }
 
+        // It doens't provide atomic operation like ConcurrentDictionary.
+        public TValue AddOrUpdate(TKey key, Func<TKey, TValue> addValueFactory, Func<TKey, TValue, TValue> updateValueFactory)
+        {
+            TValue value;
+            if (_dictionary.TryGetValue(key, out value) == false)
+            {
+                TValue addValue = addValueFactory(key);
+                Add(key, addValue);
+                return addValue;
+            }
+
+            TValue newValue = updateValueFactory(key, value);
+            _dictionary[key] = newValue;
+
+            if (typeof(TValue).IsValueType == false)
+            {
+                // TODO: Improve this by immutability check
+                if (Object.ReferenceEquals(value, newValue))
+                    throw new InvalidOperationException("TrackableDictionary update need you to clone value.");
+            }
+
+            if (Tracker != null)
+                Tracker.TrackModify(key, value, newValue);
+
+            return newValue;
+        }
+
         // ITrackable
 
         public bool Changed
