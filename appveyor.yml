@@ -4,6 +4,7 @@ configuration: Debug
 services:
 - mongodb
 - mssql2014
+- mysql
 before_build:
 - cmd: nuget restore
 build:

@@ -68,6 +68,12 @@ let projects = ([
         Dependencies=[("TrackableData", "");];
     };
     {   emptyProject with
+        Name="TrackableData.MySql";
+        Folder="./plugins/TrackableData.MySql";
+        Dependencies=[("TrackableData", "");
+                      ("MySql.Data", "")];
+    };
+    {   emptyProject with
         Name="TrackableData.Protobuf";
         Folder="./plugins/TrackableData.Protobuf";
         Dependencies=[("TrackableData", "");
