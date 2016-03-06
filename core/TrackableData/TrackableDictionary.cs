@@ -12,9 +12,6 @@ namespace TrackableData
 
         public IDictionaryTracker<TKey, TValue> Tracker { get; set; }
 
-        // Safe update. It can detect that references of value and new updated value are same.
-        // Rollback will be broken if references are same. 
-        // To prevent this problem, it checks reference equality.
         public bool Update(TKey key, Func<TKey, TValue, TValue> updateValueFactory)
         {
             TValue value;
@@ -24,13 +21,6 @@ namespace TrackableData
             TValue newValue = updateValueFactory(key, value);
             _dictionary[key] = newValue;
 
-            if (typeof(TValue).IsValueType == false)
-            {
-                // TODO: Improve this by immutability check
-                if (Object.ReferenceEquals(value, newValue))
-                    throw new InvalidOperationException("TrackableDictionary update need you to clone value.");
-            }
-
             if (Tracker != null)
                 Tracker.TrackModify(key, value, newValue);
 
@@ -38,33 +28,9 @@ namespace TrackableData
         }
 
         // It doens't provide atomic operation like ConcurrentDictionary.
-        public TValue AddOrUpdate(TKey key, TValue addValue, Func<TKey, TValue, TValue> updateValueFactory)
-        {
-            TValue value;
-            if (_dictionary.TryGetValue(key, out value) == false)
-            {
-                Add(key, addValue);
-                return addValue;
-            }
-
-            TValue newValue = updateValueFactory(key, value);
-            _dictionary[key] = newValue;
-
-            if (typeof(TValue).IsValueType == false)
-            {
-                // TODO: Improve this by immutability check
-                if (Object.ReferenceEquals(value, newValue))
-                    throw new InvalidOperationException("TrackableDictionary update need you to clone value.");
-            }
-
-            if (Tracker != null)
-                Tracker.TrackModify(key, value, newValue);
-
-            return newValue;
-        }
-
-        // It doens't provide atomic operation like ConcurrentDictionary.
-        public TValue AddOrUpdate(TKey key, Func<TKey, TValue> addValueFactory, Func<TKey, TValue, TValue> updateValueFactory)
+        public TValue AddOrUpdate(TKey key,
+                                  Func<TKey, TValue> addValueFactory,
+                                  Func<TKey, TValue, TValue> updateValueFactory)
         {
             TValue value;
             if (_dictionary.TryGetValue(key, out value) == false)
@@ -76,13 +42,6 @@ namespace TrackableData
 
             TValue newValue = updateValueFactory(key, value);
             _dictionary[key] = newValue;
-
-            if (typeof(TValue).IsValueType == false)
-            {
-                // TODO: Improve this by immutability check
-                if (Object.ReferenceEquals(value, newValue))
-                    throw new InvalidOperationException("TrackableDictionary update need you to clone value.");
-            }
 
             if (Tracker != null)
                 Tracker.TrackModify(key, value, newValue);
@@ -192,7 +151,7 @@ namespace TrackableData
                 }
                 else
                 {
-                    _dictionary[key] = value;
+                    _dictionary.Add(key, value);
 
                     if (Tracker != null)
                         Tracker.TrackAdd(key, value);

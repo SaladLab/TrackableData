@@ -25,40 +25,42 @@ namespace TrackableData.Tests
         }
 
         [Fact]
-        public void TestDictionary_Update_Detect_Value_Changed_Ok()
+        public void TestDictionary_Update_Existing_Key_Updated()
         {
-            var dict = new TrackableDictionary<int, int>();
-            dict[1] = 100;
-            dict.Update(1, (key, value) => value + 1);
+            var dict = CreateTestDictionaryWithTracker();
+            var ret = dict.Update(1, (key, value) => value + "!");
+            Assert.Equal(true, ret);
+            Assert.Equal(true, dict.Tracker.HasChange);
+            Assert.Equal("One!", dict[1]);
         }
 
         [Fact]
-        public void TestDictionary_Update_Detect_Value_Equal_Ok()
+        public void TestDictionary_Update_NonExisting_Key_NotChanged()
         {
-            var dict = new TrackableDictionary<int, int>();
-            dict[1] = 100;
-            var a = "!";
-            var b = a.Clone();
-            dict.Update(1, (key, value) => value);
+            var dict = CreateTestDictionaryWithTracker();
+            var ret = dict.Update(-1, (key, value) => value + "!");
+            Assert.Equal(false, ret);
+            Assert.Equal(false, dict.Tracker.HasChange);
         }
 
         [Fact]
-        public void TestDictionary_Update_Detect_Reference_Cloned_Ok()
+        public void TestDictionary_AddOrUpdate_Existing_Key_Updated()
         {
-            var dict = new TrackableDictionary<int, string>();
-            dict[1] = "one";
-            dict.Update(1, (key, value) => value + "!");
+            var dict = CreateTestDictionaryWithTracker();
+            var ret = dict.AddOrUpdate(1, (key) => "", (key, value) => value + "!");
+            Assert.Equal("One!", ret);
+            Assert.Equal(true, dict.Tracker.HasChange);
+            Assert.Equal("One!", dict[1]);
         }
 
         [Fact]
-        public void TestDictionary_Update_Detect_Reference_Equal_Error()
+        public void TestDictionary_AddOrUpdate_NonExisting_Key_Added()
         {
-            var dict = new TrackableDictionary<int, string>();
-            dict[1] = "one";
-            Assert.Throws<InvalidOperationException>(() =>
-            {
-                dict.Update(1, (key, value) => value);
-            });
+            var dict = CreateTestDictionaryWithTracker();
+            var ret = dict.AddOrUpdate(-1, (key) => "New" + key, (key, value) => value + "!");
+            Assert.Equal("New-1", ret);
+            Assert.Equal(true, dict.Tracker.HasChange);
+            Assert.Equal("New-1", dict[-1]);
         }
 
         [Fact]
