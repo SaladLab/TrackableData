@@ -16,7 +16,7 @@ namespace TrackableData.MySql.Tests
             var cstrForMaster = "";
             {
                 var connectionBuilder = new SqlConnectionStringBuilder(cstr);
-                connectionBuilder.InitialCatalog = "sys";
+                connectionBuilder.InitialCatalog = "";
                 cstrForMaster = connectionBuilder.ToString();
             }
 
