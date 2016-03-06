@@ -8,7 +8,7 @@ namespace TrackableData.MySql
     {
         public static string GetEscapedName(string name)
         {
-            return "[" + name + "]";
+            return "`" + name + "`";
         }
 
         public static string GetEscapedValue(string value)
@@ -71,29 +71,29 @@ namespace TrackableData.MySql
 
         public static string GetSqlType(Type type, int length = 0)
         {
-            var lengthStr = length > 0 ? length.ToString() : "MAX";
+            var lengthStr = length > 0 ? length.ToString() : "10000"; // TODO: BLOB for MAX
             if (type == typeof(bool))
-                return "[bit]";
+                return "BIT";
             if (type == typeof(byte))
-                return "[tinyint]";
+                return "TINYINT";
             if (type == typeof(int))
-                return "[int]";
+                return "INT";
             if (type == typeof(long))
-                return "[bigint]";
+                return "BIGINT";
             if (type == typeof(short))
-                return "[smallint]";
+                return "SMALLINT";
             if (type == typeof(float))
-                return "[real]";
+                return "FLOAT";
             if (type == typeof(double))
-                return "[float]";
+                return "DOUBLE ";
             if (type == typeof(DateTime))
                 return "[datetime2]";
             if (type == typeof(DateTimeOffset))
                 return "[datetimeoffset]";
             if (type == typeof(string))
-                return $"[nvarchar]({lengthStr})";
+                return $"VARCHAR({lengthStr}) CHARACTER SET utf8";
             if (type == typeof(byte[]))
-                return $"[varbinary]({lengthStr})";
+                return $"VARBINARY({lengthStr})";
             if (type == typeof(Guid))
                 return "[uniqueidentifier]";
             return "";

@@ -337,7 +337,7 @@ namespace TrackableData.MsSql
             sql.Append(sqlModify);
             if (removeIds.Any())
             {
-                sql.Append("DELETE ").Append(_tableName).Append(" WHERE ");
+                sql.Append("DELETE FROM ").Append(_tableName).Append(" WHERE ");
                 for (var k = 0; k < _headKeyColumns.Length; k++)
                 {
                     sqlModify.Append(_headKeyColumns[k].Name).Append("=");

@@ -1,7 +1,7 @@
-﻿using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Configuration;
 using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
 
 namespace TrackableData.MySql.Tests
 {
@@ -28,6 +28,7 @@ namespace TrackableData.MySql.Tests
                 {
                     cmd.CommandText = string.Format(@"
                         DROP DATABASE IF EXISTS {0};
+                        CREATE DATABASE {0};
                     ", new SqlConnectionStringBuilder(cstr).InitialCatalog);
                     cmd.Connection = conn;
 

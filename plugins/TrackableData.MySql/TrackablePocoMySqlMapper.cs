@@ -1,12 +1,11 @@
-﻿using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace TrackableData.MySql
 {
@@ -114,7 +113,7 @@ namespace TrackableData.MySql
             _allColumnStringExceptHead = string.Join(",", _valueColumns.Select(c => c.Name));
         }
 
-        #region MSSQL SQL Builder
+        #region MySQL SQL Builder
 
         private void BuildWhereClauses(StringBuilder sb, params object[] keyValues)
         {
@@ -133,29 +132,22 @@ namespace TrackableData.MySql
                 ",\n",
                 _allColumns.Select(c =>
                 {
-                    var identity = c.IsIdentity ? "IDENTITY(1,1)" : "";
+                    var identity = c.IsIdentity ? "AUTO_INCREMENT" : "";
                     var notnull = c.Type.IsValueType ? "NOT NULL" : "";
                     return $"{c.Name} {SqlMapperHelper.GetSqlType(c.Type, c.Length)} {identity} {notnull}";
                 }));
 
             var primaryKeyDef = string.Join(
                 ",",
-                _primaryKeyColumns.Select(c =>
-                                          $"{c.Name} ASC"));
+                _primaryKeyColumns.Select(c => $"{c.Name}"));
 
             var sb = new StringBuilder();
             if (includeDropIfExists)
-            {
-                sb.AppendLine($"IF OBJECT_ID('dbo.{_tableName}', 'U') IS NOT NULL");
-                sb.AppendLine($"  DROP TABLE dbo.{_tableName}");
-            }
-            sb.AppendLine($"CREATE TABLE [dbo].[{_tableName}] (");
+                sb.AppendLine($"DROP TABLE IF EXISTS `{_tableName}`;");
+            sb.AppendLine($"CREATE TABLE `{_tableName}` (");
             sb.AppendLine(columnDef);
-            sb.AppendLine($"  CONSTRAINT[PK_{_tableName}] PRIMARY KEY CLUSTERED({primaryKeyDef}) WITH (");
-            sb.AppendLine(
-                "  PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON");
-            sb.AppendLine("  ) ON[PRIMARY]");
-            sb.AppendLine(") ON[PRIMARY]");
+            sb.AppendLine($", PRIMARY KEY ({primaryKeyDef})");
+            sb.AppendLine(");");
             return sb.ToString();
         }
 
@@ -164,9 +156,8 @@ namespace TrackableData.MySql
             if (keyValues.Length != _headKeyColumns.Length)
                 throw new ArgumentException("Head key value required");
 
-            var outputClause = _identityColumn != null ? "OUTPUT Inserted." + _identityColumn.Name : "";
             var sb = new StringBuilder();
-            sb.Append($"INSERT INTO {_tableName} ({_allColumnStringExceptIdentity}) {outputClause} VALUES (");
+            sb.Append($"INSERT INTO {_tableName} ({_allColumnStringExceptIdentity}) VALUES (");
 
             var concating = false;
             var keyIndex = 0;
@@ -193,6 +184,8 @@ namespace TrackableData.MySql
             }
 
             sb.Append(");\n");
+            sb.Append("SELECT LAST_INSERT_ID();");
+
             return sb.ToString();
         }
 
@@ -271,7 +264,10 @@ namespace TrackableData.MySql
                     {
                         if (await reader.ReadAsync())
                         {
-                            _identityColumn.PropertyInfo.SetValue(value, reader.GetValue(0));
+                            var id = reader.GetValue(0);
+                            _identityColumn.PropertyInfo.SetValue(
+                                value, 
+                                Convert.ChangeType(id, _identityColumn.PropertyInfo.PropertyType));
                             return 1;
                         }
                     }

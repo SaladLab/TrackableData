@@ -1,12 +1,11 @@
-﻿using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace TrackableData.MySql
 {
@@ -138,7 +137,7 @@ namespace TrackableData.MySql
                                          string.Join(",", _valueColumns.Select(c => c.Name));
         }
 
-        #region MSSQL SQL Builder
+        #region MySQL SQL Builder
 
         private void BuildWhereClauses(StringBuilder sb, params object[] keyValues)
         {
@@ -168,17 +167,11 @@ namespace TrackableData.MySql
 
             var sb = new StringBuilder();
             if (includeDropIfExists)
-            {
-                sb.AppendLine($"IF OBJECT_ID('dbo.{_tableName}', 'U') IS NOT NULL");
-                sb.AppendLine($"  DROP TABLE dbo.{_tableName}");
-            }
-            sb.AppendLine($"CREATE TABLE [dbo].[{_tableName}] (");
+                sb.AppendLine($"DROP TABLE IF EXISTS `{_tableName}`;");
+            sb.AppendLine($"CREATE TABLE `{_tableName}` (");
             sb.AppendLine(columnDef);
-            sb.AppendLine($"  CONSTRAINT[PK_{_tableName}] PRIMARY KEY CLUSTERED({primaryKeyDef}) WITH (");
-            sb.AppendLine("  PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF,");
-            sb.AppendLine("  IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON");
-            sb.AppendLine("  ) ON[PRIMARY]");
-            sb.AppendLine(") ON[PRIMARY]");
+            sb.AppendLine($", PRIMARY KEY ({primaryKeyDef})");
+            sb.AppendLine(");");
             return sb.ToString();
         }
 
@@ -338,7 +331,7 @@ namespace TrackableData.MySql
             sql.Append(sqlModify);
             if (removeIds.Any())
             {
-                sql.Append("DELETE ").Append(_tableName).Append(" WHERE ");
+                sql.Append("DELETE FROM ").Append(_tableName).Append(" WHERE ");
                 for (var k = 0; k < _headKeyColumns.Length; k++)
                 {
                     sqlModify.Append(_headKeyColumns[k].Name).Append("=");
