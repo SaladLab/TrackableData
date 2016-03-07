@@ -5,6 +5,7 @@ services:
 - mongodb
 - mssql2014
 - mysql
+- postgresql
 before_build:
 - cmd: nuget restore
 build:
