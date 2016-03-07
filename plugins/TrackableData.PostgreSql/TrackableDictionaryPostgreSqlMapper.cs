@@ -14,6 +14,7 @@ namespace TrackableData.PostgreSql
         private class Column
         {
             public string Name;
+            public string EscapedName;
             public Type Type;
             public int Length;
             public PropertyInfo PropertyInfo;
@@ -22,6 +23,7 @@ namespace TrackableData.PostgreSql
         }
 
         private readonly string _tableName;
+        private readonly string _tableEscapedName;
         private readonly Column[] _allColumns;
         private readonly Column[] _headKeyColumns;
         private readonly Column[] _primaryKeyColumns;
@@ -46,6 +48,7 @@ namespace TrackableData.PostgreSql
                                                    ColumnDefinition[] headKeyColumnDefs)
         {
             _tableName = tableName;
+            _tableEscapedName = SqlMapperHelper.GetEscapedName(tableName);
 
             var allColumns = new List<Column>();
             var headKeyColumns = new List<Column>();
@@ -60,7 +63,8 @@ namespace TrackableData.PostgreSql
                 {
                     var column = new Column
                     {
-                        Name = SqlMapperHelper.GetEscapedName(headKeyColumnDef.Name),
+                        Name = headKeyColumnDef.Name,
+                        EscapedName = SqlMapperHelper.GetEscapedName(headKeyColumnDef.Name),
                         Type = headKeyColumnDef.Type,
                         Length = headKeyColumnDef.Length,
                         ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(headKeyColumnDef.Type)
@@ -75,7 +79,8 @@ namespace TrackableData.PostgreSql
 
             _keyColumn = new Column
             {
-                Name = SqlMapperHelper.GetEscapedName(keyColumnDef.Name),
+                Name = keyColumnDef.Name,
+                EscapedName = SqlMapperHelper.GetEscapedName(keyColumnDef.Name),
                 Type = typeof(TKey),
                 Length = keyColumnDef.Length,
                 ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(typeof(TKey))
@@ -89,7 +94,8 @@ namespace TrackableData.PostgreSql
             {
                 var column = new Column
                 {
-                    Name = SqlMapperHelper.GetEscapedName(singleValueColumnDef.Name),
+                    Name = singleValueColumnDef.Name,
+                    EscapedName = SqlMapperHelper.GetEscapedName(singleValueColumnDef.Name),
                     Type = typeof(TValue),
                     Length = singleValueColumnDef.Length,
                     ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(typeof(TValue)),
@@ -115,7 +121,8 @@ namespace TrackableData.PostgreSql
 
                     var column = new Column
                     {
-                        Name = SqlMapperHelper.GetEscapedName(columnName),
+                        Name = columnName,
+                        EscapedName = SqlMapperHelper.GetEscapedName(columnName),
                         Type = property.PropertyType,
                         PropertyInfo = property,
                         ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(property.PropertyType),
@@ -132,9 +139,9 @@ namespace TrackableData.PostgreSql
             _primaryKeyColumns = primaryKeyColumns.ToArray();
             _valueColumns = valueColumns.ToArray();
             _valueColumnMap = _valueColumns.Where(x => x.PropertyInfo != null).ToDictionary(x => x.PropertyInfo, y => y);
-            _allColumnString = string.Join(",", _allColumns.Select(c => c.Name));
-            _allColumnStringExceptHead = _keyColumn.Name + "," +
-                                         string.Join(",", _valueColumns.Select(c => c.Name));
+            _allColumnString = string.Join(",", _allColumns.Select(c => c.EscapedName));
+            _allColumnStringExceptHead = _keyColumn.EscapedName + "," +
+                                         string.Join(",", _valueColumns.Select(c => c.EscapedName));
         }
 
         #region PostgreSQL SQL Builder
@@ -147,7 +154,7 @@ namespace TrackableData.PostgreSql
             sb.Append(" WHERE ");
             sb.Append(string.Join(
                 " AND ",
-                keyValues.Zip(_primaryKeyColumns, (v, c) => $"{c.Name} = {c.ConvertToSqlValue(v)}")));
+                keyValues.Zip(_primaryKeyColumns, (v, c) => $"{c.EscapedName} = {c.ConvertToSqlValue(v)}")));
         }
 
         public string BuildCreateTableSql(bool includeDropIfExists = false)
@@ -157,18 +164,17 @@ namespace TrackableData.PostgreSql
                 _allColumns.Select(c =>
                 {
                     var notnull = c.Type.IsValueType ? "NOT NULL" : "";
-                    return $"{c.Name} {SqlMapperHelper.GetSqlType(c.Type, c.Length)} {notnull}";
+                    return $"{c.EscapedName} {SqlMapperHelper.GetSqlType(c.Type, c.Length)} {notnull}";
                 }));
 
             var primaryKeyDef = string.Join(
                 ",",
-                _headKeyColumns.Concat(new[] { _keyColumn }).Select(c =>
-                                                                    $"{c.Name} ASC"));
+                _headKeyColumns.Concat(new[] { _keyColumn }).Select(c => $"{c.EscapedName}"));
 
             var sb = new StringBuilder();
             if (includeDropIfExists)
-                sb.AppendLine($"DROP TABLE IF EXISTS \"{_tableName}\";");
-            sb.AppendLine($"CREATE TABLE \"{_tableName}\" (");
+                sb.AppendLine($"DROP TABLE IF EXISTS {_tableEscapedName};");
+            sb.AppendLine($"CREATE TABLE {_tableEscapedName} (");
             sb.AppendLine(columnDef);
             sb.AppendLine($", PRIMARY KEY ({primaryKeyDef})");
             sb.AppendLine(");");
@@ -189,7 +195,7 @@ namespace TrackableData.PostgreSql
             {
                 if (insertCount == 0)
                 {
-                    sql.Append("INSERT INTO ").Append(_tableName);
+                    sql.Append("INSERT INTO ").Append(_tableEscapedName);
                     sql.Append(" (").Append(_allColumnString).Append(") VALUES\n");
                 }
                 else
@@ -226,7 +232,7 @@ namespace TrackableData.PostgreSql
         public string BuildSqlForDelete(params object[] keyValues)
         {
             var sb = new StringBuilder();
-            sb.Append($"DELETE FROM {_tableName}");
+            sb.Append($"DELETE FROM {_tableEscapedName}");
             BuildWhereClauses(sb, keyValues);
             sb.Append(";\n");
             return sb.ToString();
@@ -235,7 +241,7 @@ namespace TrackableData.PostgreSql
         public string BuildSqlForLoad(params object[] keyValues)
         {
             var sb = new StringBuilder();
-            sb.Append($"SELECT {_allColumnStringExceptHead} FROM \"{_tableName}\"");
+            sb.Append($"SELECT {_allColumnStringExceptHead} FROM {_tableEscapedName}");
             BuildWhereClauses(sb, keyValues);
             sb.Append(";\n");
             return sb.ToString();
@@ -262,7 +268,7 @@ namespace TrackableData.PostgreSql
                     case TrackableDictionaryOperation.Add:
                         if (insertCount == 0)
                         {
-                            sqlAdd.Append("INSERT INTO ").Append(_tableName);
+                            sqlAdd.Append("INSERT INTO ").Append(_tableEscapedName);
                             sqlAdd.Append(" (").Append(_allColumnString).Append(") VALUES\n");
                         }
                         else
@@ -292,7 +298,7 @@ namespace TrackableData.PostgreSql
                         break;
 
                     case TrackableDictionaryOperation.Modify:
-                        sqlModify.Append("UPDATE ").Append(_tableName);
+                        sqlModify.Append("UPDATE ").Append(_tableEscapedName);
                         sqlModify.Append(" SET ");
                         var concating = false;
                         foreach (var col in _valueColumns)
@@ -301,18 +307,18 @@ namespace TrackableData.PostgreSql
                                 concating = true;
                             else
                                 sqlModify.Append(",");
-                            sqlModify.Append(col.Name).Append("=").Append(col.ExtractToSqlValue(v));
+                            sqlModify.Append(col.EscapedName).Append("=").Append(col.ExtractToSqlValue(v));
                         }
 
                         sqlModify.Append(" WHERE ");
                         for (var k = 0; k < _headKeyColumns.Length; k++)
                         {
-                            sqlModify.Append(_headKeyColumns[k].Name).Append("=");
+                            sqlModify.Append(_headKeyColumns[k].EscapedName).Append("=");
                             sqlModify.Append(_headKeyColumns[k].ConvertToSqlValue(keyValues[k]));
                             sqlModify.Append(" AND ");
                         }
 
-                        sqlModify.Append(_keyColumn.Name).Append("=");
+                        sqlModify.Append(_keyColumn.EscapedName).Append("=");
                         sqlModify.Append(_keyColumn.ConvertToSqlValue(i.Key)).Append(";\n");
                         break;
 
@@ -331,14 +337,14 @@ namespace TrackableData.PostgreSql
             sql.Append(sqlModify);
             if (removeIds.Any())
             {
-                sql.Append("DELETE FROM ").Append(_tableName).Append(" WHERE ");
+                sql.Append("DELETE FROM ").Append(_tableEscapedName).Append(" WHERE ");
                 for (var k = 0; k < _headKeyColumns.Length; k++)
                 {
-                    sqlModify.Append(_headKeyColumns[k].Name).Append("=");
+                    sqlModify.Append(_headKeyColumns[k].EscapedName).Append("=");
                     sqlModify.Append(_headKeyColumns[k].ConvertToSqlValue(keyValues[k]));
                     sqlModify.Append(" AND ");
                 }
-                sql.Append(_keyColumn.Name).Append(" IN (");
+                sql.Append(_keyColumn.EscapedName).Append(" IN (");
                 var concating = false;
                 foreach (var id in removeIds)
                 {

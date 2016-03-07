@@ -5,7 +5,6 @@ using Xunit;
 
 namespace TrackableData.PostgreSql.Tests
 {
-    /*
     public interface ITestPoco : ITrackablePoco<ITestPoco>
     {
         [TrackableProperty("sql.primary-key")]
@@ -149,5 +148,4 @@ namespace TrackableData.PostgreSql.Tests
             return _mapper.SaveAsync(_connection, (TrackablePocoTracker<ITestPocoWithIdentity>)tracker, id);
         }
     }
-    */
 }

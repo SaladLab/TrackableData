@@ -53,7 +53,7 @@ namespace TrackableData.PostgreSql
                 {
                     var column = new Column
                     {
-                        Name = SqlMapperHelper.GetEscapedName(headKeyColumnDef.Name),
+                        Name = headKeyColumnDef.Name,
                         Type = headKeyColumnDef.Type,
                         Length = headKeyColumnDef.Length,
                         ConvertToSqlValue = SqlMapperHelper.GetSqlValueFunc(headKeyColumnDef.Type)
@@ -85,7 +85,7 @@ namespace TrackableData.PostgreSql
 
                 var column = new Column
                 {
-                    Name = SqlMapperHelper.GetEscapedName(columnName),
+                    Name = columnName,
                     Type = property.PropertyType,
                     IsIdentity = isIdentity,
                     PropertyInfo = property,
@@ -109,8 +109,9 @@ namespace TrackableData.PostgreSql
             _valueColumnMap = _valueColumns.ToDictionary(x => x.PropertyInfo, y => y);
             _allColumnStringExceptIdentity = string.Join(",",
                                                          _allColumns.Where(c => c.IsIdentity == false)
-                                                                    .Select(c => c.Name));
-            _allColumnStringExceptHead = string.Join(",", _valueColumns.Select(c => c.Name));
+                                                                    .Select(c => SqlMapperHelper.GetEscapedName(c.Name)));
+            _allColumnStringExceptHead = string.Join(",",
+                                                     _valueColumns.Select(c => SqlMapperHelper.GetEscapedName(c.Name)));
         }
 
         #region PostgreSQL SQL Builder
@@ -123,7 +124,8 @@ namespace TrackableData.PostgreSql
             sb.Append(" WHERE ");
             sb.Append(string.Join(
                 " AND ",
-                keyValues.Zip(_primaryKeyColumns, (v, c) => $"{c.Name} = {c.ConvertToSqlValue(v)}")));
+                keyValues.Zip(_primaryKeyColumns,
+                              (v, c) => $"{SqlMapperHelper.GetEscapedName(c.Name)} = {c.ConvertToSqlValue(v)}")));
         }
 
         public string BuildCreateTableSql(bool includeDropIfExists = false)
@@ -132,22 +134,28 @@ namespace TrackableData.PostgreSql
                 ",\n",
                 _allColumns.Select(c =>
                 {
-                    var identity = c.IsIdentity ? "AUTO_INCREMENT" : "";
+                    var identity = c.IsIdentity ? $"DEFAULT nextval('\"{_tableName}_{c.Name}_seq\"')" : "";
                     var notnull = c.Type.IsValueType ? "NOT NULL" : "";
-                    return $"{c.Name} {SqlMapperHelper.GetSqlType(c.Type, c.Length)} {identity} {notnull}";
+                    return
+                        $"{SqlMapperHelper.GetEscapedName(c.Name)} {SqlMapperHelper.GetSqlType(c.Type, c.Length)} {identity} {notnull}";
                 }));
 
             var primaryKeyDef = string.Join(
                 ",",
-                _primaryKeyColumns.Select(c => $"{c.Name}"));
+                _primaryKeyColumns.Select(c => $"{SqlMapperHelper.GetEscapedName(c.Name)}"));
 
             var sb = new StringBuilder();
             if (includeDropIfExists)
                 sb.AppendLine($"DROP TABLE IF EXISTS \"{_tableName}\";");
+            if (_identityColumn != null)
+                sb.AppendLine($"CREATE SEQUENCE \"{_tableName}_{_identityColumn.Name}_seq\";\n");
             sb.AppendLine($"CREATE TABLE \"{_tableName}\" (");
             sb.AppendLine(columnDef);
             sb.AppendLine($", PRIMARY KEY ({primaryKeyDef})");
             sb.AppendLine(");");
+            if (_identityColumn != null)
+                sb.AppendLine(
+                    $"ALTER SEQUENCE \"{_tableName}_{_identityColumn.Name}_seq\" OWNED BY \"{_tableName}\".\"{_identityColumn.Name}\";\n");
             return sb.ToString();
         }
 
@@ -157,7 +165,7 @@ namespace TrackableData.PostgreSql
                 throw new ArgumentException("Head key value required");
 
             var sb = new StringBuilder();
-            sb.Append($"INSERT INTO {_tableName} ({_allColumnStringExceptIdentity}) VALUES (");
+            sb.Append($"INSERT INTO \"{_tableName}\" ({_allColumnStringExceptIdentity}) VALUES (");
 
             var concating = false;
             var keyIndex = 0;
@@ -183,8 +191,10 @@ namespace TrackableData.PostgreSql
                 }
             }
 
-            sb.Append(");\n");
-            sb.Append("SELECT LAST_INSERT_ID();");
+            if (_identityColumn != null)
+                sb.Append($") RETURNING \"{_identityColumn.Name}\";\n");
+            else
+                sb.Append(");\n");
 
             return sb.ToString();
         }
@@ -227,7 +237,7 @@ namespace TrackableData.PostgreSql
                 else
                     sb.Append(",");
 
-                sb.Append(column.Name);
+                sb.Append(SqlMapperHelper.GetEscapedName(column.Name));
                 sb.Append("=");
                 sb.Append(column.ConvertToSqlValue(c.Value.NewValue));
             }

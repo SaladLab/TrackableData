@@ -7,7 +7,6 @@ using Xunit;
 
 namespace TrackableData.PostgreSql.Tests
 {
-    /*
     public class TrackableDictionaryStringTest : StorageDictionaryValueTestKit<int>, IClassFixture<Database>, IDisposable
     {
         private static readonly ColumnDefinition SingleValueColumnDef = new ColumnDefinition("Value", typeof(string));
@@ -155,5 +154,4 @@ namespace TrackableData.PostgreSql.Tests
             return _mapper.SaveAsync(_connection, (TrackableDictionaryTracker<int, ItemData>)tracker, 1, "One");
         }
     }
-    */
 }

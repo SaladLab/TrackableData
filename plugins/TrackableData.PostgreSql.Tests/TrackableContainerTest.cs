@@ -6,7 +6,6 @@ using Xunit;
 
 namespace TrackableData.PostgreSql.Tests
 {
-    /*
     public interface ITestPocoForContainer : ITrackablePoco<ITestPocoForContainer>
     {
         string Name { get; set; }
@@ -78,5 +77,4 @@ namespace TrackableData.PostgreSql.Tests
             return _mapper.SaveAsync(_connection, (TrackableTestContainerTracker)tracker, _testId);
         }
     }
-    */
 }

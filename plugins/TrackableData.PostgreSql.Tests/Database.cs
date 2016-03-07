@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Npgsql;
 
@@ -7,6 +8,8 @@ namespace TrackableData.PostgreSql.Tests
 {
     public class Database : IDisposable
     {
+        private List<NpgsqlConnection> _connections = new List<NpgsqlConnection>();
+
         public Database()
         {
             var cstr = ConfigurationManager.ConnectionStrings["TestDb"].ConnectionString;
@@ -39,12 +42,15 @@ namespace TrackableData.PostgreSql.Tests
                 var cstr = ConfigurationManager.ConnectionStrings["TestDb"].ConnectionString;
                 var connection = new NpgsqlConnection(cstr);
                 connection.Open();
+                _connections.Add(connection);
                 return connection;
             }
         }
 
         public void Dispose()
         {
+            foreach (var connection in _connections)
+                connection.Dispose();
         }
     }
 }
