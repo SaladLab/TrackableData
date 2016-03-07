@@ -63,6 +63,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData.PostgreSql", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData.PostgreSql.Tests", "plugins\TrackableData.PostgreSql.Tests\TrackableData.PostgreSql.Tests.csproj", "{8630BC70-3C6D-4C5B-AA6D-C6A2EAB64226}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData.Sql", "plugins\TrackableData.Sql\TrackableData.Sql.csproj", "{D472777A-9C57-4B6B-92B8-0960FECC06B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -153,6 +155,10 @@ Global
 		{8630BC70-3C6D-4C5B-AA6D-C6A2EAB64226}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8630BC70-3C6D-4C5B-AA6D-C6A2EAB64226}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8630BC70-3C6D-4C5B-AA6D-C6A2EAB64226}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D472777A-9C57-4B6B-92B8-0960FECC06B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D472777A-9C57-4B6B-92B8-0960FECC06B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D472777A-9C57-4B6B-92B8-0960FECC06B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D472777A-9C57-4B6B-92B8-0960FECC06B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -179,5 +185,6 @@ Global
 		{10AE52DE-3D7A-497C-97C8-C6B3E3A41A16} = {9C429998-836D-4F36-8B4E-825B48B0E759}
 		{EA7DD842-6E6B-4C81-8B74-2E758C9CF8B1} = {9C429998-836D-4F36-8B4E-825B48B0E759}
 		{8630BC70-3C6D-4C5B-AA6D-C6A2EAB64226} = {9C429998-836D-4F36-8B4E-825B48B0E759}
+		{D472777A-9C57-4B6B-92B8-0960FECC06B9} = {9C429998-836D-4F36-8B4E-825B48B0E759}
 	EndGlobalSection
 EndGlobal
