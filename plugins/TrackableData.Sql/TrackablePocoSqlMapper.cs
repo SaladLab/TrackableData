@@ -157,7 +157,6 @@ namespace TrackableData.Sql
                 }
                 else
                 {
-
                     sb.Append(column.ExtractToSqlValue(poco));
                 }
             }
