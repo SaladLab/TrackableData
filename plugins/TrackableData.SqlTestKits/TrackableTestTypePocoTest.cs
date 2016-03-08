@@ -18,16 +18,6 @@ namespace TrackableData.SqlTestKits
         }
 
         [Fact]
-        public async Task Test_CreateAsDefault_LoadAndCheckEqual()
-        {
-            var p0 = new TrackableTestTypePoco();
-            await _mapper.CreateAsync(_db.Connection, p0);
-
-            var p1 = await _mapper.LoadAsync(_db.Connection, p0.Id);
-            AssertTestPocoEqual(p0, p1);
-        }
-
-        [Fact]
         public async Task Test_CreateAsIdentity_LoadAndCheckEqual()
         {
             var p0 = new TrackableTestTypePoco();
@@ -61,10 +51,10 @@ namespace TrackableData.SqlTestKits
             p0.vFloat = -9999.99f; // just arbitrary value for float, double, decimal
             p0.vDouble = -99999.99;
             p0.vDecimal = -999999.99m;
-            p0.vDateTime = new DateTime(1, 1, 1, 0, 0, 0);
-            p0.vDateTimeOffset = new DateTimeOffset(1, 1, 1, 0, 0, 0, TimeSpan.Zero);
-            p0.vTimeSpan = new TimeSpan(1, 1, 1);
-            p0.vString = "1";
+            p0.vDateTime = new DateTime(1000, 1, 1, 0, 0, 0);
+            p0.vDateTimeOffset = new DateTimeOffset(1000, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            p0.vTimeSpan = new TimeSpan(0, 0, 0);
+            p0.vString = "0";
             p0.vBytes = new byte[] { 0 };
             p0.vGuid = Guid.Empty;
             await _mapper.CreateAsync(_db.Connection, p0);

@@ -20,6 +20,10 @@ namespace TrackableData.Sql
             {
                 return ConvertValue(o, underlyingType);
             }
+            if (t == typeof(DateTimeOffset) && o != null && o.GetType() == typeof(DateTime))
+            {
+                return new DateTimeOffset((DateTime)o, TimeSpan.Zero);
+            }
 
             return Convert.ChangeType(o, t);
         }
