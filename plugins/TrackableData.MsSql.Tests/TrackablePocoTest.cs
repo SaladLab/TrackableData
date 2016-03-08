@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using TrackableData.MsSql;
+using TrackableData.Sql;
 using Xunit;
 
 namespace TrackableData.MsSql.Tests
@@ -24,8 +24,8 @@ namespace TrackableData.MsSql.Tests
 
     public class TrackablePocoTest : TestKits.StoragePocoTestKit<TrackableTestPoco, int>, IClassFixture<Database>, IDisposable
     {
-        private static TrackablePocoMsSqlMapper<ITestPoco> _mapper =
-            new TrackablePocoMsSqlMapper<ITestPoco>(nameof(TrackablePocoTest));
+        private static TrackablePocoSqlMapper<ITestPoco> _mapper =
+            new TrackablePocoSqlMapper<ITestPoco>(MsSqlProvider.Instance, nameof(TrackablePocoTest));
 
         private Database _db;
         private SqlConnection _connection;
@@ -70,8 +70,10 @@ namespace TrackableData.MsSql.Tests
             new ColumnDefinition("Head1", typeof(int)),
             new ColumnDefinition("Head2", typeof(string), 100)
         };
-        private static TrackablePocoMsSqlMapper<ITestPoco> _mapper =
-            new TrackablePocoMsSqlMapper<ITestPoco>(nameof(TrackablePocoWithHeadKeysTest), HeadKeyColumnDefs);
+
+        private static TrackablePocoSqlMapper<ITestPoco> _mapper =
+            new TrackablePocoSqlMapper<ITestPoco>(MsSqlProvider.Instance, nameof(TrackablePocoWithHeadKeysTest),
+                                                  HeadKeyColumnDefs);
 
         private Database _db;
         private SqlConnection _connection;
@@ -111,8 +113,9 @@ namespace TrackableData.MsSql.Tests
 
     public class TrackablePocoWithAutoIdTest : TestKits.StoragePocoWithAutoIdTestKit<TrackableTestPocoWithIdentity, int>, IClassFixture<Database>, IDisposable
     {
-        private static TrackablePocoMsSqlMapper<ITestPocoWithIdentity> _mapper =
-            new TrackablePocoMsSqlMapper<ITestPocoWithIdentity>(nameof(TrackablePocoWithAutoIdTest));
+        private static TrackablePocoSqlMapper<ITestPocoWithIdentity> _mapper =
+            new TrackablePocoSqlMapper<ITestPocoWithIdentity>(MsSqlProvider.Instance,
+                                                              nameof(TrackablePocoWithAutoIdTest));
 
         private Database _db;
         private SqlConnection _connection;

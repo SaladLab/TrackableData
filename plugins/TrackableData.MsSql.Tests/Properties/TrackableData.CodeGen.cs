@@ -10,9 +10,9 @@
 using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using TrackableData.Sql;
 using TrackableData.TestKits;
 using Xunit;
-using TrackableData.MsSql;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;

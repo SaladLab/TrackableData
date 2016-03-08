@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using TrackableData.MsSql;
+using TrackableData.Sql;
 using TrackableData.TestKits;
 using Xunit;
 
@@ -12,8 +12,9 @@ namespace TrackableData.MsSql.Tests
     {
         private static readonly ColumnDefinition SingleValueColumnDef = new ColumnDefinition("Value", typeof(string));
 
-        private static TrackableDictionaryMsSqlMapper<int, string> _mapper = 
-            new TrackableDictionaryMsSqlMapper<int, string>(
+        private static TrackableDictionarySqlMapper<int, string> _mapper = 
+            new TrackableDictionarySqlMapper<int, string>(
+                MsSqlProvider.Instance,
                 nameof(TrackableDictionaryStringTest), new ColumnDefinition("Id"), SingleValueColumnDef, null);
 
         private Database _db;
@@ -59,8 +60,9 @@ namespace TrackableData.MsSql.Tests
 
     public class TrackableDictionaryDataTest : StorageDictionaryDataTestKit<int>, IClassFixture<Database>, IDisposable
     {
-        private static TrackableDictionaryMsSqlMapper<int, ItemData> _mapper =
-            new TrackableDictionaryMsSqlMapper<int, ItemData>(
+        private static TrackableDictionarySqlMapper<int, ItemData> _mapper =
+            new TrackableDictionarySqlMapper<int, ItemData>(
+                MsSqlProvider.Instance,
                 nameof(TrackableDictionaryDataTest), new ColumnDefinition("Id"));
 
         private Database _db;
@@ -111,8 +113,9 @@ namespace TrackableData.MsSql.Tests
             new ColumnDefinition("Head1", typeof(int)),
             new ColumnDefinition("Head2", typeof(string), 100)
         };
-        private static TrackableDictionaryMsSqlMapper<int, ItemData> _mapper =
-            new TrackableDictionaryMsSqlMapper<int, ItemData>(
+        private static TrackableDictionarySqlMapper<int, ItemData> _mapper =
+            new TrackableDictionarySqlMapper<int, ItemData>(
+                MsSqlProvider.Instance,
                 nameof(TrackableDictionaryDataWithHeadKeysTest), new ColumnDefinition("Id"), HeadKeyColumnDefs);
 
         private Database _db;

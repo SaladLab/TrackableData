@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using TrackableData.Sql;
 using TrackableData.TestKits;
 using Xunit;
 
@@ -28,8 +29,9 @@ namespace TrackableData.MsSql.Tests
             new ColumnDefinition("ContainerId", typeof(int)),
         };
 
-        private static TrackableContainerMsSqlMapper<ITestContainer> _mapper =
-            new TrackableContainerMsSqlMapper<ITestContainer>(
+        private static TrackableContainerSqlMapper<ITestContainer> _mapper =
+            new TrackableContainerSqlMapper<ITestContainer>(
+                MsSqlProvider.Instance,
                 new[]
                 {
                     Tuple.Create("Person", new object[]
