@@ -4,7 +4,7 @@ using TrackableData.TestKits;
 
 namespace TrackableData.SqlTestKits
 {
-    public class TrackablePocoWithHeadKeysTest : StoragePocoTestKit<TrackableTestPoco, int>
+    public abstract class TrackablePocoWithHeadKeysTest : StoragePocoTestKit<TrackableTestPoco, int>
     {
         private IDbConnectionProvider _db;
         private TrackablePocoSqlMapper<ITestPoco> _mapper;

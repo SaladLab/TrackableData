@@ -5,7 +5,7 @@ using TrackableData.TestKits;
 
 namespace TrackableData.SqlTestKits
 {
-    public class TrackableDictionaryStringTest : StorageDictionaryValueTestKit<int>
+    public abstract class TrackableDictionaryStringTest : StorageDictionaryValueTestKit<int>
     {
         private IDbConnectionProvider _db;
         private TrackableDictionarySqlMapper<int, string> _mapper;
