@@ -48,6 +48,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData.MySql.Tests", "plugins\TrackableData.MySql.Tests\TrackableData.MySql.Tests.csproj", "{6CFD2EC4-B29C-4D06-B2CB-13A5665D33D6}"
 	ProjectSection(ProjectDependencies) = postProject
 		{011E72B0-3E37-4652-ACB9-2CAC26665AFD} = {011E72B0-3E37-4652-ACB9-2CAC26665AFD}
+		{601864B9-D8C2-4FD0-B844-70A0F865B67F} = {601864B9-D8C2-4FD0-B844-70A0F865B67F}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData.Tests", "core\TrackableData.Tests\TrackableData.Tests.csproj", "{A915294A-D1A8-4783-801D-E676A262EA16}"
@@ -65,6 +66,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData.MsSql.Tests", "plugins\TrackableData.MsSql.Tests\TrackableData.MsSql.Tests.csproj", "{0C6F8BC0-37F8-4229-99D6-D4EF786A2691}"
 	ProjectSection(ProjectDependencies) = postProject
 		{011E72B0-3E37-4652-ACB9-2CAC26665AFD} = {011E72B0-3E37-4652-ACB9-2CAC26665AFD}
+		{601864B9-D8C2-4FD0-B844-70A0F865B67F} = {601864B9-D8C2-4FD0-B844-70A0F865B67F}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData.Json.Tests", "plugins\TrackableData.Json.Tests\TrackableData.Json.Tests.csproj", "{4F03BB0F-C08F-4D0C-86EF-B8057BD60E54}"
@@ -82,6 +84,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData.PostgreSql.Tests", "plugins\TrackableData.PostgreSql.Tests\TrackableData.PostgreSql.Tests.csproj", "{8630BC70-3C6D-4C5B-AA6D-C6A2EAB64226}"
 	ProjectSection(ProjectDependencies) = postProject
 		{011E72B0-3E37-4652-ACB9-2CAC26665AFD} = {011E72B0-3E37-4652-ACB9-2CAC26665AFD}
+		{601864B9-D8C2-4FD0-B844-70A0F865B67F} = {601864B9-D8C2-4FD0-B844-70A0F865B67F}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData.Sql", "plugins\TrackableData.Sql\TrackableData.Sql.csproj", "{D472777A-9C57-4B6B-92B8-0960FECC06B9}"
