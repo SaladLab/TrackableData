@@ -74,4 +74,3 @@ namespace TrackableData.MsSql.Tests
         }
     }
 }
-
