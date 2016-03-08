@@ -73,7 +73,7 @@ let projects = ([
         Folder="./plugins/TrackableData.MySql";
         Dependencies=[("TrackableData", "");
                       ("TrackableData.Sql", "");
-                      ("MySql.Data", "")];];
+                      ("MySql.Data", "")];
     };
     {   emptyProject with
         Name="TrackableData.PostgreSql";
@@ -81,7 +81,7 @@ let projects = ([
         Dependencies=[("TrackableData", "");
                       ("TrackableData.Sql", "");
                       ("Npgsql", "");];
-    };    
+    };
     {   emptyProject with
         Name="TrackableData.Protobuf";
         Folder="./plugins/TrackableData.Protobuf";
