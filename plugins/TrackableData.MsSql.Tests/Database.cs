@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Common;
 using System.Data.SqlClient;
+using TrackableData.Sql;
 
 namespace TrackableData.MsSql.Tests
 {
-    public class Database : IDisposable
+    public class Database : SqlTestKits.IDbConnectionProvider, IDisposable
     {
+        private List<SqlConnection> _connections = new List<SqlConnection>();
+
         public Database()
         {
             var cstr = ConfigurationManager.ConnectionStrings["TestDb"].ConnectionString;
@@ -38,19 +43,24 @@ namespace TrackableData.MsSql.Tests
             }
         }
 
-        public SqlConnection Connection
+        public DbConnection Connection
         {
             get
             {
                 var cstr = ConfigurationManager.ConnectionStrings["TestDb"].ConnectionString;
                 var connection = new SqlConnection(cstr);
                 connection.Open();
+                _connections.Add(connection);
                 return connection;
             }
         }
 
         public void Dispose()
         {
+            foreach (var connection in _connections)
+                connection.Dispose();
         }
+
+        static public ISqlProvider SqlProvider => MsSqlProvider.Instance;
     }
 }
