@@ -65,19 +65,33 @@ let projects = ([
     {   emptyProject with
         Name="TrackableData.MsSql";
         Folder="./plugins/TrackableData.MsSql";
-        Dependencies=[("TrackableData", "");];
+        Dependencies=[("TrackableData", "");
+                      ("TrackableData.Sql", "");];
     };
     {   emptyProject with
         Name="TrackableData.MySql";
         Folder="./plugins/TrackableData.MySql";
         Dependencies=[("TrackableData", "");
-                      ("MySql.Data", "")];
+                      ("TrackableData.Sql", "");
+                      ("MySql.Data", "")];];
     };
+    {   emptyProject with
+        Name="TrackableData.PostgreSql";
+        Folder="./plugins/TrackableData.PostgreSql";
+        Dependencies=[("TrackableData", "");
+                      ("TrackableData.Sql", "");
+                      ("Npgsql", "");];
+    };    
     {   emptyProject with
         Name="TrackableData.Protobuf";
         Folder="./plugins/TrackableData.Protobuf";
         Dependencies=[("TrackableData", "");
                       ("protobuf-net", "")];
+    };
+    {   emptyProject with
+        Name="TrackableData.Sql";
+        Folder="./plugins/TrackableData.Sql";
+        Dependencies=[("TrackableData", "");];
     };]
     |> List.map (fun p -> 
         let parsedReleases =
