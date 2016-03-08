@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Configuration;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data.Common;
 using System.Text.RegularExpressions;
 using Npgsql;
+using TrackableData.Sql;
 
 namespace TrackableData.PostgreSql.Tests
 {
-    public class Database : IDisposable
+    public class Database : SqlTestKits.IDbConnectionProvider, IDisposable
     {
         private List<NpgsqlConnection> _connections = new List<NpgsqlConnection>();
 
@@ -35,7 +37,7 @@ namespace TrackableData.PostgreSql.Tests
             }
         }
 
-        public NpgsqlConnection Connection
+        public DbConnection Connection
         {
             get
             {
@@ -52,5 +54,7 @@ namespace TrackableData.PostgreSql.Tests
             foreach (var connection in _connections)
                 connection.Dispose();
         }
+
+        public static ISqlProvider SqlProvider => PostgreSqlProvider.Instance;
     }
 }
