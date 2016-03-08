@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using TrackableData.TestKits;
 using Npgsql;
 using Xunit;
+using TrackableData.Sql;
 
 namespace TrackableData.PostgreSql.Tests
 {
@@ -11,8 +12,9 @@ namespace TrackableData.PostgreSql.Tests
     {
         private static readonly ColumnDefinition SingleValueColumnDef = new ColumnDefinition("Value", typeof(string));
 
-        private static TrackableDictionaryPostgreSqlMapper<int, string> _mapper = 
-            new TrackableDictionaryPostgreSqlMapper<int, string>(
+        private static TrackableDictionarySqlMapper<int, string> _mapper = 
+            new TrackableDictionarySqlMapper<int, string>(
+                PostgreSqlProvider.Instance,
                 nameof(TrackableDictionaryStringTest), new ColumnDefinition("Id"), SingleValueColumnDef, null);
 
         private Database _db;
@@ -58,8 +60,9 @@ namespace TrackableData.PostgreSql.Tests
 
     public class TrackableDictionaryDataTest : StorageDictionaryDataTestKit<int>, IClassFixture<Database>, IDisposable
     {
-        private static TrackableDictionaryPostgreSqlMapper<int, ItemData> _mapper =
-            new TrackableDictionaryPostgreSqlMapper<int, ItemData>(
+        private static TrackableDictionarySqlMapper<int, ItemData> _mapper =
+            new TrackableDictionarySqlMapper<int, ItemData>(
+                PostgreSqlProvider.Instance,
                 nameof(TrackableDictionaryDataTest), new ColumnDefinition("Id"));
 
         private Database _db;
@@ -110,8 +113,9 @@ namespace TrackableData.PostgreSql.Tests
             new ColumnDefinition("Head1", typeof(int)),
             new ColumnDefinition("Head2", typeof(string), 100)
         };
-        private static TrackableDictionaryPostgreSqlMapper<int, ItemData> _mapper =
-            new TrackableDictionaryPostgreSqlMapper<int, ItemData>(
+        private static TrackableDictionarySqlMapper<int, ItemData> _mapper =
+            new TrackableDictionarySqlMapper<int, ItemData>(
+                PostgreSqlProvider.Instance,
                 nameof(TrackableDictionaryDataWithHeadKeysTest), new ColumnDefinition("Id"), HeadKeyColumnDefs);
 
         private Database _db;

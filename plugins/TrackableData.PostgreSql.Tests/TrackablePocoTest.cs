@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Npgsql;
 using Xunit;
+using TrackableData.Sql;
 
 namespace TrackableData.PostgreSql.Tests
 {
@@ -23,8 +24,8 @@ namespace TrackableData.PostgreSql.Tests
 
     public class TrackablePocoTest : TestKits.StoragePocoTestKit<TrackableTestPoco, int>, IClassFixture<Database>, IDisposable
     {
-        private static TrackablePocoPostgreSqlMapper<ITestPoco> _mapper =
-            new TrackablePocoPostgreSqlMapper<ITestPoco>(nameof(TrackablePocoTest));
+        private static TrackablePocoSqlMapper<ITestPoco> _mapper =
+            new TrackablePocoSqlMapper<ITestPoco>(PostgreSqlProvider.Instance, nameof(TrackablePocoTest));
 
         private Database _db;
         private NpgsqlConnection _connection;
@@ -69,8 +70,8 @@ namespace TrackableData.PostgreSql.Tests
             new ColumnDefinition("Head1", typeof(int)),
             new ColumnDefinition("Head2", typeof(string), 100)
         };
-        private static TrackablePocoPostgreSqlMapper<ITestPoco> _mapper =
-            new TrackablePocoPostgreSqlMapper<ITestPoco>(nameof(TrackablePocoWithHeadKeysTest), HeadKeyColumnDefs);
+        private static TrackablePocoSqlMapper<ITestPoco> _mapper =
+            new TrackablePocoSqlMapper<ITestPoco>(PostgreSqlProvider.Instance, nameof(TrackablePocoWithHeadKeysTest), HeadKeyColumnDefs);
 
         private Database _db;
         private NpgsqlConnection _connection;
@@ -110,8 +111,8 @@ namespace TrackableData.PostgreSql.Tests
 
     public class TrackablePocoWithAutoIdTest : TestKits.StoragePocoWithAutoIdTestKit<TrackableTestPocoWithIdentity, int>, IClassFixture<Database>, IDisposable
     {
-        private static TrackablePocoPostgreSqlMapper<ITestPocoWithIdentity> _mapper =
-            new TrackablePocoPostgreSqlMapper<ITestPocoWithIdentity>(nameof(TrackablePocoWithAutoIdTest));
+        private static TrackablePocoSqlMapper<ITestPocoWithIdentity> _mapper =
+            new TrackablePocoSqlMapper<ITestPocoWithIdentity>(PostgreSqlProvider.Instance, nameof(TrackablePocoWithAutoIdTest));
 
         private Database _db;
         private NpgsqlConnection _connection;

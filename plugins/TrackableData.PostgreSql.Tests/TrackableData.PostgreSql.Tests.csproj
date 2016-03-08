@@ -87,6 +87,10 @@
       <Project>{ea7dd842-6e6b-4c81-8b74-2e758c9cf8b1}</Project>
       <Name>TrackableData.PostgreSql</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TrackableData.Sql\TrackableData.Sql.csproj">
+      <Project>{d472777a-9c57-4b6b-92b8-0960fecc06b9}</Project>
+      <Name>TrackableData.Sql</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TrackableData.TestKits\TrackableData.TestKits.csproj">
       <Project>{005f1dfc-49ad-462c-aaff-3e3890b95c0b}</Project>
       <Name>TrackableData.TestKits</Name>

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using TrackableData.TestKits;
 using Npgsql;
 using Xunit;
+using TrackableData.Sql;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;

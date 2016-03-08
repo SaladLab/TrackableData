@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using TrackableData.TestKits;
 using Npgsql;
 using Xunit;
+using TrackableData.Sql;
 
 namespace TrackableData.PostgreSql.Tests
 {
@@ -28,8 +29,9 @@ namespace TrackableData.PostgreSql.Tests
             new ColumnDefinition("ContainerId", typeof(int)),
         };
 
-        private static TrackableContainerPostgreSqlMapper<ITestContainer> _mapper =
-            new TrackableContainerPostgreSqlMapper<ITestContainer>(
+        private static TrackableContainerSqlMapper<ITestContainer> _mapper =
+            new TrackableContainerSqlMapper<ITestContainer>(
+                PostgreSqlProvider.Instance,
                 new[]
                 {
                     Tuple.Create("Person", new object[]

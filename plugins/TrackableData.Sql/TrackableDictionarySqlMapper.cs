@@ -131,7 +131,7 @@ namespace TrackableData.Sql
                                            .ToDictionary(x => x.PropertyInfo, y => y);
 
             _allColumnString = string.Join(",", _allColumns.Select(c => c.EscapedName));
-            _allColumnStringExceptHead = _keyColumn.Name + "," +
+            _allColumnStringExceptHead = _keyColumn.EscapedName + "," +
                                          string.Join(",", _valueColumns.Select(c => c.EscapedName));
         }
 
@@ -169,7 +169,7 @@ namespace TrackableData.Sql
             {
                 if (insertCount == 0)
                 {
-                    sql.Append("INSERT INTO ").Append(_tableName);
+                    sql.Append("INSERT INTO ").Append(_tableEscapedName);
                     sql.Append(" (").Append(_allColumnString).Append(") VALUES\n");
                 }
                 else
@@ -281,18 +281,18 @@ namespace TrackableData.Sql
                                 concating = true;
                             else
                                 sqlModify.Append(",");
-                            sqlModify.Append(col.Name).Append("=").Append(col.ExtractToSqlValue(v));
+                            sqlModify.Append(col.EscapedName).Append("=").Append(col.ExtractToSqlValue(v));
                         }
 
                         sqlModify.Append(" WHERE ");
                         for (var k = 0; k < _headKeyColumns.Length; k++)
                         {
-                            sqlModify.Append(_headKeyColumns[k].Name).Append("=");
+                            sqlModify.Append(_headKeyColumns[k].EscapedName).Append("=");
                             sqlModify.Append(_headKeyColumns[k].ConvertToSqlValue(keyValues[k]));
                             sqlModify.Append(" AND ");
                         }
 
-                        sqlModify.Append(_keyColumn.Name).Append("=");
+                        sqlModify.Append(_keyColumn.EscapedName).Append("=");
                         sqlModify.Append(_keyColumn.ConvertToSqlValue(i.Key)).Append(";\n");
                         break;
 
@@ -314,11 +314,11 @@ namespace TrackableData.Sql
                 sql.Append("DELETE FROM ").Append(_tableEscapedName).Append(" WHERE ");
                 for (var k = 0; k < _headKeyColumns.Length; k++)
                 {
-                    sqlModify.Append(_headKeyColumns[k].Name).Append("=");
+                    sqlModify.Append(_headKeyColumns[k].EscapedName).Append("=");
                     sqlModify.Append(_headKeyColumns[k].ConvertToSqlValue(keyValues[k]));
                     sqlModify.Append(" AND ");
                 }
-                sql.Append(_keyColumn.Name).Append(" IN (");
+                sql.Append(_keyColumn.EscapedName).Append(" IN (");
                 var concating = false;
                 foreach (var id in removeIds)
                 {
