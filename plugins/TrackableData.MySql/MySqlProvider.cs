@@ -12,7 +12,10 @@ namespace TrackableData.MySql
     {
         private static readonly Lazy<MySqlProvider> _instance = new Lazy<MySqlProvider>(() => new MySqlProvider());
 
-        public static MySqlProvider Instance { get { return _instance.Value; } }
+        public static MySqlProvider Instance
+        {
+            get { return _instance.Value; }
+        }
 
         public string GetSqlType(Type type, int length = 0)
         {

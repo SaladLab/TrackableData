@@ -1,19 +1,22 @@
-﻿using Npgsql;
-using System;
+﻿using System;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using Npgsql;
 using TrackableData.Sql;
 
 namespace TrackableData.PostgreSql
 {
     public class PostgreSqlProvider : ISqlProvider
     {
-        private static readonly Lazy<PostgreSqlProvider> _instance = new Lazy<PostgreSqlProvider>(() => new PostgreSqlProvider());
+        private static readonly Lazy<PostgreSqlProvider> _instance =
+            new Lazy<PostgreSqlProvider>(() => new PostgreSqlProvider());
 
-        public static PostgreSqlProvider Instance { get { return _instance.Value; } }
+        public static PostgreSqlProvider Instance
+        {
+            get { return _instance.Value; }
+        }
 
         public string GetSqlType(Type type, int length = 0)
         {
