@@ -9,7 +9,7 @@ namespace TrackableData.Json
 {
     public class TrackerJsonConverter : JsonConverter
     {
-        private ConcurrentDictionary<Type, JsonConverter> _converterMap = 
+        private ConcurrentDictionary<Type, JsonConverter> _converterMap =
             new ConcurrentDictionary<Type, JsonConverter>();
 
         public override bool CanConvert(Type objectType)
@@ -62,7 +62,6 @@ namespace TrackableData.Json
                     var trackerType = typeof(TrackableListTrackerJsonConverter<>)
                         .MakeGenericType(type.GetGenericArguments());
                     return (JsonConverter)Activator.CreateInstance(trackerType);
-
                 }
                 return null;
             });

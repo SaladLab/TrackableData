@@ -48,7 +48,7 @@ namespace TrackableData
 
                 case TrackableDictionaryOperation.Modify:
                     prevChange.NewValue = newValue;
-                    SetChange(key,  prevChange);
+                    SetChange(key, prevChange);
                     break;
 
                 case TrackableDictionaryOperation.Remove:

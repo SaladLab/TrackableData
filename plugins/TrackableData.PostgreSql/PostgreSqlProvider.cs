@@ -10,12 +10,12 @@ namespace TrackableData.PostgreSql
 {
     public class PostgreSqlProvider : ISqlProvider
     {
-        private static readonly Lazy<PostgreSqlProvider> _instance =
+        private static readonly Lazy<PostgreSqlProvider> s_instance =
             new Lazy<PostgreSqlProvider>(() => new PostgreSqlProvider());
 
         public static PostgreSqlProvider Instance
         {
-            get { return _instance.Value; }
+            get { return s_instance.Value; }
         }
 
         public string GetSqlType(Type type, int length = 0)

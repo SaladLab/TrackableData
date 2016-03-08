@@ -14,7 +14,7 @@ namespace TrackableData.TestKits
         protected abstract Task<int> DeleteAsync(TId id);
         protected abstract Task<TTrackablePoco> LoadAsync(TId id);
         protected abstract Task SaveAsync(ITracker tracker, TId id);
-        
+
         [Fact]
         public async Task Test_CreateAndLoad()
         {

@@ -46,7 +46,6 @@ namespace TrackableData
                 Index = index,
                 OldValue = oldValue,
             });
-
         }
 
         public void TrackModify(int index, T oldValue, T newValue)

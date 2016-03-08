@@ -70,7 +70,7 @@ namespace TrackableData.TestKits
         private void AssertEqualDictionary(TrackableList<JobData> a, TrackableList<JobData> b)
         {
             Assert.Equal(a.Count, b.Count);
-            for (int i=0; i<a.Count; i++)
+            for (int i = 0; i < a.Count; i++)
             {
                 var a_v = a[i];
                 var b_v = b[i];

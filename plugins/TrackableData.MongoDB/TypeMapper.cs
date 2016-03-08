@@ -67,7 +67,7 @@ namespace TrackableData.MongoDB
                 // if duplicate key exists
                 return false;
             }
-            
+
             return true;
         }
 

@@ -10,11 +10,12 @@ namespace TrackableData.MsSql
 {
     public class MsSqlProvider : ISqlProvider
     {
-        private static readonly Lazy<MsSqlProvider> _instance = new Lazy<MsSqlProvider>(() => new MsSqlProvider());
+        private static readonly Lazy<MsSqlProvider> s_instance =
+            new Lazy<MsSqlProvider>(() => new MsSqlProvider());
 
         public static MsSqlProvider Instance
         {
-            get { return _instance.Value; }
+            get { return s_instance.Value; }
         }
 
         public string GetSqlType(Type type, int length = 0)
