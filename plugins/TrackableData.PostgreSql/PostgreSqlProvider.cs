@@ -2,6 +2,7 @@
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using Npgsql;
 using TrackableData.Sql;
@@ -18,68 +19,121 @@ namespace TrackableData.PostgreSql
             get { return s_instance.Value; }
         }
 
+        private static readonly MethodInfo s_methodForGetSqlValueFuncForNullable =
+            typeof(PostgreSqlProvider).GetMethod("GetSqlValueFuncForNullable",
+                                                 BindingFlags.Instance | BindingFlags.Public);
+
         public string GetSqlType(Type type, int length = 0)
         {
             var lengthStr = length > 0 ? length.ToString() : "10000"; // TODO: BLOB for MAX
             if (type == typeof(bool))
-                return "boolean";
+                return "BOOLEAN";
             if (type == typeof(byte)) // PostgreSQL doesn't provide 1 byte integer.
-                return "smallint";
-            if (type == typeof(int))
-                return "integer";
-            if (type == typeof(long))
-                return "bigint";
+                return "SMALLINT";
             if (type == typeof(short))
-                return "smallint";
+                return "SMALLINT";
+            if (type == typeof(char))
+                return "INTEGER";
+            if (type == typeof(int))
+                return "INTEGER";
+            if (type == typeof(long))
+                return "BIGINT";
             if (type == typeof(float))
-                return "float4";
+                return "FLOAT4";
             if (type == typeof(double))
-                return "float8 ";
+                return "FLOAT8";
+            if (type == typeof(decimal))
+                return "NUMERIC";
             if (type == typeof(DateTime))
-                return "timestamp";
+                return "TIMESTAMP";
             if (type == typeof(DateTimeOffset))
-                return "timestamptz";
+                return "TIMESTAMPTZ";
+            if (type == typeof(TimeSpan))
+                return "TIME";
             if (type == typeof(string))
                 return $"VARCHAR({lengthStr})";
             if (type == typeof(byte[]))
-                return $"VARBINARY({lengthStr})";
+                return $"BYTEA";
             if (type == typeof(Guid))
-                return "[uniqueidentifier]";
+                return "UUID";
             return "";
         }
 
         public Func<object, string> GetSqlValueFunc(Type type)
         {
+            if (type == typeof(bool))
+                return (o => (bool)o ? "TRUE" : "FALSE");
+            if (type == typeof(char))
+                return (o => ((int)(char)o).ToString());
             if (type == typeof(DateTime))
-            {
                 return (o => GetSqlValue((DateTime)o));
-            }
-            else if (type == typeof(string))
-            {
+            if (type == typeof(DateTimeOffset))
+                return (o => GetSqlValue((DateTimeOffset)o));
+            if (type == typeof(TimeSpan))
+                return (o => GetSqlValue((TimeSpan)o));
+            if (type == typeof(string))
                 return (o => o != null ? GetSqlValue((string)o) : "NULL");
-            }
-            else if (type == typeof(bool))
+            if (type == typeof(byte[]))
+                return (o => o != null ? GetSqlValue((byte[])o) : "NULL");
+            if (type == typeof(Guid))
+                return (o => GetSqlValue((Guid)o));
+            if (type.IsEnum)
+                return (o => Convert.ToInt64(o).ToString(CultureInfo.InvariantCulture));
+            if (Nullable.GetUnderlyingType(type) != null)
             {
-                return (o => (bool)o ? "1" : "0");
+                return (Func<object, string>)
+                       s_methodForGetSqlValueFuncForNullable
+                           .MakeGenericMethod(Nullable.GetUnderlyingType(type))
+                           .Invoke(this, new object[] { });
             }
-            else if (type.IsEnum)
-            {
-                return (o => Convert.ToInt32(o).ToString(CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                return (o => o.ToString());
-            }
+            return (o => o.ToString());
         }
 
-        public static string GetSqlValue(string value)
+        public Func<object, string> GetSqlValueFuncForNullable<T>() where T : struct
         {
-            return "N'" + value.Replace("'", "''") + "'";
+            var func = GetSqlValueFunc(typeof(T));
+            return (o =>
+            {
+                var v = (T?)o;
+                return v.HasValue ? func(v.Value) : "NULL";
+            });
         }
 
         public static string GetSqlValue(DateTime value)
         {
-            return "'" + value.ToString("yyyy-MM-dd HH:mm:ss") + "'";
+            return "'" + value.ToString(@"yyyy-MM-dd HH\:mm\:ss.fffffff") + "'";
+        }
+
+        public static string GetSqlValue(DateTimeOffset value)
+        {
+            return "'" + value.ToString(@"yyyy-MM-dd HH\:mm\:ss.fffffffzzz") + "'";
+        }
+
+        public static string GetSqlValue(TimeSpan value)
+        {
+            return "'" + value.ToString() + "'";
+        }
+
+        public static string GetSqlValue(string value)
+        {
+            return "'" + value.Replace("'", "''") + "'";
+        }
+
+        public static string GetSqlValue(byte[] value)
+        {
+            var sb = new StringBuilder(value.Length * 2 + 6);
+
+            sb.Append("E'\\\\x");
+            foreach (var b in value)
+                sb.Append(b.ToString("X2", CultureInfo.InvariantCulture));
+            sb.Append("'");
+
+            return sb.ToString();
+        }
+
+        public static string GetSqlValue(Guid value)
+        {
+            return "'" + value.ToString() + "'";
         }
 
         public string EscapeName(string name)
@@ -97,9 +151,18 @@ namespace TrackableData.PostgreSql
                 ",\n",
                 columns.Select(c =>
                 {
-                    var identity = c.IsIdentity ? $" DEFAULT nextval('\"{tableName}_{c.Name}_seq\"')" : "";
-                    var notnull = c.Type.IsValueType ? " NOT NULL" : "";
-                    return $"{c.EscapedName} {GetSqlType(c.Type, c.Length)}{identity}{notnull}";
+                    if (Nullable.GetUnderlyingType(c.Type) != null)
+                    {
+                        var underlyingType = Nullable.GetUnderlyingType(c.Type);
+                        var identity = c.IsIdentity ? $" DEFAULT nextval('\"{tableName}_{c.Name}_seq\"')" : "";
+                        return $"{c.EscapedName} {GetSqlType(underlyingType, c.Length)}{identity}";
+                    }
+                    else
+                    {
+                        var identity = c.IsIdentity ? $" DEFAULT nextval('\"{tableName}_{c.Name}_seq\"')" : "";
+                        var notnull = c.Type.IsValueType ? " NOT NULL" : "";
+                        return $"{c.EscapedName} {GetSqlType(c.Type, c.Length)}{identity}{notnull}";
+                    }
                 }));
 
             var primaryKeyDef = string.Join(

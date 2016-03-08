@@ -22,7 +22,11 @@ namespace TrackableData.Sql
             }
             if (t == typeof(DateTimeOffset) && o != null && o.GetType() == typeof(DateTime))
             {
-                return new DateTimeOffset((DateTime)o, TimeSpan.Zero);
+                var dt = (DateTime)o;
+                if (dt.Kind == DateTimeKind.Unspecified)
+                    return new DateTimeOffset((DateTime)o, TimeSpan.Zero); // MySQL
+                else
+                    return new DateTimeOffset(((DateTime)o).ToUniversalTime(), TimeSpan.Zero); // PostgreSQL
             }
 
             return Convert.ChangeType(o, t);
