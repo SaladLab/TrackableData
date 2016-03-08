@@ -26,35 +26,35 @@ namespace TrackableData.MsSql
         public string GetSqlType(Type type, int length = 0)
         {
             if (type == typeof(bool))
-                return "bit";
+                return "BIT";
             if (type == typeof(byte))
-                return "tinyint";
+                return "TINYINT";
             if (type == typeof(short))
-                return "smallint";
+                return "SMALLINT";
             if (type == typeof(char))
-                return "int";
+                return "INT";
             if (type == typeof(int))
-                return "int";
+                return "INT";
             if (type == typeof(long))
-                return "bigint";
+                return "BIGINT";
             if (type == typeof(float))
-                return "real";
+                return "REAL";
             if (type == typeof(double))
-                return "float";
+                return "FLOAT";
             if (type == typeof(decimal))
-                return "decimal(18,2)";
+                return "DECIMAL(18,2)";
             if (type == typeof(DateTime))
-                return "datetime2";
+                return "DATETIME2";
             if (type == typeof(DateTimeOffset))
-                return "datetimeoffset";
+                return "DATETIMEOFFSET";
             if (type == typeof(TimeSpan))
-                return "time";
+                return "TIME";
             if (type == typeof(string))
-                return $"nvarchar({GetSqlLength(length)})";
+                return $"NVARCHAR({GetSqlLength(length)})";
             if (type == typeof(byte[]))
-                return $"varbinary({GetSqlLength(length)})";
+                return $"VARBINARY({GetSqlLength(length)})";
             if (type == typeof(Guid))
-                return "uniqueidentifier";
+                return "UNIQUEIDENTIFIER";
             return "";
         }
 
