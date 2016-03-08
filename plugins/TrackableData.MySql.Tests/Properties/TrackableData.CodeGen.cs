@@ -9,10 +9,11 @@
 
 using MySql.Data.MySqlClient;
 using System;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
+using TrackableData.Sql;
 using TrackableData.TestKits;
 using Xunit;
+using System.Data.SqlClient;
 using TrackableData.MySql;
 using System.Collections.Generic;
 using System.Reflection;

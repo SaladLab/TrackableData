@@ -1,7 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
+using TrackableData.Sql;
 using TrackableData.TestKits;
 using Xunit;
 
@@ -29,8 +29,9 @@ namespace TrackableData.MySql.Tests
             new ColumnDefinition("ContainerId", typeof(int)),
         };
 
-        private static TrackableContainerMySqlMapper<ITestContainer> _mapper =
-            new TrackableContainerMySqlMapper<ITestContainer>(
+        private static TrackableContainerSqlMapper<ITestContainer> _mapper =
+            new TrackableContainerSqlMapper<ITestContainer>(
+                MySqlProvider.Instance,
                 new[]
                 {
                     Tuple.Create("Person", new object[]

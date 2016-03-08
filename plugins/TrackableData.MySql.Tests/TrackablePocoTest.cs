@@ -3,6 +3,7 @@ using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using TrackableData.MySql;
+using TrackableData.Sql;
 using Xunit;
 
 namespace TrackableData.MySql.Tests
@@ -25,8 +26,8 @@ namespace TrackableData.MySql.Tests
 
     public class TrackablePocoTest : TestKits.StoragePocoTestKit<TrackableTestPoco, int>, IClassFixture<Database>, IDisposable
     {
-        private static TrackablePocoMySqlMapper<ITestPoco> _mapper =
-            new TrackablePocoMySqlMapper<ITestPoco>(nameof(TrackablePocoTest));
+        private static TrackablePocoSqlMapper<ITestPoco> _mapper =
+            new TrackablePocoSqlMapper<ITestPoco>(MySqlProvider.Instance, nameof(TrackablePocoTest));
 
         private Database _db;
         private MySqlConnection _connection;
@@ -71,8 +72,8 @@ namespace TrackableData.MySql.Tests
             new ColumnDefinition("Head1", typeof(int)),
             new ColumnDefinition("Head2", typeof(string), 100)
         };
-        private static TrackablePocoMySqlMapper<ITestPoco> _mapper =
-            new TrackablePocoMySqlMapper<ITestPoco>(nameof(TrackablePocoWithHeadKeysTest), HeadKeyColumnDefs);
+        private static TrackablePocoSqlMapper<ITestPoco> _mapper =
+            new TrackablePocoSqlMapper<ITestPoco>(MySqlProvider.Instance, nameof(TrackablePocoWithHeadKeysTest), HeadKeyColumnDefs);
 
         private Database _db;
         private MySqlConnection _connection;
@@ -112,8 +113,8 @@ namespace TrackableData.MySql.Tests
 
     public class TrackablePocoWithAutoIdTest : TestKits.StoragePocoWithAutoIdTestKit<TrackableTestPocoWithIdentity, int>, IClassFixture<Database>, IDisposable
     {
-        private static TrackablePocoMySqlMapper<ITestPocoWithIdentity> _mapper =
-            new TrackablePocoMySqlMapper<ITestPocoWithIdentity>(nameof(TrackablePocoWithAutoIdTest));
+        private static TrackablePocoSqlMapper<ITestPocoWithIdentity> _mapper =
+            new TrackablePocoSqlMapper<ITestPocoWithIdentity>(MySqlProvider.Instance, nameof(TrackablePocoWithAutoIdTest));
 
         private Database _db;
         private MySqlConnection _connection;
@@ -150,5 +151,4 @@ namespace TrackableData.MySql.Tests
             return _mapper.SaveAsync(_connection, (TrackablePocoTracker<ITestPocoWithIdentity>)tracker, id);
         }
     }
-
 }

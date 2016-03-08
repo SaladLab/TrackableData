@@ -1,9 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
-using TrackableData.MySql;
+using TrackableData.Sql;
 using TrackableData.TestKits;
 using Xunit;
 
@@ -13,8 +12,9 @@ namespace TrackableData.MySql.Tests
     {
         private static readonly ColumnDefinition SingleValueColumnDef = new ColumnDefinition("Value", typeof(string));
 
-        private static TrackableDictionaryMySqlMapper<int, string> _mapper = 
-            new TrackableDictionaryMySqlMapper<int, string>(
+        private static TrackableDictionarySqlMapper<int, string> _mapper = 
+            new TrackableDictionarySqlMapper<int, string>(
+                MySqlProvider.Instance,
                 nameof(TrackableDictionaryStringTest), new ColumnDefinition("Id"), SingleValueColumnDef, null);
 
         private Database _db;
@@ -60,8 +60,9 @@ namespace TrackableData.MySql.Tests
 
     public class TrackableDictionaryDataTest : StorageDictionaryDataTestKit<int>, IClassFixture<Database>, IDisposable
     {
-        private static TrackableDictionaryMySqlMapper<int, ItemData> _mapper =
-            new TrackableDictionaryMySqlMapper<int, ItemData>(
+        private static TrackableDictionarySqlMapper<int, ItemData> _mapper =
+            new TrackableDictionarySqlMapper<int, ItemData>(
+                MySqlProvider.Instance,
                 nameof(TrackableDictionaryDataTest), new ColumnDefinition("Id"));
 
         private Database _db;
@@ -112,8 +113,9 @@ namespace TrackableData.MySql.Tests
             new ColumnDefinition("Head1", typeof(int)),
             new ColumnDefinition("Head2", typeof(string), 100)
         };
-        private static TrackableDictionaryMySqlMapper<int, ItemData> _mapper =
-            new TrackableDictionaryMySqlMapper<int, ItemData>(
+        private static TrackableDictionarySqlMapper<int, ItemData> _mapper =
+            new TrackableDictionarySqlMapper<int, ItemData>(
+                MySqlProvider.Instance,
                 nameof(TrackableDictionaryDataWithHeadKeysTest), new ColumnDefinition("Id"), HeadKeyColumnDefs);
 
         private Database _db;

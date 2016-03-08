@@ -239,7 +239,10 @@ namespace TrackableData.Sql
                     {
                         if (await reader.ReadAsync())
                         {
-                            _identityColumn.PropertyInfo.SetValue(value, reader.GetValue(0));
+                            var identity = reader.GetValue(0);
+                            _identityColumn.PropertyInfo.SetValue(
+                                value,
+                                Convert.ChangeType(identity, _identityColumn.PropertyInfo.PropertyType));
                             return 1;
                         }
                     }

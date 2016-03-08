@@ -44,18 +44,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ColumnDefinition.cs" />
+    <Compile Include="MySqlProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyInfoGenerated.cs" />
-    <Compile Include="SqlMapperHelper.cs" />
-    <Compile Include="TrackableContainerMySqlMapper.cs" />
-    <Compile Include="TrackableDictionaryMySqlMapper.cs" />
-    <Compile Include="TrackablePocoMySqlMapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\core\TrackableData\TrackableData.csproj">
       <Project>{c2c3a8ca-62f9-4c5a-8b2b-5091e5a41c54}</Project>
       <Name>TrackableData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TrackableData.Sql\TrackableData.Sql.csproj">
+      <Project>{d472777a-9c57-4b6b-92b8-0960fecc06b9}</Project>
+      <Name>TrackableData.Sql</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

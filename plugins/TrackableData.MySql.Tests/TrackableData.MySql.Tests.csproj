@@ -83,6 +83,10 @@
       <Project>{4718ba4e-f43d-4fc8-9605-85cb84f67126}</Project>
       <Name>TrackableData.MySql</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TrackableData.Sql\TrackableData.Sql.csproj">
+      <Project>{d472777a-9c57-4b6b-92b8-0960fecc06b9}</Project>
+      <Name>TrackableData.Sql</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TrackableData.TestKits\TrackableData.TestKits.csproj">
       <Project>{5d955da9-66ae-458e-8fd4-d6c0c5630d10}</Project>
       <Name>TrackableData.TestKits</Name>
