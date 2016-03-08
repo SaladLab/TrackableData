@@ -11,10 +11,17 @@ namespace TrackableData.Sql
             {
                 return Enum.ToObject(t, o);
             }
-            else
+            if (o == DBNull.Value)
             {
-                return Convert.ChangeType(o, t);
+                return null;
             }
+            var underlyingType = Nullable.GetUnderlyingType(t);
+            if (underlyingType != null)
+            {
+                return ConvertValue(o, underlyingType);
+            }
+
+            return Convert.ChangeType(o, t);
         }
 
         public static Func<object, string> GetExtractToSqlValueFunc(this ISqlProvider sqlProvider, PropertyInfo pi)
