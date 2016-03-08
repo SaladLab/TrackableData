@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Configuration;
+using System.Data.Common;
 using System.Data.SqlClient;
+using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
+using TrackableData.Sql;
 
 namespace TrackableData.MySql.Tests
 {
-    public class Database : IDisposable
+    public class Database : SqlTestKits.IDbConnectionProvider, IDisposable
     {
         public Database()
         {
@@ -13,14 +16,9 @@ namespace TrackableData.MySql.Tests
 
             // create TestDb if not exist
 
-            var cstrForMaster = "";
-            {
-                var connectionBuilder = new SqlConnectionStringBuilder(cstr);
-                connectionBuilder.InitialCatalog = "";
-                cstrForMaster = connectionBuilder.ToString();
-            }
-
-            using (var conn = new MySqlConnection(cstrForMaster))
+            var cstrWithoutDatabase = Regex.Replace(cstr, "Database=[^;]+", "");
+            var databaseName = Regex.Match(cstr, "Database=([^;]+)").Groups[1].ToString();
+            using (var conn = new MySqlConnection(cstrWithoutDatabase))
             {
                 conn.Open();
 
@@ -37,7 +35,7 @@ namespace TrackableData.MySql.Tests
             }
         }
 
-        public MySqlConnection Connection
+        public DbConnection Connection
         {
             get
             {
@@ -51,5 +49,7 @@ namespace TrackableData.MySql.Tests
         public void Dispose()
         {
         }
+
+        public static ISqlProvider SqlProvider => MySqlProvider.Instance;
     }
 }
