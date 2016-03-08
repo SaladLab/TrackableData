@@ -125,12 +125,13 @@ namespace TrackableData.MsSql
 
         public static string GetSqlValue(byte[] value)
         {
-            var stringBuilder = new StringBuilder("0x");
+            var sb = new StringBuilder(value.Length * 2 + 2);
 
+            sb.Append("0x");
             foreach (var b in value)
-                stringBuilder.Append(b.ToString("X2", CultureInfo.InvariantCulture));
+                sb.Append(b.ToString("X2", CultureInfo.InvariantCulture));
 
-            return stringBuilder.ToString();
+            return sb.ToString();
         }
 
         public static string GetSqlValue(Guid value)
