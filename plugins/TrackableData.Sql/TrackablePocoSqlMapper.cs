@@ -126,7 +126,7 @@ namespace TrackableData.Sql
 
         public string BuildCreateTableSql(bool dropIfExists = false)
         {
-            return _sqlProvider.BuildCreateTableSql(_tableEscapedName,
+            return _sqlProvider.BuildCreateTableSql(_tableName,
                                                     _allColumns,
                                                     _primaryKeyColumns,
                                                     dropIfExists);
@@ -162,7 +162,7 @@ namespace TrackableData.Sql
                 }
             }
 
-            return _sqlProvider.BuildInsertIntoSql(_tableEscapedName,
+            return _sqlProvider.BuildInsertIntoSql(_tableName,
                                                    _allColumnStringExceptIdentity,
                                                    sb.ToString(),
                                                    _identityColumn);

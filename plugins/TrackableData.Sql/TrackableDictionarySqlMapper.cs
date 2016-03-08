@@ -149,9 +149,9 @@ namespace TrackableData.Sql
 
         public string BuildCreateTableSql(bool dropIfExists = false)
         {
-            return _sqlProvider.BuildCreateTableSql(_tableEscapedName,
+            return _sqlProvider.BuildCreateTableSql(_tableName,
                                                     _allColumns,
-                                                    _headKeyColumns,
+                                                    _headKeyColumns.Concat(new[] { _keyColumn }).ToArray(),
                                                     dropIfExists);
         }
 

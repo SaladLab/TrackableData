@@ -15,13 +15,13 @@ namespace TrackableData.Sql
         string EscapeName(string name);
 
         // CREATE TABLE [tableEscapedName] { columns } WITH primaryKeys
-        string BuildCreateTableSql(string tableEscapedName,
+        string BuildCreateTableSql(string tableName,
                                    ColumnProperty[] columns,
                                    ColumnProperty[] primaryKeys,
                                    bool dropIfExists);
 
         // INSERT INTO [tableEscapedName] (columns) OUTPUT INSERTED.identity VALUES (values)
-        string BuildInsertIntoSql(string tableEscapedName,
+        string BuildInsertIntoSql(string tableName,
                                   string columns,
                                   string values,
                                   ColumnProperty identity);
