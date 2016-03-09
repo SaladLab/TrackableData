@@ -54,7 +54,7 @@ namespace TrackableData.Sql
                         escapedName: _sqlProvider.EscapeName(headKeyColumnDef.Name),
                         type: headKeyColumnDef.Type,
                         length: headKeyColumnDef.Length,
-                        convertToSqlValue: _sqlProvider.GetSqlValueFunc(headKeyColumnDef.Type));
+                        convertToSqlValue: _sqlProvider.GetConvertToSqlValueFunc(headKeyColumnDef.Type));
 
                     headKeyColumns.Add(column);
                     primaryKeyColumns.Add(column);
@@ -87,8 +87,10 @@ namespace TrackableData.Sql
                     type: property.PropertyType,
                     isIdentity: isIdentity,
                     propertyInfo: property,
-                    convertToSqlValue: _sqlProvider.GetSqlValueFunc(property.PropertyType),
-                    extractToSqlValue: _sqlProvider.GetExtractToSqlValueFunc(property));
+                    convertToSqlValue: _sqlProvider.GetConvertToSqlValueFunc(property.PropertyType),
+                    convertFromDbValue: _sqlProvider.GetConvertFromDbValueFunc(property.PropertyType),
+                    extractToSqlValue: _sqlProvider.GetExtractToSqlValueFunc(property),
+                    installFromDbValue: _sqlProvider.GetInstallFromDbValueFunc(property));
 
                 if (primaryKey)
                     primaryKeyColumns.Add(column);
@@ -238,10 +240,8 @@ namespace TrackableData.Sql
                     {
                         if (await reader.ReadAsync())
                         {
-                            var identity = reader.GetValue(0);
-                            _identityColumn.PropertyInfo.SetValue(
-                                value,
-                                Convert.ChangeType(identity, _identityColumn.PropertyInfo.PropertyType));
+                            var columnValue = reader.GetValue(0);
+                            _identityColumn.InstallFromDbValue(value, columnValue);
                             return 1;
                         }
                     }
@@ -301,9 +301,8 @@ namespace TrackableData.Sql
             var value = (T)Activator.CreateInstance(_trackableType);
             for (var i = 0; i < _valueColumns.Length; i++)
             {
-                _valueColumns[i].PropertyInfo.SetValue(
-                    value,
-                    SqlUtility.ConvertValue(record.GetValue(i), _valueColumns[i].Type));
+                var columnValue = record.GetValue(i);
+                _valueColumns[i].InstallFromDbValue(value, columnValue);
             }
             return value;
         }

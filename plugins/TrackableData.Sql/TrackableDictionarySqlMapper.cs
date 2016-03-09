@@ -60,7 +60,7 @@ namespace TrackableData.Sql
                         escapedName: _sqlProvider.EscapeName(headKeyColumnDef.Name),
                         type: headKeyColumnDef.Type,
                         length: headKeyColumnDef.Length,
-                        convertToSqlValue: _sqlProvider.GetSqlValueFunc(headKeyColumnDef.Type));
+                        convertToSqlValue: _sqlProvider.GetConvertToSqlValueFunc(headKeyColumnDef.Type));
 
                     headKeyColumns.Add(column);
                     primaryKeyColumns.Add(column);
@@ -75,7 +75,8 @@ namespace TrackableData.Sql
                 escapedName: _sqlProvider.EscapeName(keyColumnDef.Name),
                 type: typeof(TKey),
                 length: keyColumnDef.Length,
-                convertToSqlValue: _sqlProvider.GetSqlValueFunc(typeof(TKey)));
+                convertToSqlValue: _sqlProvider.GetConvertToSqlValueFunc(typeof(TKey)),
+                convertFromDbValue: _sqlProvider.GetConvertFromDbValueFunc(typeof(TKey)));
 
             primaryKeyColumns.Add(_keyColumn);
             allColumns.Add(_keyColumn);
@@ -89,8 +90,9 @@ namespace TrackableData.Sql
                     escapedName: _sqlProvider.EscapeName(singleValueColumnDef.Name),
                     type: typeof(TValue),
                     length: singleValueColumnDef.Length,
-                    convertToSqlValue: _sqlProvider.GetSqlValueFunc(typeof(TValue)),
-                    extractToSqlValue: _sqlProvider.GetSqlValueFunc(typeof(TValue)));
+                    convertToSqlValue: _sqlProvider.GetConvertToSqlValueFunc(typeof(TValue)),
+                    convertFromDbValue: _sqlProvider.GetConvertFromDbValueFunc(typeof(TValue)),
+                    extractToSqlValue: _sqlProvider.GetConvertToSqlValueFunc(typeof(TValue)));
 
                 valueColumns.Add(column);
                 allColumns.Add(column);
@@ -115,8 +117,10 @@ namespace TrackableData.Sql
                         escapedName: _sqlProvider.EscapeName(columnName),
                         type: property.PropertyType,
                         propertyInfo: property,
-                        convertToSqlValue: _sqlProvider.GetSqlValueFunc(property.PropertyType),
-                        extractToSqlValue: _sqlProvider.GetExtractToSqlValueFunc(property));
+                        convertToSqlValue: _sqlProvider.GetConvertToSqlValueFunc(property.PropertyType),
+                        convertFromDbValue: _sqlProvider.GetConvertFromDbValueFunc(property.PropertyType),
+                        extractToSqlValue: _sqlProvider.GetExtractToSqlValueFunc(property),
+                        installFromDbValue: _sqlProvider.GetInstallFromDbValueFunc(property));
 
                     valueColumns.Add(column);
                     allColumns.Add(column);
@@ -382,21 +386,21 @@ namespace TrackableData.Sql
 
         private KeyValuePair<TKey, TValue> ConvertToKeyAndValue(IDataRecord record)
         {
-            var key = (TKey)SqlUtility.ConvertValue(record.GetValue(0), typeof(TKey));
+            var key = (TKey)_keyColumn.ConvertFromDbValue(record.GetValue(0));
             TValue value;
 
             if (IsSingleValueType)
             {
-                value = (TValue)SqlUtility.ConvertValue(record.GetValue(1), typeof(TValue));
+                var columnValue = record.GetValue(1);
+                value = (TValue)_valueColumns[0].ConvertFromDbValue(columnValue);
             }
             else
             {
                 value = (TValue)Activator.CreateInstance(typeof(TValue));
                 for (var i = 0; i < _valueColumns.Length; i++)
                 {
-                    _valueColumns[i].PropertyInfo.SetValue(
-                        value,
-                        SqlUtility.ConvertValue(record.GetValue(i + 1), _valueColumns[i].Type));
+                    var columnValue = record.GetValue(i + 1);
+                    _valueColumns[i].InstallFromDbValue(value, columnValue);
                 }
             }
 

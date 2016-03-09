@@ -5,11 +5,11 @@ namespace TrackableData.Sql
 {
     public interface ISqlProvider
     {
-        // ex: string(10) -> varchar(10)
-        string GetSqlType(Type type, int length = 0);
-
         // ex: type(string) -> (v -> "N'" + v.Replace("'", "''") + "'")
-        Func<object, string> GetSqlValueFunc(Type type);
+        Func<object, string> GetConvertToSqlValueFunc(Type type);
+
+        // ex: type(string) -> (o -> o != DbNull ? o : null)
+        Func<object, object> GetConvertFromDbValueFunc(Type type);
 
         // ex: name -> [name]
         string EscapeName(string name);

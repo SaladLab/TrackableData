@@ -19,8 +19,8 @@ namespace TrackableData.PostgreSql
             get { return s_instance.Value; }
         }
 
-        private static readonly MethodInfo s_methodForGetSqlValueFuncForNullable =
-            typeof(PostgreSqlProvider).GetMethod("GetSqlValueFuncForNullable",
+        private static readonly MethodInfo s_methodForGetConvertToSqlValueFuncForNullable =
+            typeof(PostgreSqlProvider).GetMethod("GetConvertToSqlValueFuncForNullable",
                                                  BindingFlags.Instance | BindingFlags.Public);
 
         public string GetSqlType(Type type, int length = 0)
@@ -59,7 +59,7 @@ namespace TrackableData.PostgreSql
             return "";
         }
 
-        public Func<object, string> GetSqlValueFunc(Type type)
+        public Func<object, string> GetConvertToSqlValueFunc(Type type)
         {
             if (type == typeof(bool))
                 return (o => (bool)o ? "TRUE" : "FALSE");
@@ -82,16 +82,16 @@ namespace TrackableData.PostgreSql
             if (Nullable.GetUnderlyingType(type) != null)
             {
                 return (Func<object, string>)
-                       s_methodForGetSqlValueFuncForNullable
+                       s_methodForGetConvertToSqlValueFuncForNullable
                            .MakeGenericMethod(Nullable.GetUnderlyingType(type))
                            .Invoke(this, new object[] { });
             }
             return (o => o.ToString());
         }
 
-        public Func<object, string> GetSqlValueFuncForNullable<T>() where T : struct
+        public Func<object, string> GetConvertToSqlValueFuncForNullable<T>() where T : struct
         {
-            var func = GetSqlValueFunc(typeof(T));
+            var func = GetConvertToSqlValueFunc(typeof(T));
             return (o =>
             {
                 var v = (T?)o;
@@ -134,6 +134,25 @@ namespace TrackableData.PostgreSql
         public static string GetSqlValue(Guid value)
         {
             return "'" + value.ToString() + "'";
+        }
+
+        public Func<object, object> GetConvertFromDbValueFunc(Type type)
+        {
+            if (type == typeof(string))
+                return (o => o != DBNull.Value ? Convert.ChangeType(o, type) : null);
+            if (type == typeof(byte[]))
+                return (o => o != DBNull.Value ? Convert.ChangeType(o, type) : null);
+            // PostgreSQL treats DateTimeOffset as DateTime at UTC
+            if (type == typeof(DateTimeOffset))
+                return (o => new DateTimeOffset(((DateTime)o).ToUniversalTime(), TimeSpan.Zero));
+            if (type.IsEnum)
+                return (o => Enum.ToObject(type, o));
+            if (Nullable.GetUnderlyingType(type) != null)
+            {
+                var underlyingFunc = GetConvertFromDbValueFunc(Nullable.GetUnderlyingType(type));
+                return (o => o != DBNull.Value ? underlyingFunc(o) : null);
+            }
+            return (o => Convert.ChangeType(o, type));
         }
 
         public string EscapeName(string name)
