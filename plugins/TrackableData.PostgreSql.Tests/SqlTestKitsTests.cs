@@ -26,7 +26,6 @@ namespace TrackableData.PostgreSql.Tests
         }
     }
 
-    /*
     public class TrackableTestTypePocoTest : SqlTestKits.TrackableTestTypePocoTest, IClassFixture<Database>
     {
         public TrackableTestTypePocoTest(Database db)
@@ -42,7 +41,6 @@ namespace TrackableData.PostgreSql.Tests
         {
         }
     }
-    */
 
     public class TrackableDictionaryDataTest : SqlTestKits.TrackableDictionaryDataTest, IClassFixture<Database>
     {
