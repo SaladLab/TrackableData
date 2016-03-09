@@ -55,6 +55,8 @@ namespace TrackableData.MsSql
                 return $"VARBINARY({GetSqlLength(length)})";
             if (type == typeof(Guid))
                 return "UNIQUEIDENTIFIER";
+            if (type.IsEnum)
+                return GetSqlType(Enum.GetUnderlyingType(type));
             return "";
         }
 

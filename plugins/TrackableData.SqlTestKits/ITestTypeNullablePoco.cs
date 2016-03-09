@@ -18,5 +18,6 @@ namespace TrackableData.SqlTestKits
         DateTimeOffset? vDateTimeOffset { get; set; }
         TimeSpan? vTimeSpan { get; set; }
         Guid? vGuid { get; set; }
+        Suit? vSuit { get; set; }
     }
 }

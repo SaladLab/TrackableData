@@ -2,6 +2,14 @@ using System;
 
 namespace TrackableData.SqlTestKits
 {
+    public enum Suit : byte
+    {
+        Spade = 1,
+        Heart,
+        Diamond,
+        Club
+    }
+
     public interface ITestTypePoco : ITrackablePoco<ITestTypePoco>
     {
         [TrackableProperty("sql.primary-key", "sql.identity")] int Id { get; set; }
@@ -20,5 +28,6 @@ namespace TrackableData.SqlTestKits
         string vString { get; set; }
         byte[] vBytes { get; set; }
         Guid vGuid { get; set; }
+        Suit vSuit { get; set; }
     }
 }

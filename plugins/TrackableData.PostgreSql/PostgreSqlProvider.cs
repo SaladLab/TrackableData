@@ -56,6 +56,8 @@ namespace TrackableData.PostgreSql
                 return $"BYTEA";
             if (type == typeof(Guid))
                 return "UUID";
+            if (type.IsEnum)
+                return GetSqlType(Enum.GetUnderlyingType(type));
             return "";
         }
 

@@ -36,6 +36,7 @@ namespace TrackableData.SqlTestKits
             p0.vString = "1";
             p0.vBytes = new byte[] { 1 };
             p0.vGuid = new Guid(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+            p0.vSuit = Suit.Spade;
             await _mapper.CreateAsync(_db.Connection, p0);
 
             var p1 = await _mapper.LoadAsync(_db.Connection, p0.Id);
@@ -68,6 +69,7 @@ namespace TrackableData.SqlTestKits
             p0.vString = "0";
             p0.vBytes = new byte[] { 0 };
             p0.vGuid = Guid.Empty;
+            p0.vSuit = (Suit)0;
             await _mapper.CreateAsync(_db.Connection, p0);
 
             var p1 = await _mapper.LoadAsync(_db.Connection, p0.Id);
@@ -104,6 +106,7 @@ namespace TrackableData.SqlTestKits
             p0.vString = "\xAC00\xD7A3";
             p0.vBytes = new byte[] { 0, 127, 255 };
             p0.vGuid = new Guid(0xFFFFFFFF, 0xFFFF, 0xFFFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF);
+            p0.vSuit = (Suit)0xFF;
             await _mapper.CreateAsync(_db.Connection, p0);
 
             var p1 = await _mapper.LoadAsync(_db.Connection, p0.Id);

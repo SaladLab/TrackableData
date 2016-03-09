@@ -415,6 +415,7 @@ namespace TrackableData.SqlTestKits
             public static readonly PropertyInfo vString = typeof(ITestTypePoco).GetProperty("vString");
             public static readonly PropertyInfo vBytes = typeof(ITestTypePoco).GetProperty("vBytes");
             public static readonly PropertyInfo vGuid = typeof(ITestTypePoco).GetProperty("vGuid");
+            public static readonly PropertyInfo vSuit = typeof(ITestTypePoco).GetProperty("vSuit");
         }
 
         private int _Id;
@@ -672,6 +673,22 @@ namespace TrackableData.SqlTestKits
                 _vGuid = value;
             }
         }
+
+        private Suit _vSuit;
+
+        public Suit vSuit
+        {
+            get
+            {
+                return _vSuit;
+            }
+            set
+            {
+                if (Tracker != null && vSuit != value)
+                    Tracker.TrackSet(PropertyTable.vSuit, _vSuit, value);
+                _vSuit = value;
+            }
+        }
     }
 }
 
@@ -744,6 +761,7 @@ namespace TrackableData.SqlTestKits
             public static readonly PropertyInfo vDateTimeOffset = typeof(ITestTypeNullablePoco).GetProperty("vDateTimeOffset");
             public static readonly PropertyInfo vTimeSpan = typeof(ITestTypeNullablePoco).GetProperty("vTimeSpan");
             public static readonly PropertyInfo vGuid = typeof(ITestTypeNullablePoco).GetProperty("vGuid");
+            public static readonly PropertyInfo vSuit = typeof(ITestTypeNullablePoco).GetProperty("vSuit");
         }
 
         private int _Id;
@@ -967,6 +985,22 @@ namespace TrackableData.SqlTestKits
                 if (Tracker != null && vGuid != value)
                     Tracker.TrackSet(PropertyTable.vGuid, _vGuid, value);
                 _vGuid = value;
+            }
+        }
+
+        private Suit? _vSuit;
+
+        public Suit? vSuit
+        {
+            get
+            {
+                return _vSuit;
+            }
+            set
+            {
+                if (Tracker != null && vSuit != value)
+                    Tracker.TrackSet(PropertyTable.vSuit, _vSuit, value);
+                _vSuit = value;
             }
         }
     }

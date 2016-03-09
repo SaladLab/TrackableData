@@ -56,6 +56,8 @@ namespace TrackableData.MySql
                 return $"VARBINARY({lengthStr})";
             if (type == typeof(Guid))
                 return "CHAR(36)";
+            if (type.IsEnum)
+                return GetSqlType(Enum.GetUnderlyingType(type));
             return "";
         }
 

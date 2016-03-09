@@ -43,6 +43,7 @@ namespace TrackableData.SqlTestKits
             p0.vDateTimeOffset = new DateTimeOffset(2001, 1, 1, 1, 1, 1, TimeSpan.Zero);
             p0.vTimeSpan = new TimeSpan(1, 1, 1);
             p0.vGuid = new Guid(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+            p0.vSuit = Suit.Spade;
             await _mapper.CreateAsync(_db.Connection, p0);
 
             var p1 = await _mapper.LoadAsync(_db.Connection, p0.Id);
