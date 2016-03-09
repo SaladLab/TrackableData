@@ -15,7 +15,10 @@ namespace CodeGen
             Console.WriteLine("GenerateCode: " + iname);
 
             writer.PushRegion(iname);
-            writer.PushNamespace(idecl.GetNamespaceScope());
+
+            var namespaceScope = idecl.GetNamespaceScope();
+            if (string.IsNullOrEmpty(namespaceScope) == false)
+                writer.PushNamespace(idecl.GetNamespaceScope());
 
             var useProtoContract = idecl.AttributeLists.GetAttribute("ProtoContractAttribute") != null;
             GenerateTrackablePocoCode(idecl, writer, useProtoContract);
@@ -23,7 +26,9 @@ namespace CodeGen
             if (useProtoContract)
                 GenerateTrackablePocoSurrogateCode(idecl, writer);
 
-            writer.PopNamespace();
+            if (string.IsNullOrEmpty(namespaceScope) == false)
+                writer.PopNamespace();
+
             writer.PopRegion();
         }
 

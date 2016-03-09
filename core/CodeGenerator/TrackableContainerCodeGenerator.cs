@@ -15,12 +15,17 @@ namespace CodeGen
             Console.WriteLine("GenerateCode: " + iname);
 
             writer.PushRegion(iname);
-            writer.PushNamespace(idecl.GetNamespaceScope());
+
+            var namespaceScope = idecl.GetNamespaceScope();
+            if (string.IsNullOrEmpty(namespaceScope) == false)
+                writer.PushNamespace(idecl.GetNamespaceScope());
 
             GenerateTrackableContainerCode(idecl, writer);
             GenerateTrackableContainerTrackerCode(idecl, writer);
 
-            writer.PopNamespace();
+            if (string.IsNullOrEmpty(namespaceScope) == false)
+                writer.PopNamespace();
+
             writer.PopRegion();
         }
 
