@@ -379,8 +379,7 @@ namespace TrackableData.Sql
             }
         }
 
-        public async Task<TrackableDictionary<TKey, TValue>> LoadAsync(DbDataReader reader,
-                                                                       params object[] keyValues)
+        public async Task<TrackableDictionary<TKey, TValue>> LoadAsync(DbDataReader reader)
         {
             var dictionary = new TrackableDictionary<TKey, TValue>();
             while (await reader.ReadAsync())

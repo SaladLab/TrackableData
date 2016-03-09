@@ -23,7 +23,8 @@ namespace TrackableData.Sql
             public Func<string> BuildCreateTableSql;
             public Func<T, object[], string> BuildSqlForCreate;
             public Func<object[], string> BuildSqlForDelete;
-            public Func<DbConnection, object[], T, Task> LoadAndSetAsync;
+            public Func<object[], string> BuildSqlForLoad;
+            public Func<DbDataReader, T, Task> LoadAndSetAsync;
             public Func<IContainerTracker<T>, object[], string> BuildSqlForSave;
         }
 
@@ -112,9 +113,13 @@ namespace TrackableData.Sql
             {
                 return mapper.BuildSqlForDelete(keyValues);
             };
-            item.LoadAndSetAsync = async (connection, keyValues, container) =>
+            item.BuildSqlForLoad = (keyValues) =>
             {
-                var value = await mapper.LoadAsync(connection, keyValues);
+                return mapper.BuildSqlForLoad(keyValues);
+            };
+            item.LoadAndSetAsync = async (reader, container) =>
+            {
+                var value = await mapper.LoadAsync(reader);
                 item.Property.SetValue(container, value);
             };
             item.BuildSqlForSave = (tracker, keyValues) =>
@@ -162,9 +167,13 @@ namespace TrackableData.Sql
             {
                 return mapper.BuildSqlForDelete(keyValues);
             };
-            item.LoadAndSetAsync = async (connection, keyValues, container) =>
+            item.BuildSqlForLoad = (keyValues) =>
             {
-                var value = await mapper.LoadAsync(connection, keyValues);
+                return mapper.BuildSqlForLoad(keyValues);
+            };
+            item.LoadAndSetAsync = async (reader, container) =>
+            {
+                var value = await mapper.LoadAsync(reader);
                 item.Property.SetValue(container, value);
             };
             item.BuildSqlForSave = (tracker, keyValues) =>
@@ -217,10 +226,23 @@ namespace TrackableData.Sql
 
         public async Task<T> LoadAsync(DbConnection connection, params object[] keyValues)
         {
-            var container = (T)Activator.CreateInstance(_trackableType);
+            var sql = new StringBuilder();
             foreach (var pi in PropertyItems)
             {
-                await pi.LoadAndSetAsync(connection, keyValues, container);
+                sql.Append(pi.BuildSqlForLoad(keyValues));
+            }
+
+            var container = (T)Activator.CreateInstance(_trackableType);
+            using (var command = _sqlProvider.CreateDbCommand(sql.ToString(), connection))
+            {
+                using (var reader = command.ExecuteReader())
+                {
+                    foreach (var pi in PropertyItems)
+                    {
+                        await pi.LoadAndSetAsync(reader, container);
+                        reader.NextResult();
+                    }
+                }
             }
             return container;
         }
