@@ -366,20 +366,26 @@ namespace TrackableData.Sql
             }
         }
 
-        public async Task<TrackableDictionary<TKey, TValue>> LoadAsync(DbConnection connection,
-                                                                       params object[] keyValues)
+        public Task<TrackableDictionary<TKey, TValue>> LoadAsync(DbConnection connection,
+                                                                 params object[] keyValues)
         {
             var sql = BuildSqlForLoad(keyValues);
-            var dictionary = new TrackableDictionary<TKey, TValue>();
             using (var command = _sqlProvider.CreateDbCommand(sql, connection))
             {
                 using (var reader = command.ExecuteReader())
                 {
-                    while (await reader.ReadAsync())
-                    {
-                        dictionary.Add(ConvertToKeyAndValue(reader));
-                    }
+                    return LoadAsync(reader);
                 }
+            }
+        }
+
+        public async Task<TrackableDictionary<TKey, TValue>> LoadAsync(DbDataReader reader,
+                                                                       params object[] keyValues)
+        {
+            var dictionary = new TrackableDictionary<TKey, TValue>();
+            while (await reader.ReadAsync())
+            {
+                dictionary.Add(ConvertToKeyAndValue(reader));
             }
             return dictionary;
         }

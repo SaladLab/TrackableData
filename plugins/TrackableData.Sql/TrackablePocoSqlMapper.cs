@@ -263,35 +263,45 @@ namespace TrackableData.Sql
             }
         }
 
-        public async Task<T> LoadAsync(DbConnection connection, params object[] keyValues)
+        public Task<T> LoadAsync(DbConnection connection, params object[] keyValues)
         {
             var sql = BuildSqlForLoad(keyValues);
             using (var command = _sqlProvider.CreateDbCommand(sql, connection))
             {
                 using (var reader = command.ExecuteReader())
                 {
-                    while (await reader.ReadAsync())
-                    {
-                        return ConvertToPoco(reader);
-                    }
+                    return LoadAsync(reader);
                 }
+            }
+        }
+
+        public async Task<T> LoadAsync(DbDataReader reader)
+        {
+            if (await reader.ReadAsync())
+            {
+                return ConvertToPoco(reader);
             }
             return default(T);
         }
 
-        public async Task<List<T>> LoadAllAsync(DbConnection connection, params object[] keyValues)
+        public Task<List<T>> LoadAllAsync(DbConnection connection, params object[] keyValues)
         {
             var sql = BuildSqlForLoad(keyValues);
-            var list = new List<T>();
             using (var command = _sqlProvider.CreateDbCommand(sql, connection))
             {
                 using (var reader = command.ExecuteReader())
                 {
-                    while (await reader.ReadAsync())
-                    {
-                        list.Add(ConvertToPoco(reader));
-                    }
+                    return LoadAllAsync(reader);
                 }
+            }
+        }
+
+        public async Task<List<T>> LoadAllAsync(DbDataReader reader)
+        {
+            var list = new List<T>();
+            while (await reader.ReadAsync())
+            {
+                list.Add(ConvertToPoco(reader));
             }
             return list;
         }
