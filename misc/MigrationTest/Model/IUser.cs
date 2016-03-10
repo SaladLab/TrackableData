@@ -1,11 +1,10 @@
-using System;
 using ProtoBuf;
 using TrackableData;
 
 namespace Model
 {
     [ProtoContract]
-    public interface IUserContext : ITrackableContainer<IUserContext>
+    public interface IUser : ITrackableContainer<IUser>
     {
         [ProtoMember(1)] TrackableUserData Data { get; set; }
         [ProtoMember(2)] TrackableDictionary<int, UserItem> Items { get; set; }

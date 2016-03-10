@@ -5,16 +5,14 @@ namespace MigrationTest
 {
     internal class Options
     {
-        [Option('p', "parallel", HelpText = "Parallel")]
-        public bool Parallel { get; set; }
+        [Option('p', "parallel", HelpText = "Parallel")] public bool Parallel { get; set; }
 
-        [Value(0)]
-        public string Job { get; set; }
+        [Value(0)] public string Job { get; set; }
     }
 
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var parser = new Parser(config => config.HelpWriter = Console.Out);
             if (args.Length == 0)

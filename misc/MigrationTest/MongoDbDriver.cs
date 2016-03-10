@@ -1,18 +1,16 @@
 ﻿using System.Data.SqlClient;
-using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
 using Model;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using TrackableData;
 using TrackableData.MongoDB;
 
 namespace MigrationTest
 {
-    class MongoDbDriver
+    public class MongoDbDriver
     {
-        private static TrackableContainerMongoDbMapper<IUserContext> _userMapper =
-            new TrackableContainerMongoDbMapper<IUserContext>();
+        private static TrackableContainerMongoDbMapper<IUser> _userMapper =
+            new TrackableContainerMongoDbMapper<IUser>();
 
         private readonly MongoClient _client;
         private readonly IMongoDatabase _database;
@@ -35,12 +33,12 @@ namespace MigrationTest
             get { return _database.GetCollection<BsonDocument>(name); }
         }
 
-        public Task CreateUserAsync(int uid, TrackableUserContext user)
+        public Task CreateUserAsync(int uid, TrackableUser user)
         {
             return _userMapper.CreateAsync(this[_collectionName], user, uid);
         }
 
-        public async Task ReplaceUserAsync(int uid, TrackableUserContext user)
+        public async Task ReplaceUserAsync(int uid, TrackableUser user)
         {
             var bson = _userMapper.ConvertToBsonDocument(user);
             await Collection.ReplaceOneAsync(
@@ -53,12 +51,12 @@ namespace MigrationTest
             return _userMapper.DeleteAsync(this[_collectionName], uid);
         }
 
-        public async Task<TrackableUserContext> LoadUserAsync(int uid)
+        public async Task<TrackableUser> LoadUserAsync(int uid)
         {
-            return (TrackableUserContext)(await _userMapper.LoadAsync(this[_collectionName], uid));
+            return (TrackableUser)(await _userMapper.LoadAsync(this[_collectionName], uid));
         }
 
-        public Task SaveUserAsync(int uid, TrackableUserContextTracker tracker)
+        public Task SaveUserAsync(int uid, TrackableUserTracker tracker)
         {
             return _userMapper.SaveAsync(this[_collectionName], tracker, uid);
         }

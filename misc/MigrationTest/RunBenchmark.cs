@@ -4,14 +4,13 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Model;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using TrackableData;
 
 namespace MigrationTest
 {
-    class RunBenchmark
+    internal class RunBenchmark
     {
         private static async Task<List<int>> LoadUids(IMongoCollection<BsonDocument> collection, int uidKey)
         {

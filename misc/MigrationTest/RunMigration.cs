@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
+using TrackableData.MsSql;
 
 namespace MigrationTest
 {
-    class RunMigration
+    internal class RunMigration
     {
         public static async Task MigrateAsync()
         {
-            var sqlDriver = new MsSqlDriver(
-                ConfigurationManager.ConnectionStrings["SqlDb"].ConnectionString);
+            var sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["SqlDb"].ConnectionString);
+            sqlConnection.Open();
+            var sqlDriver = new SqlDriver(MsSqlProvider.Instance, sqlConnection);
 
             var mongoDriver = new MongoDbDriver(
                 ConfigurationManager.ConnectionStrings["MongoDb"].ConnectionString, "User");
@@ -31,7 +32,7 @@ namespace MigrationTest
                 mongoDriver.Database.GetCollection<BsonDocument>("User");
 
                 var sql = $"SELECT [Uid] FROM tblUser WHERE [Uid] BETWEEN ${uid0} AND ${uid1}";
-                using (var command = new SqlCommand(sql, sqlDriver.Connection))
+                using (var command = new SqlCommand(sql, sqlConnection))
                 {
                     using (var reader = command.ExecuteReader())
                     {
