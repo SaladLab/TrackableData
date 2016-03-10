@@ -33,14 +33,14 @@ namespace MigrationTest
 
             Console.WriteLine(uids.Count);
 
-            var repeatCount = 1000;
+            var repeatCount = 100;
             var timer = new Stopwatch();
             timer.Start();
 
             for (int i = 0; i < repeatCount; i++)
             {
                 var tasks = uids.Select(uid => sqlDriver.LoadUserAsync(uid));
-                await tasks.WaitForComplete(true);
+                await tasks.WaitForComplete(parallel);
             }
 
             var elapsed = timer.Elapsed.TotalSeconds;

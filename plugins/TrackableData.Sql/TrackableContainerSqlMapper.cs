@@ -240,7 +240,24 @@ namespace TrackableData.Sql
                     foreach (var pi in PropertyItems)
                     {
                         await pi.LoadAndSetAsync(reader, container);
-                        reader.NextResult();
+                        await reader.NextResultAsync();
+                    }
+                }
+            }
+            return container;
+        }
+
+        public async Task<T> LoadSerializedAsync(DbConnection connection, params object[] keyValues)
+        {
+            var container = (T)Activator.CreateInstance(_trackableType);
+            foreach (var pi in PropertyItems)
+            {
+                var sql = pi.BuildSqlForLoad(keyValues);
+                using (var command = _sqlProvider.CreateDbCommand(sql.ToString(), connection))
+                {
+                    using (var reader = command.ExecuteReader())
+                    {
+                        await pi.LoadAndSetAsync(reader, container);
                     }
                 }
             }
