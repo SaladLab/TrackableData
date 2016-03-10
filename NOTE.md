@@ -13,10 +13,6 @@
 
   앞으로 작성할 매뉴얼의 큰 그림도 만들자
 
-### 고정 배열 처리?
-
-  고정 배열 처리 (UserTeam.Members)
-
 ### 필드 무시 (ignore)
 
   필드 무시는 어떻게 할까?
@@ -30,11 +26,6 @@
         - Calculation method 는 partial class TrackablePoco 로 추가 가능하다.
       - TrackableDictionary 등에 일반 타입을 사용하는 것에 대해서는 해당 플러그인
         기능을 사용 (위 ProtoMember 등)
-
-### 타입 지원
-
-  주요 타입 IO 가 잘되나 보자.
-  - TrackableData.MsSql 이 Nullable 을 잘 지원하는지 보자.
 
 ## TODO LATER
 

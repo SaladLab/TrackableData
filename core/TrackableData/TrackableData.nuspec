@@ -6,12 +6,12 @@
     <version>@build.number@</version>
     <authors>Esun Kim</authors>
     <owners>Esun Kim</owners>
-    <description>TrackableData</description>
+    <description>POCO, list, dictionary and container which can track changes. These changes can be saved or rollbacked or replayed to another object.</description>
     <licenseUrl>https://raw.githubusercontent.com/SaladbowlCreative/TrackableData/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/SaladbowlCreative/TrackableData</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>@releaseNotes@</releaseNotes>
-    <copyright>Copyright © 2015 Saladbowl Creative</copyright>
+    <copyright>Copyright © 2016 Saladbowl Creative</copyright>
     <tags>trackable data</tags>
     @dependencies@
     @references@
