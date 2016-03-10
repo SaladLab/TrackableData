@@ -6,7 +6,7 @@
     <version>@build.number@</version>
     <authors>Esun Kim</authors>
     <owners>Esun Kim</owners>
-    <description>TrackableData visual studio project template for POCO and container.</description>
+    <description>Visual Studio project template to generate codes for POCO and container of TrackableData.</description>
     <licenseUrl>https://raw.githubusercontent.com/SaladbowlCreative/TrackableData/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/SaladbowlCreative/TrackableData</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
