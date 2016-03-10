@@ -73,4 +73,12 @@ namespace TrackableData.MsSql.Tests
         {
         }
     }
+
+    public class TrackableContainerIgnoreTest : SqlTestKits.TrackableContainerIgnoreTest, IClassFixture<Database>
+    {
+        public TrackableContainerIgnoreTest(Database db)
+            : base(db, Database.SqlProvider)
+        {
+        }
+    }
 }

@@ -24,7 +24,7 @@ namespace TrackableData.Sql
             public Func<T, object[], string> BuildSqlForCreate;
             public Func<object[], string> BuildSqlForDelete;
             public Func<object[], string> BuildSqlForLoad;
-            public Func<DbDataReader, T, Task> LoadAndSetAsync;
+            public Func<DbDataReader, T, Task<bool>> LoadAndSetAsync;
             public Func<IContainerTracker<T>, object[], string> BuildSqlForSave;
         }
 
@@ -50,6 +50,13 @@ namespace TrackableData.Sql
             var propertyItems = new List<PropertyItem>();
             foreach (var property in typeof(T).GetProperties())
             {
+                var attr = property.GetCustomAttribute<TrackablePropertyAttribute>();
+                if (attr != null)
+                {
+                    if (attr["sql.ignore"] != null)
+                        continue;
+                }
+
                 var item = new PropertyItem
                 {
                     Name = property.Name,
@@ -121,6 +128,7 @@ namespace TrackableData.Sql
             {
                 var value = await mapper.LoadAsync(reader);
                 item.Property.SetValue(container, value);
+                return value != null;
             };
             item.BuildSqlForSave = (tracker, keyValues) =>
             {
@@ -175,6 +183,7 @@ namespace TrackableData.Sql
             {
                 var value = await mapper.LoadAsync(reader);
                 item.Property.SetValue(container, value);
+                return value != null;
             };
             item.BuildSqlForSave = (tracker, keyValues) =>
             {
@@ -239,7 +248,9 @@ namespace TrackableData.Sql
                 {
                     foreach (var pi in PropertyItems)
                     {
-                        await pi.LoadAndSetAsync(reader, container);
+                        var readed = await pi.LoadAndSetAsync(reader, container);
+                        if (readed == false)
+                            return default(T);
                         await reader.NextResultAsync();
                     }
                 }
@@ -257,7 +268,9 @@ namespace TrackableData.Sql
                 {
                     using (var reader = command.ExecuteReader())
                     {
-                        await pi.LoadAndSetAsync(reader, container);
+                        var readed = await pi.LoadAndSetAsync(reader, container);
+                        if (readed == false)
+                            return default(T);
                     }
                 }
             }

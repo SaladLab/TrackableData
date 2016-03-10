@@ -1267,3 +1267,263 @@ namespace TrackableData.SqlTestKits
 }
 
 #endregion
+
+#region ITestContainerWithIgnore
+
+namespace TrackableData.SqlTestKits
+{
+    public partial class TrackableTestContainerWithIgnore : ITestContainerWithIgnore
+    {
+        [IgnoreDataMember]
+        private TrackableTestContainerWithIgnoreTracker _tracker;
+
+        [IgnoreDataMember]
+        public TrackableTestContainerWithIgnoreTracker Tracker
+        {
+            get
+            {
+                return _tracker;
+            }
+            set
+            {
+                _tracker = value;
+                Person.Tracker = value?.PersonTracker;
+                Missions.Tracker = value?.MissionsTracker;
+            }
+        }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
+
+        ITracker ITrackable.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackableTestContainerWithIgnoreTracker)value;
+                Tracker = t;
+            }
+        }
+
+        ITracker<ITestContainerWithIgnore> ITrackable<ITestContainerWithIgnore>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackableTestContainerWithIgnoreTracker)value;
+                Tracker = t;
+            }
+        }
+
+        IContainerTracker<ITestContainerWithIgnore> ITrackableContainer<ITestContainerWithIgnore>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (TrackableTestContainerWithIgnoreTracker)value;
+                Tracker = t;
+            }
+        }
+
+        public ITrackable GetChildTrackable(object name)
+        {
+            switch ((string)name)
+            {
+                case "Person":
+                    return Person as ITrackable;
+                case "Missions":
+                    return Missions as ITrackable;
+                default:
+                    return null;
+            }
+        }
+
+        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
+        {
+            var trackablePerson = Person as ITrackable;
+            if (trackablePerson != null && (changedOnly == false || trackablePerson.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Person", trackablePerson);
+            var trackableMissions = Missions as ITrackable;
+            if (trackableMissions != null && (changedOnly == false || trackableMissions.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Missions", trackableMissions);
+        }
+
+        private TrackableTestPocoForContainer _Person = new TrackableTestPocoForContainer();
+
+        public TrackableTestPocoForContainer Person
+        {
+            get
+            {
+                return _Person;
+            }
+            set
+            {
+                if (_Person != null)
+                    _Person.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.PersonTracker;
+                _Person = value;
+            }
+        }
+
+        TrackableTestPocoForContainer ITestContainerWithIgnore.Person
+        {
+            get { return _Person; }
+            set { _Person = (TrackableTestPocoForContainer)value; }
+        }
+
+        private TrackableDictionary<int, MissionData> _Missions = new TrackableDictionary<int, MissionData>();
+
+        public TrackableDictionary<int, MissionData> Missions
+        {
+            get
+            {
+                return _Missions;
+            }
+            set
+            {
+                if (_Missions != null)
+                    _Missions.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.MissionsTracker;
+                _Missions = value;
+            }
+        }
+
+        TrackableDictionary<int, MissionData> ITestContainerWithIgnore.Missions
+        {
+            get { return _Missions; }
+            set { _Missions = (TrackableDictionary<int, MissionData>)value; }
+        }
+    }
+
+    public class TrackableTestContainerWithIgnoreTracker : IContainerTracker<ITestContainerWithIgnore>
+    {
+        public TrackablePocoTracker<ITestPocoForContainer> PersonTracker { get; set; } = new TrackablePocoTracker<ITestPocoForContainer>();
+        public TrackableDictionaryTracker<int, MissionData> MissionsTracker { get; set; } = new TrackableDictionaryTracker<int, MissionData>();
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append("{ ");
+            var first = true;
+            if (PersonTracker != null && PersonTracker.HasChange)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(", ");
+                sb.Append("Person:");
+                sb.Append(PersonTracker);
+            }
+            if (MissionsTracker != null && MissionsTracker.HasChange)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(", ");
+                sb.Append("Missions:");
+                sb.Append(MissionsTracker);
+            }
+            sb.Append(" }");
+            return sb.ToString();
+        }
+
+        public bool HasChange
+        {
+            get
+            {
+                return
+                    (PersonTracker != null && PersonTracker.HasChange) ||
+                    (MissionsTracker != null && MissionsTracker.HasChange) ||
+                    false;
+            }
+        }
+
+        public event TrackerHasChangeSet HasChangeSet
+        {
+            add { throw new NotImplementedException(); }
+            remove { throw new NotImplementedException(); }
+        }
+
+        public void Clear()
+        {
+            if (PersonTracker != null)
+                PersonTracker.Clear();
+            if (MissionsTracker != null)
+                MissionsTracker.Clear();
+        }
+
+        public void ApplyTo(object trackable)
+        {
+            ApplyTo((ITestContainerWithIgnore)trackable);
+        }
+
+        public void ApplyTo(ITestContainerWithIgnore trackable)
+        {
+            if (PersonTracker != null)
+                PersonTracker.ApplyTo(trackable.Person);
+            if (MissionsTracker != null)
+                MissionsTracker.ApplyTo(trackable.Missions);
+        }
+
+        public void ApplyTo(ITracker tracker)
+        {
+            ApplyTo((TrackableTestContainerWithIgnoreTracker)tracker);
+        }
+
+        public void ApplyTo(ITracker<ITestContainerWithIgnore> tracker)
+        {
+            ApplyTo((TrackableTestContainerWithIgnoreTracker)tracker);
+        }
+
+        public void ApplyTo(TrackableTestContainerWithIgnoreTracker tracker)
+        {
+            if (PersonTracker != null)
+                PersonTracker.ApplyTo(tracker.PersonTracker);
+            if (MissionsTracker != null)
+                MissionsTracker.ApplyTo(tracker.MissionsTracker);
+        }
+
+        public void RollbackTo(object trackable)
+        {
+            RollbackTo((ITestContainerWithIgnore)trackable);
+        }
+
+        public void RollbackTo(ITestContainerWithIgnore trackable)
+        {
+            if (PersonTracker != null)
+                PersonTracker.RollbackTo(trackable.Person);
+            if (MissionsTracker != null)
+                MissionsTracker.RollbackTo(trackable.Missions);
+        }
+
+        public void RollbackTo(ITracker tracker)
+        {
+            RollbackTo((TrackableTestContainerWithIgnoreTracker)tracker);
+        }
+
+        public void RollbackTo(ITracker<ITestContainerWithIgnore> tracker)
+        {
+            RollbackTo((TrackableTestContainerWithIgnoreTracker)tracker);
+        }
+
+        public void RollbackTo(TrackableTestContainerWithIgnoreTracker tracker)
+        {
+            if (PersonTracker != null)
+                PersonTracker.RollbackTo(tracker.PersonTracker);
+            if (MissionsTracker != null)
+                MissionsTracker.RollbackTo(tracker.MissionsTracker);
+        }
+    }
+}
+
+#endregion
