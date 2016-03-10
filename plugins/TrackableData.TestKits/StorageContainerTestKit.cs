@@ -140,9 +140,9 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_Save()
         {
-            dynamic container = CreateTestContainer(true);
-            await SaveAsync(container.Tracker);
-            container.Tracker.Clear();
+            dynamic container = CreateTestContainer(false);
+            await CreateAsync(container);
+            ((ITrackable)container).SetDefaultTracker();
 
             // modify person
 
@@ -178,6 +178,7 @@ namespace TrackableData.TestKits
             // check equality
 
             dynamic container2 = await LoadAsync();
+            Assert.Equal(container.Person.Age, container2.Person.Age);
             AssertEqualDictionary(container.Missions, container2.Missions);
             if (_useList)
                 AssertEqualDictionary(container.Tags, container2.Tags);
