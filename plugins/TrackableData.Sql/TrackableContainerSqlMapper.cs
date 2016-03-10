@@ -20,7 +20,7 @@ namespace TrackableData.Sql
             public PropertyInfo Property;
             public PropertyInfo TrackerProperty;
             public object Mapper;
-            public Func<string> BuildCreateTableSql;
+            public Func<bool, string> BuildCreateTableSql;
             public Func<T, object[], string> BuildSqlForCreate;
             public Func<object[], string> BuildSqlForDelete;
             public Func<object[], string> BuildSqlForLoad;
@@ -105,9 +105,9 @@ namespace TrackableData.Sql
                                                            (ColumnDefinition[])mapperParameters[1]);
             item.Mapper = mapper;
 
-            item.BuildCreateTableSql = () =>
+            item.BuildCreateTableSql = (dropIfExists) =>
             {
-                return mapper.BuildCreateTableSql(true);
+                return mapper.BuildCreateTableSql(dropIfExists);
             };
             item.BuildSqlForCreate = (container, keyValues) =>
             {
@@ -160,9 +160,9 @@ namespace TrackableData.Sql
                                    (ColumnDefinition[])mapperParameters[3]);
             item.Mapper = mapper;
 
-            item.BuildCreateTableSql = () =>
+            item.BuildCreateTableSql = (dropIfExists) =>
             {
-                return mapper.BuildCreateTableSql(true);
+                return mapper.BuildCreateTableSql(dropIfExists);
             };
             item.BuildSqlForCreate = (container, keyValues) =>
             {
@@ -194,14 +194,60 @@ namespace TrackableData.Sql
             };
         }
 
-        public async Task<int> ResetTableAsync(DbConnection connection)
+        public string BuildCreateTableSql(bool dropIfExists = false)
         {
             var sql = new StringBuilder();
             foreach (var pi in PropertyItems)
             {
-                sql.Append(pi.BuildCreateTableSql());
+                sql.Append(pi.BuildCreateTableSql(dropIfExists));
             }
-            using (var command = _sqlProvider.CreateDbCommand(sql.ToString(), connection))
+            return sql.ToString();
+        }
+
+        public string BuildSqlForCreate(T value, params object[] keyValues)
+        {
+            var sql = new StringBuilder();
+            foreach (var pi in PropertyItems)
+            {
+                sql.Append(pi.BuildSqlForCreate(value, keyValues));
+            }
+            return sql.ToString();
+        }
+
+        public string BuildSqlForDelete(params object[] keyValues)
+        {
+            var sql = new StringBuilder();
+            foreach (var pi in PropertyItems)
+            {
+                sql.Append(pi.BuildSqlForDelete(keyValues));
+            }
+            return sql.ToString();
+        }
+
+        public string BuildSqlForLoad(params object[] keyValues)
+        {
+            var sql = new StringBuilder();
+            foreach (var pi in PropertyItems)
+            {
+                sql.Append(pi.BuildSqlForLoad(keyValues));
+            }
+            return sql.ToString();
+        }
+
+        public string BuildSqlForSave(IContainerTracker<T> tracker, params object[] keyValues)
+        {
+            var sql = new StringBuilder();
+            foreach (var pi in PropertyItems)
+            {
+                sql.Append(pi.BuildSqlForSave(tracker, keyValues));
+            }
+            return sql.ToString();
+        }
+
+        public async Task<int> ResetTableAsync(DbConnection connection, bool dropIfExists = false)
+        {
+            var sql = BuildCreateTableSql(dropIfExists);
+            using (var command = _sqlProvider.CreateDbCommand(sql, connection))
             {
                 return await command.ExecuteNonQueryAsync();
             }
@@ -209,12 +255,8 @@ namespace TrackableData.Sql
 
         public async Task<int> CreateAsync(DbConnection connection, T value, params object[] keyValues)
         {
-            var sql = new StringBuilder();
-            foreach (var pi in PropertyItems)
-            {
-                sql.Append(pi.BuildSqlForCreate(value, keyValues));
-            }
-            using (var command = _sqlProvider.CreateDbCommand(sql.ToString(), connection))
+            var sql = BuildSqlForCreate(value, keyValues);
+            using (var command = _sqlProvider.CreateDbCommand(sql, connection))
             {
                 return await command.ExecuteNonQueryAsync();
             }
@@ -222,12 +264,8 @@ namespace TrackableData.Sql
 
         public async Task<int> DeleteAsync(DbConnection connection, params object[] keyValues)
         {
-            var sql = new StringBuilder();
-            foreach (var pi in PropertyItems)
-            {
-                sql.Append(pi.BuildSqlForDelete(keyValues));
-            }
-            using (var command = _sqlProvider.CreateDbCommand(sql.ToString(), connection))
+            var sql = BuildSqlForDelete(keyValues);
+            using (var command = _sqlProvider.CreateDbCommand(sql, connection))
             {
                 return await command.ExecuteNonQueryAsync();
             }
@@ -235,14 +273,9 @@ namespace TrackableData.Sql
 
         public async Task<T> LoadAsync(DbConnection connection, params object[] keyValues)
         {
-            var sql = new StringBuilder();
-            foreach (var pi in PropertyItems)
-            {
-                sql.Append(pi.BuildSqlForLoad(keyValues));
-            }
-
             var container = (T)Activator.CreateInstance(_trackableType);
-            using (var command = _sqlProvider.CreateDbCommand(sql.ToString(), connection))
+            var sql = BuildSqlForLoad(keyValues);
+            using (var command = _sqlProvider.CreateDbCommand(sql, connection))
             {
                 using (var reader = command.ExecuteReader())
                 {
@@ -285,15 +318,8 @@ namespace TrackableData.Sql
         public async Task<int> SaveAsync(DbConnection connection, IContainerTracker<T> tracker,
                                          params object[] keyValues)
         {
-            if (tracker.HasChange == false)
-                return 0;
-
-            var sql = new StringBuilder();
-            foreach (var pi in PropertyItems)
-            {
-                sql.Append(pi.BuildSqlForSave(tracker, keyValues));
-            }
-            using (var command = _sqlProvider.CreateDbCommand(sql.ToString(), connection))
+            var sql = BuildSqlForSave(tracker, keyValues);
+            using (var command = _sqlProvider.CreateDbCommand(sql, connection))
             {
                 return await command.ExecuteNonQueryAsync();
             }

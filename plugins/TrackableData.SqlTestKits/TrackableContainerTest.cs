@@ -32,7 +32,7 @@ namespace TrackableData.SqlTestKits
                         new[] { new ColumnDefinition("ContainerId", typeof(int)) },
                     }),
                 });
-            _mapper.ResetTableAsync(_db.Connection).Wait();
+            _mapper.ResetTableAsync(_db.Connection, true).Wait();
         }
 
         protected override Task CreateAsync(TrackableTestContainer container)
