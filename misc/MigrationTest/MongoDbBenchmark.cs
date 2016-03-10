@@ -10,7 +10,7 @@ using TrackableData;
 
 namespace MigrationTest
 {
-    internal class RunBenchmark
+    internal class MongoDbBenchmark
     {
         private static async Task<List<int>> LoadUids(IMongoCollection<BsonDocument> collection, int uidKey)
         {

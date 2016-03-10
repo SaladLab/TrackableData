@@ -34,32 +34,36 @@ namespace MigrationTest
             Console.WriteLine(options.Job);
             switch (options.Job.ToLower())
             {
+                case "sqlread":
+                    SqlBenchmark.ReadAsync(options.Parallel).Wait();
+                    break;
+
                 case "migrate":
-                    RunMigration.MigrateAsync().Wait();
+                    Sql2MongoMigrator.MigrateAsync().Wait();
                     break;
 
                 case "read":
-                    RunBenchmark.ReadAsync(options.Parallel).Wait();
+                    MongoDbBenchmark.ReadAsync(options.Parallel).Wait();
                     break;
 
                 case "duplicate":
-                    RunBenchmark.DuplicateAsync(options.Parallel).Wait();
+                    MongoDbBenchmark.DuplicateAsync(options.Parallel).Wait();
                     break;
 
                 case "replace":
-                    RunBenchmark.ReplaceAsync(options.Parallel).Wait();
+                    MongoDbBenchmark.ReplaceAsync(options.Parallel).Wait();
                     break;
 
                 case "savesimple":
-                    RunBenchmark.SaveSimpleAsync(options.Parallel).Wait();
+                    MongoDbBenchmark.SaveSimpleAsync(options.Parallel).Wait();
                     break;
 
                 case "savecomplex":
-                    RunBenchmark.SaveComplexAsync(options.Parallel, false).Wait();
+                    MongoDbBenchmark.SaveComplexAsync(options.Parallel, false).Wait();
                     break;
 
                 case "savecomplexfull":
-                    RunBenchmark.SaveComplexAsync(options.Parallel, true).Wait();
+                    MongoDbBenchmark.SaveComplexAsync(options.Parallel, true).Wait();
                     break;
 
                 default:

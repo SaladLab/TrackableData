@@ -9,7 +9,7 @@ using TrackableData.MsSql;
 
 namespace MigrationTest
 {
-    internal class RunMigration
+    internal class Sql2MongoMigrator
     {
         public static async Task MigrateAsync()
         {

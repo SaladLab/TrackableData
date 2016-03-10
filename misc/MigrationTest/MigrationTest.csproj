@@ -103,12 +103,14 @@
     <Compile Include="Model\UserTeam.cs" />
     <Compile Include="Model\UserTypes.cs" />
     <Compile Include="MongoDbDriver.cs" />
+    <Compile Include="SqlBenchmark.cs" />
     <Compile Include="SqlDriver.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\TrackableData.CodeGen.cs" />
-    <Compile Include="RunBenchmark.cs" />
-    <Compile Include="RunMigration.cs" />
+    <Compile Include="MongoDbBenchmark.cs" />
+    <Compile Include="Sql2MongoMigrator.cs" />
+    <Compile Include="TaskExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
