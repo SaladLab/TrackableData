@@ -7,11 +7,11 @@
     <authors>Esun Kim</authors>
     <owners>Esun Kim</owners>
     <description>Visual Studio project template to generate codes for POCO and container of TrackableData.</description>
-    <licenseUrl>https://raw.githubusercontent.com/SaladbowlCreative/TrackableData/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/SaladbowlCreative/TrackableData</projectUrl>
+    <licenseUrl>https://raw.githubusercontent.com/SaladLab/TrackableData/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/SaladLab/TrackableData</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>@releaseNotes@</releaseNotes>
-    <copyright>Copyright © 2016 Saladbowl Creative</copyright>
+    <copyright>Copyright © 2016 SaladLab</copyright>
     <tags>trackable data</tags>
     @dependencies@
     @references@

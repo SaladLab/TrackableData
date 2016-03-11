@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("TrackableData.PostgreSql.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Saladbowl Creative")]
+[assembly: AssemblyCompany("SaladLab")]
 [assembly: AssemblyProduct("TrackableData.PostgreSql.Tests")]
-[assembly: AssemblyCopyright("Copyright © Saladbowl Creative 2016")]
+[assembly: AssemblyCopyright("Copyright © SaladLab 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
