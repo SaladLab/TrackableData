@@ -318,9 +318,9 @@ namespace TrackableData.Sql
                 sql.Append("DELETE FROM ").Append(_tableEscapedName).Append(" WHERE ");
                 for (var k = 0; k < _headKeyColumns.Length; k++)
                 {
-                    sqlModify.Append(_headKeyColumns[k].EscapedName).Append("=");
-                    sqlModify.Append(_headKeyColumns[k].ConvertToSqlValue(keyValues[k]));
-                    sqlModify.Append(" AND ");
+                    sql.Append(_headKeyColumns[k].EscapedName).Append("=");
+                    sql.Append(_headKeyColumns[k].ConvertToSqlValue(keyValues[k]));
+                    sql.Append(" AND ");
                 }
                 sql.Append(_keyColumn.EscapedName).Append(" IN (");
                 var concating = false;
