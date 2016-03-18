@@ -9,6 +9,7 @@ services:
 install:
 - cmd: nuget install redis-64 -OutputDirectory packages -excludeversion 
 - cmd: packages\redis-64\tools\redis-server.exe --service-install
+- cmd: packages\redis-64\tools\redis-server.exe --service-start
 before_build:
 - cmd: nuget restore
 build:
