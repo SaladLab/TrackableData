@@ -98,7 +98,7 @@ namespace TrackableData.Sql
             where TPoco : ITrackablePoco<TPoco>
         {
             if (mapperParameters.Length != 2)
-                throw new ArgumentException("The length of mapperParameters should be  2");
+                throw new ArgumentException("The length of mapperParameters should be 2");
 
             var mapper = new TrackablePocoSqlMapper<TPoco>(sqlProvider,
                                                            (string)mapperParameters[0],
