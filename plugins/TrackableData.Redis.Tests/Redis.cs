@@ -17,9 +17,6 @@ namespace TrackableData.Redis.Tests
         {
             var cstr = ConfigurationManager.ConnectionStrings["TestRedis"].ConnectionString;
             Connection = ConnectionMultiplexer.ConnectAsync(cstr + ",allowAdmin=true").Result;
-
-            var server = Connection.GetServer(Connection.GetEndPoints()[0]);
-            server.FlushDatabase(0);
         }
 
         public void Dispose()
