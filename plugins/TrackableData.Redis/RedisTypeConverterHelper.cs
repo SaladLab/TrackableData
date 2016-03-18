@@ -6,17 +6,20 @@ namespace TrackableData.Redis
 {
     internal static class RedisTypeConverterHelper
     {
-        public static Func<object, RedisValue> Convert<T>(Func<T, RedisValue> func)
+        // Func<T, RedisValue> -> Func<object, RedisValue>
+        public static Func<object, RedisValue> ConvertToObjectToFunc<T>(Func<T, RedisValue> func)
         {
             return o => func((T)o);
         }
 
-        public static Func<RedisValue, object> Convert<T>(Func<RedisValue, T> func)
+        // Func<RedisValue, T> -> Func<RedisValue, object>
+        public static Func<RedisValue, object> ConvertToObjectFromFunc<T>(Func<RedisValue, T> func)
         {
             return o => func(o);
         }
 
-        public static Delegate Convert(Type type, Func<object, RedisValue> func)
+        // Func<object, RedisValue> -> Func<T, RedisValue>
+        public static Delegate ConvertToToFunc(Type type, Func<object, RedisValue> func)
         {
             var v = Expression.Parameter(type, "v");
             if (func.Target != null)
@@ -38,7 +41,8 @@ namespace TrackableData.Redis
             }
         }
 
-        public static Delegate Convert(Type type, Func<RedisValue, object> func)
+        // Func<RedisValue, object> -> Func<RedisValue, T>
+        public static Delegate ConvertToFromFunc(Type type, Func<RedisValue, object> func)
         {
             var v = Expression.Parameter(typeof(RedisValue), "v");
             if (func.Target != null)

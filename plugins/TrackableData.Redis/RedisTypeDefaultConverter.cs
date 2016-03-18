@@ -1,6 +1,7 @@
 ﻿using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 
@@ -23,6 +24,14 @@ namespace TrackableData.Redis
                                 m.GetParameters()[0].ParameterType == typeof(RedisValue))
                     .ToDictionary(i => i.ReturnParameter.ParameterType, i => i);
 
+                var convertToObjectToFuncMethod = typeof(RedisTypeConverterHelper)
+                    .GetMethods(BindingFlags.Static | BindingFlags.Public)
+                    .FirstOrDefault(m => m.Name.StartsWith("ConvertToObjectToFunc"));
+
+                var convertToObjectFromFuncMethod = typeof(RedisTypeConverterHelper)
+                    .GetMethods(BindingFlags.Static | BindingFlags.Public)
+                    .FirstOrDefault(m => m.Name.StartsWith("ConvertToObjectFromFunc"));
+
                 return toMethods.ToDictionary(
                     i => i.Key,
                     i =>
@@ -32,19 +41,25 @@ namespace TrackableData.Redis
 
                         var toFunc = toMethod.CreateDelegate(
                             typeof(Func<,>).MakeGenericType(i.Key, typeof(RedisValue)));
-                        var fromFunc = toMethod.CreateDelegate(
+                        var fromFunc = fromMethod.CreateDelegate(
                             typeof(Func<,>).MakeGenericType(typeof(RedisValue), i.Key));
+                        var convertToObjectToFunc = convertToObjectToFuncMethod.MakeGenericMethod(i.Key);
+                        var convertToObjectFromFunc = convertToObjectFromFuncMethod.MakeGenericMethod(i.Key);
 
                         return new RedisTypeConverter.ConverterSet
                         {
                             ToRedisValueFunc = toFunc,
                             FromRedisValueFunc = fromFunc,
-                            ObjectToRedisValueFunc = null,
-                            ObjectFromRedisValueFunc = null
+                            ObjectToRedisValueFunc = (Func<object, RedisValue>)
+                                                     convertToObjectToFunc.Invoke(null, new object[] { toFunc }),
+                            ObjectFromRedisValueFunc = (Func<RedisValue, object>)
+                                                       convertToObjectFromFunc.Invoke(null, new object[] { fromFunc })
                         };
                     });
             });
-    
+
+        public static Dictionary<Type, RedisTypeConverter.ConverterSet> ConvertMap => _converterMap.Value;
+
         private static RedisValue ToRedisValue(bool v) => v;
         private static RedisValue ToRedisValue(short v) => v;
         private static RedisValue ToRedisValue(int v) => v;

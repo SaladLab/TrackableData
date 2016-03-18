@@ -24,7 +24,7 @@ namespace TrackableData.Redis
 
         public RedisTypeConverter(JsonSerializerSettings jsonSerializerSettings = null)
         {
-            _converterMap = new Dictionary<Type, ConverterSet>();
+            _converterMap = new Dictionary<Type, ConverterSet>(RedisTypeDefaultConverter.ConvertMap);
             _jsonSerializerSettings = jsonSerializerSettings ?? new JsonSerializerSettings();
         }
 
@@ -35,8 +35,8 @@ namespace TrackableData.Redis
             {
                 ToRedisValueFunc = toRedisValueFunc,
                 FromRedisValueFunc = fromRedisValueFunc,
-                ObjectToRedisValueFunc = RedisTypeConverterHelper.Convert(toRedisValueFunc),
-                ObjectFromRedisValueFunc = RedisTypeConverterHelper.Convert(fromRedisValueFunc),
+                ObjectToRedisValueFunc = RedisTypeConverterHelper.ConvertToObjectToFunc(toRedisValueFunc),
+                ObjectFromRedisValueFunc = RedisTypeConverterHelper.ConvertToObjectFromFunc(fromRedisValueFunc),
             };
 
             lock (_converterMap)
@@ -51,8 +51,8 @@ namespace TrackableData.Redis
         {
             var cs = new ConverterSet
             {
-                ToRedisValueFunc = RedisTypeConverterHelper.Convert(type, toRedisValueFunc),
-                FromRedisValueFunc = RedisTypeConverterHelper.Convert(type, fromRedisValueFunc),
+                ToRedisValueFunc = RedisTypeConverterHelper.ConvertToToFunc(type, toRedisValueFunc),
+                FromRedisValueFunc = RedisTypeConverterHelper.ConvertToFromFunc(type, fromRedisValueFunc),
                 ObjectToRedisValueFunc = toRedisValueFunc,
                 ObjectFromRedisValueFunc = fromRedisValueFunc,
             };
@@ -70,8 +70,8 @@ namespace TrackableData.Redis
 
             var cs = new ConverterSet
             {
-                ToRedisValueFunc = RedisTypeConverterHelper.Convert(type, toFunc),
-                FromRedisValueFunc = RedisTypeConverterHelper.Convert(type, fromFunc),
+                ToRedisValueFunc = RedisTypeConverterHelper.ConvertToToFunc(type, toFunc),
+                FromRedisValueFunc = RedisTypeConverterHelper.ConvertToFromFunc(type, fromFunc),
                 ObjectToRedisValueFunc = toFunc,
                 ObjectFromRedisValueFunc = fromFunc,
             };
