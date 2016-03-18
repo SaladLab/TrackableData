@@ -39,9 +39,9 @@ namespace TrackableData.MongoDB.Tests
             return _mapper.LoadAsync(_collection, _testId, "V");
         }
 
-        protected override Task SaveAsync(ITracker tracker)
+        protected override Task SaveAsync(TrackableList<string> list)
         {
-            return _mapper.SaveAsync(_collection, (TrackableListTracker<string>)tracker, _testId, "V");
+            return _mapper.SaveAsync(_collection, list.Tracker, _testId, "V");
         }
     }
 
@@ -76,9 +76,9 @@ namespace TrackableData.MongoDB.Tests
             return _mapper.LoadAsync(_collection, _testId, "V");
         }
 
-        protected override Task SaveAsync(ITracker tracker)
+        protected override Task SaveAsync(TrackableList<JobData> list)
         {
-            return _mapper.SaveAsync(_collection, (TrackableListTracker<JobData>)tracker, _testId, "V");
+            return _mapper.SaveAsync(_collection, list.Tracker, _testId, "V");
         }
     }
 
@@ -113,9 +113,9 @@ namespace TrackableData.MongoDB.Tests
             return _mapper.LoadAsync(_collection, _testId, 1, "One");
         }
 
-        protected override Task SaveAsync(ITracker tracker)
+        protected override Task SaveAsync(TrackableList<JobData> list)
         {
-            return _mapper.SaveAsync(_collection, (TrackableListTracker<JobData>)tracker, _testId, 1, "One");
+            return _mapper.SaveAsync(_collection, list.Tracker, _testId, 1, "One");
         }
     }
 }

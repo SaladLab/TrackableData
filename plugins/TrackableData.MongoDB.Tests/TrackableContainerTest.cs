@@ -54,9 +54,9 @@ namespace TrackableData.MongoDB.Tests
             return (TrackableTestContainer)await _mapper.LoadAsync(_collection, _testId);
         }
 
-        protected override Task SaveAsync(IContainerTracker tracker)
+        protected override Task SaveAsync(TrackableTestContainer container)
         {
-            return _mapper.SaveAsync(_collection, (TrackableTestContainerTracker)tracker, _testId);
+            return _mapper.SaveAsync(_collection, container.Tracker, _testId);
         }
     }
 
@@ -95,9 +95,9 @@ namespace TrackableData.MongoDB.Tests
             return (TrackableTestContainer)await _mapper.LoadAsync(_collection, _testId, "One");
         }
 
-        protected override Task SaveAsync(IContainerTracker tracker)
+        protected override Task SaveAsync(TrackableTestContainer container)
         {
-            return _mapper.SaveAsync(_collection, (TrackableTestContainerTracker)tracker, _testId, "One");
+            return _mapper.SaveAsync(_collection, container.Tracker, _testId, "One");
         }
     }
 }

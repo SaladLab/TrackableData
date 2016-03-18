@@ -21,19 +21,19 @@ namespace TrackableData.SqlTestKits
             return _mapper.CreateAsync(_db.Connection, person);
         }
 
-        protected override async Task<TrackableTestPocoWithIdentity> LoadAsync(int id)
-        {
-            return (TrackableTestPocoWithIdentity)(await _mapper.LoadAsync(_db.Connection, id));
-        }
-
         protected override Task<int> DeleteAsync(int id)
         {
             return _mapper.DeleteAsync(_db.Connection, id);
         }
 
-        protected override Task SaveAsync(ITracker tracker, int id)
+        protected override async Task<TrackableTestPocoWithIdentity> LoadAsync(int id)
         {
-            return _mapper.SaveAsync(_db.Connection, (TrackablePocoTracker<ITestPocoWithIdentity>)tracker, id);
+            return (TrackableTestPocoWithIdentity)(await _mapper.LoadAsync(_db.Connection, id));
+        }
+
+        protected override Task SaveAsync(TrackableTestPocoWithIdentity person, int id)
+        {
+            return _mapper.SaveAsync(_db.Connection, person.Tracker, id);
         }
     }
 }

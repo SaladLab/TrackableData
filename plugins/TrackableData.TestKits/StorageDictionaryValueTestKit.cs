@@ -13,7 +13,7 @@ namespace TrackableData.TestKits
         protected abstract Task CreateAsync(IDictionary<TKey, string> dictionary);
         protected abstract Task<int> DeleteAsync();
         protected abstract Task<TrackableDictionary<TKey, string>> LoadAsync();
-        protected abstract Task SaveAsync(ITracker tracker);
+        protected abstract Task SaveAsync(TrackableDictionary<TKey, string> dictionary);
 
         private void AssertEqualDictionary(TrackableDictionary<TKey, string> a, TrackableDictionary<TKey, string> b)
         {
@@ -62,13 +62,13 @@ namespace TrackableData.TestKits
             dict.Add(CreateKey(2), "Two");
             dict.Add(CreateKey(3), "Three");
 
-            await SaveAsync(dict.Tracker);
+            await SaveAsync(dict);
             dict.Tracker.Clear();
 
             dict.Remove(CreateKey(1));
             dict[CreateKey(2)] = "TwoTwo";
             dict.Add(CreateKey(4), "Four");
-            await SaveAsync(dict.Tracker);
+            await SaveAsync(dict);
 
             var dict2 = await LoadAsync();
             AssertEqualDictionary(dict, dict2);

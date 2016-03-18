@@ -50,9 +50,9 @@ namespace TrackableData.SqlTestKits
             return (TrackableTestContainer)await _mapper.LoadAsync(_db.Connection, _testId);
         }
 
-        protected override Task SaveAsync(IContainerTracker tracker)
+        protected override Task SaveAsync(TrackableTestContainer container)
         {
-            return _mapper.SaveAsync(_db.Connection, (TrackableTestContainerTracker)tracker, _testId);
+            return _mapper.SaveAsync(_db.Connection, container.Tracker, _testId);
         }
     }
 }

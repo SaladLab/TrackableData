@@ -13,7 +13,7 @@ namespace TrackableData.TestKits
         protected abstract Task CreateAsync(TTrackablePoco person);
         protected abstract Task<int> DeleteAsync(TId id);
         protected abstract Task<TTrackablePoco> LoadAsync(TId id);
-        protected abstract Task SaveAsync(ITracker tracker, TId id);
+        protected abstract Task SaveAsync(TTrackablePoco person, TId id);
 
         [Fact]
         public async Task Test_CreateAndLoad()
@@ -56,7 +56,7 @@ namespace TrackableData.TestKits
             ((ITrackable)person).SetDefaultTracker();
             person.Name = "Testor";
             person.Age = 10;
-            await SaveAsync(person.Tracker, person.Id);
+            await SaveAsync(person, person.Id);
 
             var person2 = await LoadAsync(person.Id);
             Assert.Equal(person.Id, person2.Id);

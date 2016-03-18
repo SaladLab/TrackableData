@@ -29,7 +29,7 @@ namespace TrackableData.TestKits
         protected abstract Task CreateAsync(TTrackableContainer person);
         protected abstract Task<int> DeleteAsync();
         protected abstract Task<TTrackableContainer> LoadAsync();
-        protected abstract Task SaveAsync(IContainerTracker tracker);
+        protected abstract Task SaveAsync(TTrackableContainer person);
 
         protected StorageContainerTestKit(bool useList)
         {
@@ -172,7 +172,7 @@ namespace TrackableData.TestKits
 
             // save modification
 
-            await SaveAsync(container.Tracker);
+            await SaveAsync(container);
             container.Tracker.Clear();
 
             // check equality

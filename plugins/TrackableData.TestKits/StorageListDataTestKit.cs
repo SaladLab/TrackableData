@@ -19,7 +19,7 @@ namespace TrackableData.TestKits
         protected abstract Task CreateAsync(IList<JobData> list);
         protected abstract Task<int> DeleteAsync();
         protected abstract Task<TrackableList<JobData>> LoadAsync();
-        protected abstract Task SaveAsync(ITracker tracker);
+        protected abstract Task SaveAsync(TrackableList<JobData> list);
 
         private TrackableList<JobData> CreateTestList(bool withTracker)
         {
@@ -107,11 +107,11 @@ namespace TrackableData.TestKits
         public async Task Test_Save()
         {
             var list = CreateTestList(true);
-            await SaveAsync(list.Tracker);
+            await SaveAsync(list);
             list.Tracker.Clear();
 
             ModifyListForTest(list);
-            await SaveAsync(list.Tracker);
+            await SaveAsync(list);
 
             var list2 = await LoadAsync();
             AssertEqualDictionary(list, list2);

@@ -20,7 +20,7 @@ namespace TrackableData.TestKits
         protected abstract Task CreateAsync(IDictionary<TKey, ItemData> dictionary);
         protected abstract Task<int> DeleteAsync();
         protected abstract Task<TrackableDictionary<TKey, ItemData>> LoadAsync();
-        protected abstract Task SaveAsync(ITracker tracker);
+        protected abstract Task SaveAsync(TrackableDictionary<TKey, ItemData> dictionary);
 
         private TrackableDictionary<TKey, ItemData> CreateTestDictionary(bool withTracker)
         {
@@ -84,7 +84,7 @@ namespace TrackableData.TestKits
         {
             var dict = CreateTestDictionary(true);
 
-            await SaveAsync(dict.Tracker);
+            await SaveAsync(dict);
             dict.Tracker.Clear();
 
             // modify dictionary
@@ -106,7 +106,7 @@ namespace TrackableData.TestKits
 
             // save modification
 
-            await SaveAsync(dict.Tracker);
+            await SaveAsync(dict);
             dict.Tracker.Clear();
 
             // check equality

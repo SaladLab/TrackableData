@@ -40,9 +40,9 @@ namespace TrackableData.SqlTestKits
             return _mapper.LoadAsync(_db.Connection);
         }
 
-        protected override Task SaveAsync(ITracker tracker)
+        protected override Task SaveAsync(TrackableDictionary<int, ItemData> dictionary)
         {
-            return _mapper.SaveAsync(_db.Connection, (TrackableDictionaryTracker<int, ItemData>)tracker);
+            return _mapper.SaveAsync(_db.Connection, dictionary.Tracker);
         }
     }
 }
