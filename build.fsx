@@ -89,6 +89,13 @@ let projects = ([
                       ("protobuf-net", "")];
     };
     {   emptyProject with
+        Name="TrackableData.Redis";
+        Folder="./plugins/TrackableData.Redis";
+        Dependencies=[("TrackableData", "");
+                      ("StackExchange.Redis", "");
+                      ("Newtonsoft.Json", "")];
+    };
+    {   emptyProject with
         Name="TrackableData.Sql";
         Folder="./plugins/TrackableData.Sql";
         Dependencies=[("TrackableData", "");];
