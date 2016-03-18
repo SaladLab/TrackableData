@@ -6,6 +6,9 @@ services:
 - mssql2014
 - mysql
 - postgresql
+install:
+- cmd: uget install redis-64 -excludeversion
+- cmd: redis-64\tools\redis-server.exe --service-install
 before_build:
 - cmd: nuget restore
 build:
