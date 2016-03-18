@@ -13,7 +13,7 @@ namespace TrackableData.Redis.Tests
             new TrackableListRedisMapper<string>();
 
         private IDatabase _db;
-        private string _testId = "TestList";
+        private string _testId = "TestListString";
 
         public TrackableListStringTest(Redis redis)
         {
@@ -42,42 +42,38 @@ namespace TrackableData.Redis.Tests
         }
     }
 
-    /*
-    public class TrackableListDataTest : StorageListDataTestKit, IClassFixture<Database>
+    public class TrackableListDataTest : StorageListDataTestKit, IClassFixture<Redis>
     {
         private static TrackableListRedisMapper<JobData> _mapper =
             new TrackableListRedisMapper<JobData>();
 
-        private Database _db;
-        private IMongoCollection<BsonDocument> _collection;
-        private ObjectId _testId = ObjectId.GenerateNewId();
+        private IDatabase _db;
+        private string _testId = "TrackableListData";
 
-        public TrackableListDataTest(Database db)
+        public TrackableListDataTest(Redis redis)
         {
-            _db = db;
-            _db.Test.DropCollectionAsync(nameof(TrackableListDataTest)).Wait();
-            _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackableListDataTest));
+            _db = redis.Db;
+            _db.KeyDelete(_testId);
         }
 
         protected override Task CreateAsync(IList<JobData> list)
         {
-            return _mapper.CreateAsync(_collection, list, _testId, "V");
+            return _mapper.CreateAsync(_db, list, _testId);
         }
 
         protected override Task<int> DeleteAsync()
         {
-            return _mapper.DeleteAsync(_collection, _testId, "V");
+            return _mapper.DeleteAsync(_db, _testId);
         }
 
         protected override Task<TrackableList<JobData>> LoadAsync()
         {
-            return _mapper.LoadAsync(_collection, _testId, "V");
+            return _mapper.LoadAsync(_db, _testId);
         }
 
-        protected override Task SaveAsync(ITracker tracker)
+        protected override Task SaveAsync(TrackableList<JobData> list)
         {
-            return _mapper.SaveAsync(_collection, (TrackableListTracker<JobData>)tracker, _testId, "V");
+            return _mapper.SaveAsync(_db, list.Tracker, _testId);
         }
     }
-    */
 }
