@@ -53,6 +53,7 @@
     <Compile Include="RedisTypeDefaultConverter.cs" />
     <Compile Include="RedisTypeConverter.cs" />
     <Compile Include="RedisTypeConverterHelper.cs" />
+    <Compile Include="TrackableContainerHashesRedisMapper.cs" />
     <Compile Include="TrackableContainerRedisMapper.cs" />
     <Compile Include="TrackableDictionaryRedisMapper.cs" />
     <Compile Include="TrackableListRedisMapper.cs" />
