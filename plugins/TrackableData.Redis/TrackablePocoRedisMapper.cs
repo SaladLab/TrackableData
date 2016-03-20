@@ -105,7 +105,6 @@ namespace TrackableData.Redis
 
                 var fieldValue = field.ConvertFromRedisValue(entry.Value);
                 field.PropertyInfo.SetValue(value, fieldValue);
-                var property = _trackableType.GetProperty(entry.Name);
             }
             return true;
         }

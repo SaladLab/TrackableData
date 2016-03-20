@@ -156,15 +156,15 @@ namespace TrackableData.Redis
             };
         }
 
-        private static void BuildTrackableListProperty<T>(PropertyItem item,
-                                                          RedisTypeConverter typeConverter)
+        private static void BuildTrackableListProperty<TValue>(PropertyItem item,
+                                                               RedisTypeConverter typeConverter)
         {
-            var mapper = new TrackableListRedisMapper<T>(typeConverter);
+            var mapper = new TrackableListRedisMapper<TValue>(typeConverter);
             item.Mapper = mapper;
 
             item.CreateAsync = (db, container, key) =>
             {
-                var list = (IList<T>)item.Property.GetValue(container);
+                var list = (IList<TValue>)item.Property.GetValue(container);
                 return mapper.CreateAsync(db, list, key.Prepend(item.KeySuffix));
             };
             item.DeleteAsync = (db, key) =>
@@ -173,14 +173,14 @@ namespace TrackableData.Redis
             };
             item.LoadAsync = async (db, container, key) =>
             {
-                var list = (IList<T>)item.Property.GetValue(container);
+                var list = (IList<TValue>)item.Property.GetValue(container);
                 // when there is no entry for list, it is regarded as an empty list.
                 await mapper.LoadAsync(db, list, key.Prepend(item.KeySuffix));
                 return true;
             };
             item.SaveAsync = async (db, tracker, key) =>
             {
-                var valueTracker = (TrackableListTracker<T>)item.TrackerProperty.GetValue(tracker);
+                var valueTracker = (TrackableListTracker<TValue>)item.TrackerProperty.GetValue(tracker);
                 if (valueTracker.HasChange)
                 {
                     await mapper.SaveAsync(db, valueTracker, key.Prepend(item.KeySuffix));
