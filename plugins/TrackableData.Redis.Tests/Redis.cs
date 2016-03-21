@@ -1,6 +1,6 @@
-﻿using StackExchange.Redis;
-using System;
+﻿using System;
 using System.Configuration;
+using StackExchange.Redis;
 
 namespace TrackableData.Redis.Tests
 {

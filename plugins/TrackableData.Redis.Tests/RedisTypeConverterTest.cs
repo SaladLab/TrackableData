@@ -65,7 +65,7 @@ namespace TrackableData.Redis
         {
             var converter = new RedisTypeConverter();
 
-            AssertConversionEqual(converter, new { Value="123"}, "{\"Value\":\"123\"}");
+            AssertConversionEqual(converter, new { Value = "123" }, "{\"Value\":\"123\"}");
         }
 
         private void AssertConversionEqual<T>(RedisTypeConverter converter, T value,

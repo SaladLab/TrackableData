@@ -7,11 +7,11 @@
 // </auto-generated>
 // ------------------------------------------------------------------------------
 
-using System;
-using StackExchange.Redis;
 using System.Threading.Tasks;
+using StackExchange.Redis;
 using TrackableData.TestKits;
 using Xunit;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;

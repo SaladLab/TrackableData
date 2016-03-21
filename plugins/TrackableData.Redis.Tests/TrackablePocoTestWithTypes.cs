@@ -1,6 +1,6 @@
-﻿using StackExchange.Redis;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using StackExchange.Redis;
 using Xunit;
 
 namespace TrackableData.Redis.Tests
@@ -32,7 +32,7 @@ namespace TrackableData.Redis.Tests
         Guid vGuid { get; set; }
         Suit vSuit { get; set; }
     }
-    
+
     public class TrackablePocoTestWithTypes : IClassFixture<Redis>
     {
         private static TrackablePocoRedisMapper<ITestTypePoco> _mapper =
