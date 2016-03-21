@@ -81,6 +81,13 @@ namespace TrackableData.Redis
                         .MakeGenericMethod(property.PropertyType.GetGenericArguments())
                         .Invoke(null, new object[] { item, typeConverter });
                 }
+                else if (TrackableResolver.IsTrackableSet(property.PropertyType))
+                {
+                    typeof(TrackableContainerRedisMapper<T>)
+                        .GetMethod("BuildTrackableSetProperty", BindingFlags.Static | BindingFlags.NonPublic)
+                        .MakeGenericMethod(property.PropertyType.GetGenericArguments())
+                        .Invoke(null, new object[] { item, typeConverter });
+                }
                 else if (TrackableResolver.IsTrackableList(property.PropertyType))
                 {
                     typeof(TrackableContainerRedisMapper<T>)
@@ -155,6 +162,38 @@ namespace TrackableData.Redis
             item.SaveAsync = async (db, tracker, key) =>
             {
                 var valueTracker = (TrackableDictionaryTracker<TKey, TValue>)item.TrackerPropertyInfo.GetValue(tracker);
+                if (valueTracker.HasChange)
+                {
+                    await mapper.SaveAsync(db, valueTracker, key.Prepend(item.KeySuffix));
+                }
+            };
+        }
+
+        private static void BuildTrackableSetProperty<TValue>(PropertyItem item,
+                                                              RedisTypeConverter typeConverter)
+        {
+            var mapper = new TrackableSetRedisMapper<TValue>(typeConverter);
+            item.Mapper = mapper;
+
+            item.CreateAsync = (db, container, key) =>
+            {
+                var set = (ICollection<TValue>)item.PropertyInfo.GetValue(container);
+                return mapper.CreateAsync(db, set, key.Prepend(item.KeySuffix));
+            };
+            item.DeleteAsync = (db, key) =>
+            {
+                return mapper.DeleteAsync(db, key.Prepend(item.KeySuffix));
+            };
+            item.LoadAsync = async (db, container, key) =>
+            {
+                var set = (ICollection<TValue>)item.PropertyInfo.GetValue(container);
+                // when there is no entry for set, it is regarded as an empty set.
+                await mapper.LoadAsync(db, set, key.Prepend(item.KeySuffix));
+                return true;
+            };
+            item.SaveAsync = async (db, tracker, key) =>
+            {
+                var valueTracker = (TrackableSetTracker<TValue>)item.TrackerPropertyInfo.GetValue(tracker);
                 if (valueTracker.HasChange)
                 {
                     await mapper.SaveAsync(db, valueTracker, key.Prepend(item.KeySuffix));

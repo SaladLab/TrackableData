@@ -58,6 +58,7 @@
     <Compile Include="TrackableDictionaryRedisMapper.cs" />
     <Compile Include="TrackableListRedisMapper.cs" />
     <Compile Include="TrackablePocoRedisMapper.cs" />
+    <Compile Include="TrackableSetRedisMapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\core\TrackableData\TrackableData.csproj">
