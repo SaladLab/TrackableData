@@ -67,6 +67,16 @@ namespace TrackableData
         void TrackModify(TKey key, TValue oldValue, TValue newValue);
     }
 
+    public interface ISetTracker
+    {
+    }
+
+    public interface ISetTracker<T> : ITracker<ICollection<T>>, ISetTracker
+    {
+        void TrackAdd(T value);
+        void TrackRemove(T value);
+    }
+
     public interface IListTracker
     {
     }

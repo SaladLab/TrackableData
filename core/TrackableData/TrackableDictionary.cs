@@ -176,10 +176,7 @@ namespace TrackableData
             ((ICollection<KeyValuePair<TKey, TValue>>)_dictionary).Add(item);
 
             if (Tracker != null)
-            {
-                if (Tracker != null)
-                    Tracker.TrackAdd(item.Key, item.Value);
-            }
+                Tracker.TrackAdd(item.Key, item.Value);
         }
 
         public void Clear()

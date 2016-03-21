@@ -27,6 +27,7 @@ namespace TrackableData
             }
 
             // TrackableDictionary -> TrackableDictionaryTracker
+            // TrackableSet -> TrackableSetTracker
             // TrackableList -> TrackableListTracker
             if (trackableType.IsGenericType)
             {
@@ -34,6 +35,11 @@ namespace TrackableData
                 if (genericType == typeof(TrackableDictionary<,>))
                 {
                     return typeof(TrackableDictionaryTracker<,>).MakeGenericType(
+                        trackableType.GetGenericArguments());
+                }
+                if (genericType == typeof(TrackableSet<>))
+                {
+                    return typeof(TrackableSetTracker<>).MakeGenericType(
                         trackableType.GetGenericArguments());
                 }
                 if (genericType == typeof(TrackableList<>))

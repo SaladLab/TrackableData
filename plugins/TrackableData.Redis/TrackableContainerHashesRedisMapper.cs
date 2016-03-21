@@ -65,12 +65,26 @@ namespace TrackableData.Redis
                     ConvertFromRedisValue = typeConverter.GetFromRedisValueFunc(property.PropertyType),
                 };
 
+                if (item.TrackerPropertyInfo == null)
+                    throw new ArgumentException($"Cannot find tracker type of '{property.Name}'");
+
                 if (item.ConvertToRedisValue == null || item.ConvertFromRedisValue == null)
                     throw new ArgumentException("Cannot find type converter. Property=" + property.Name);
 
                 items.Add(item);
             }
             return items.ToArray();
+        }
+
+        public IEnumerable<ITrackable> GetTrackables(T container)
+        {
+            return _items.Select(item => (ITrackable)item.PropertyInfo.GetValue(container));
+        }
+
+        public IEnumerable<ITracker> GetTrackers(T container)
+        {
+            var tracker = container.Tracker;
+            return _items.Select(item => (ITracker)item.TrackerPropertyInfo.GetValue(tracker));
         }
 
         public async Task CreateAsync(IDatabase db, T container, RedisKey key)

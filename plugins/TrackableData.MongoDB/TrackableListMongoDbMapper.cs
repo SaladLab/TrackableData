@@ -15,8 +15,6 @@ namespace TrackableData.MongoDB
             TypeMapper.RegisterMap(typeof(T));
         }
 
-        #region Conversion between List and Bson
-
         public BsonArray ConvertToBsonArray(IList<T> list)
         {
             var bson = new BsonArray();
@@ -54,10 +52,6 @@ namespace TrackableData.MongoDB
             ConvertToList(partialDoc.AsBsonArray, list);
             return list;
         }
-
-        #endregion
-
-        #region MongoDB Command Builder
 
         public UpdateDefinition<BsonDocument> BuildUpdatesForCreate(
             UpdateDefinition<BsonDocument> update, IList<T> list, params object[] keyValues)
@@ -125,10 +119,6 @@ namespace TrackableData.MongoDB
             }
         }
 
-        #endregion
-
-        #region Helpers
-
         public Task CreateAsync(IMongoCollection<BsonDocument> collection, IList<T> list, params object[] keyValues)
         {
             if (keyValues.Length < 2)
@@ -194,7 +184,5 @@ namespace TrackableData.MongoDB
                     filter, update, new UpdateOptions { IsUpsert = true });
             }
         }
-
-        #endregion
     }
 }

@@ -21,6 +21,12 @@ namespace TrackableData
                    type.GetGenericTypeDefinition() == typeof(TrackableDictionary<,>);
         }
 
+        public static bool IsTrackableSet(Type type)
+        {
+            return type.IsGenericType &&
+                   type.GetGenericTypeDefinition() == typeof(TrackableSet<>);
+        }
+
         public static bool IsTrackableList(Type type)
         {
             return type.IsGenericType &&

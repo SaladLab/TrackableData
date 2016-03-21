@@ -127,10 +127,7 @@ namespace TrackableData
             if (Tracker != null)
             {
                 for (int i = _list.Count - 1; i >= 0; i--)
-                {
-                    if (Tracker != null)
-                        Tracker.TrackPopBack(_list[i]);
-                }
+                    Tracker.TrackPopBack(_list[i]);
             }
 
             _list.Clear();

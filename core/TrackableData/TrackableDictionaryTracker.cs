@@ -92,7 +92,7 @@ namespace TrackableData
                     break;
 
                 case TrackableDictionaryOperation.Remove:
-                    break;
+                    throw new InvalidOperationException("Remove after remove is impossbile.");
             }
         }
 

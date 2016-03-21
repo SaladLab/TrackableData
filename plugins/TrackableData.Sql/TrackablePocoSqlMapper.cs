@@ -30,10 +30,9 @@ namespace TrackableData.Sql
         {
             _sqlProvider = sqlProvider;
 
-            var trackableTypeName = typeof(T).Namespace + "." + ("Trackable" + typeof(T).Name.Substring(1));
-            _trackableType = typeof(T).Assembly.GetType(trackableTypeName);
+            _trackableType = TrackableResolver.GetPocoTrackerType(typeof(T));
             if (_trackableType == null)
-                throw new ArgumentException($"Cannot find type '{trackableTypeName}'");
+                throw new ArgumentException($"Cannot find type '{typeof(T).Name}'");
 
             _tableName = tableName;
             _tableEscapedName = _sqlProvider.EscapeName(tableName);
