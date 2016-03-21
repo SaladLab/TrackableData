@@ -90,6 +90,7 @@ namespace TrackableData.Redis
             }
             return v.ToString("G", NumberFormatInfo.InvariantInfo);
         }
+
         private static float ToFloat(RedisValue v) => (float)(double)v;
 
         private static RedisValue ToRedisValue(double v) => v;
@@ -97,5 +98,23 @@ namespace TrackableData.Redis
 
         private static RedisValue ToRedisValue(byte[] v) => v;
         private static byte[] ToBytes(RedisValue v) => (byte[])v;
+
+        private static RedisValue ToRedisValue(DateTime v) => v.ToString("o");
+
+        private static DateTime ToDateTime(RedisValue v) =>
+            DateTime.ParseExact(v, "o", CultureInfo.InvariantCulture);
+
+        private static RedisValue ToRedisValue(DateTimeOffset v) => v.ToString("o");
+
+        private static DateTimeOffset ToDateTimeOffset(RedisValue v) =>
+            DateTimeOffset.ParseExact(v, "o", CultureInfo.InvariantCulture);
+
+        private static RedisValue ToRedisValue(TimeSpan v) => v.ToString("c");
+
+        private static TimeSpan ToTimeSpan(RedisValue v) =>
+            TimeSpan.ParseExact(v, "c", CultureInfo.InvariantCulture);
+
+        private static RedisValue ToRedisValue(Guid v) => v.ToString("D");
+        private static Guid ToGuid(RedisValue v) => Guid.ParseExact(v, "D");
     }
 }

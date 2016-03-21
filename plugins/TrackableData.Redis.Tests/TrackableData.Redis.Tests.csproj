@@ -80,6 +80,8 @@
     <Compile Include="TrackableDictionaryTest.cs" />
     <Compile Include="TrackableListTest.cs" />
     <Compile Include="TrackablePocoTest.cs" />
+    <Compile Include="TrackablePocoTestWithNullableTypes.cs" />
+    <Compile Include="TrackablePocoTestWithTypes.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\core\TrackableData\TrackableData.csproj">

@@ -256,6 +256,651 @@ namespace TrackableData.Redis.Tests
 
 #endregion
 
+#region ITestTypeNullablePoco
+
+namespace TrackableData.Redis.Tests
+{
+    public partial class TrackableTestTypeNullablePoco : ITestTypeNullablePoco
+    {
+        [IgnoreDataMember]
+        public IPocoTracker<ITestTypeNullablePoco> Tracker { get; set; }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
+
+        ITracker ITrackable.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (IPocoTracker<ITestTypeNullablePoco>)value;
+                Tracker = t;
+            }
+        }
+
+        ITracker<ITestTypeNullablePoco> ITrackable<ITestTypeNullablePoco>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (IPocoTracker<ITestTypeNullablePoco>)value;
+                Tracker = t;
+            }
+        }
+
+        public ITrackable GetChildTrackable(object name)
+        {
+            switch ((string)name)
+            {
+                default:
+                    return null;
+            }
+        }
+
+        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
+        {
+            yield break;
+        }
+
+        public static class PropertyTable
+        {
+            public static readonly PropertyInfo Id = typeof(ITestTypeNullablePoco).GetProperty("Id");
+            public static readonly PropertyInfo vBool = typeof(ITestTypeNullablePoco).GetProperty("vBool");
+            public static readonly PropertyInfo vByte = typeof(ITestTypeNullablePoco).GetProperty("vByte");
+            public static readonly PropertyInfo vShort = typeof(ITestTypeNullablePoco).GetProperty("vShort");
+            public static readonly PropertyInfo vChar = typeof(ITestTypeNullablePoco).GetProperty("vChar");
+            public static readonly PropertyInfo vInt = typeof(ITestTypeNullablePoco).GetProperty("vInt");
+            public static readonly PropertyInfo vLong = typeof(ITestTypeNullablePoco).GetProperty("vLong");
+            public static readonly PropertyInfo vFloat = typeof(ITestTypeNullablePoco).GetProperty("vFloat");
+            public static readonly PropertyInfo vDouble = typeof(ITestTypeNullablePoco).GetProperty("vDouble");
+            public static readonly PropertyInfo vDecimal = typeof(ITestTypeNullablePoco).GetProperty("vDecimal");
+            public static readonly PropertyInfo vDateTime = typeof(ITestTypeNullablePoco).GetProperty("vDateTime");
+            public static readonly PropertyInfo vDateTimeOffset = typeof(ITestTypeNullablePoco).GetProperty("vDateTimeOffset");
+            public static readonly PropertyInfo vTimeSpan = typeof(ITestTypeNullablePoco).GetProperty("vTimeSpan");
+            public static readonly PropertyInfo vGuid = typeof(ITestTypeNullablePoco).GetProperty("vGuid");
+            public static readonly PropertyInfo vSuit = typeof(ITestTypeNullablePoco).GetProperty("vSuit");
+        }
+
+        private int _Id;
+
+        public int Id
+        {
+            get
+            {
+                return _Id;
+            }
+            set
+            {
+                if (Tracker != null && Id != value)
+                    Tracker.TrackSet(PropertyTable.Id, _Id, value);
+                _Id = value;
+            }
+        }
+
+        private bool? _vBool;
+
+        public bool? vBool
+        {
+            get
+            {
+                return _vBool;
+            }
+            set
+            {
+                if (Tracker != null && vBool != value)
+                    Tracker.TrackSet(PropertyTable.vBool, _vBool, value);
+                _vBool = value;
+            }
+        }
+
+        private byte? _vByte;
+
+        public byte? vByte
+        {
+            get
+            {
+                return _vByte;
+            }
+            set
+            {
+                if (Tracker != null && vByte != value)
+                    Tracker.TrackSet(PropertyTable.vByte, _vByte, value);
+                _vByte = value;
+            }
+        }
+
+        private short? _vShort;
+
+        public short? vShort
+        {
+            get
+            {
+                return _vShort;
+            }
+            set
+            {
+                if (Tracker != null && vShort != value)
+                    Tracker.TrackSet(PropertyTable.vShort, _vShort, value);
+                _vShort = value;
+            }
+        }
+
+        private char? _vChar;
+
+        public char? vChar
+        {
+            get
+            {
+                return _vChar;
+            }
+            set
+            {
+                if (Tracker != null && vChar != value)
+                    Tracker.TrackSet(PropertyTable.vChar, _vChar, value);
+                _vChar = value;
+            }
+        }
+
+        private int? _vInt;
+
+        public int? vInt
+        {
+            get
+            {
+                return _vInt;
+            }
+            set
+            {
+                if (Tracker != null && vInt != value)
+                    Tracker.TrackSet(PropertyTable.vInt, _vInt, value);
+                _vInt = value;
+            }
+        }
+
+        private long? _vLong;
+
+        public long? vLong
+        {
+            get
+            {
+                return _vLong;
+            }
+            set
+            {
+                if (Tracker != null && vLong != value)
+                    Tracker.TrackSet(PropertyTable.vLong, _vLong, value);
+                _vLong = value;
+            }
+        }
+
+        private float? _vFloat;
+
+        public float? vFloat
+        {
+            get
+            {
+                return _vFloat;
+            }
+            set
+            {
+                if (Tracker != null && vFloat != value)
+                    Tracker.TrackSet(PropertyTable.vFloat, _vFloat, value);
+                _vFloat = value;
+            }
+        }
+
+        private double? _vDouble;
+
+        public double? vDouble
+        {
+            get
+            {
+                return _vDouble;
+            }
+            set
+            {
+                if (Tracker != null && vDouble != value)
+                    Tracker.TrackSet(PropertyTable.vDouble, _vDouble, value);
+                _vDouble = value;
+            }
+        }
+
+        private decimal? _vDecimal;
+
+        public decimal? vDecimal
+        {
+            get
+            {
+                return _vDecimal;
+            }
+            set
+            {
+                if (Tracker != null && vDecimal != value)
+                    Tracker.TrackSet(PropertyTable.vDecimal, _vDecimal, value);
+                _vDecimal = value;
+            }
+        }
+
+        private DateTime? _vDateTime;
+
+        public DateTime? vDateTime
+        {
+            get
+            {
+                return _vDateTime;
+            }
+            set
+            {
+                if (Tracker != null && vDateTime != value)
+                    Tracker.TrackSet(PropertyTable.vDateTime, _vDateTime, value);
+                _vDateTime = value;
+            }
+        }
+
+        private DateTimeOffset? _vDateTimeOffset;
+
+        public DateTimeOffset? vDateTimeOffset
+        {
+            get
+            {
+                return _vDateTimeOffset;
+            }
+            set
+            {
+                if (Tracker != null && vDateTimeOffset != value)
+                    Tracker.TrackSet(PropertyTable.vDateTimeOffset, _vDateTimeOffset, value);
+                _vDateTimeOffset = value;
+            }
+        }
+
+        private TimeSpan? _vTimeSpan;
+
+        public TimeSpan? vTimeSpan
+        {
+            get
+            {
+                return _vTimeSpan;
+            }
+            set
+            {
+                if (Tracker != null && vTimeSpan != value)
+                    Tracker.TrackSet(PropertyTable.vTimeSpan, _vTimeSpan, value);
+                _vTimeSpan = value;
+            }
+        }
+
+        private Guid? _vGuid;
+
+        public Guid? vGuid
+        {
+            get
+            {
+                return _vGuid;
+            }
+            set
+            {
+                if (Tracker != null && vGuid != value)
+                    Tracker.TrackSet(PropertyTable.vGuid, _vGuid, value);
+                _vGuid = value;
+            }
+        }
+
+        private Suit? _vSuit;
+
+        public Suit? vSuit
+        {
+            get
+            {
+                return _vSuit;
+            }
+            set
+            {
+                if (Tracker != null && vSuit != value)
+                    Tracker.TrackSet(PropertyTable.vSuit, _vSuit, value);
+                _vSuit = value;
+            }
+        }
+    }
+}
+
+#endregion
+
+#region ITestTypePoco
+
+namespace TrackableData.Redis.Tests
+{
+    public partial class TrackableTestTypePoco : ITestTypePoco
+    {
+        [IgnoreDataMember]
+        public IPocoTracker<ITestTypePoco> Tracker { get; set; }
+
+        public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
+
+        ITracker ITrackable.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (IPocoTracker<ITestTypePoco>)value;
+                Tracker = t;
+            }
+        }
+
+        ITracker<ITestTypePoco> ITrackable<ITestTypePoco>.Tracker
+        {
+            get
+            {
+                return Tracker;
+            }
+            set
+            {
+                var t = (IPocoTracker<ITestTypePoco>)value;
+                Tracker = t;
+            }
+        }
+
+        public ITrackable GetChildTrackable(object name)
+        {
+            switch ((string)name)
+            {
+                default:
+                    return null;
+            }
+        }
+
+        public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)
+        {
+            yield break;
+        }
+
+        public static class PropertyTable
+        {
+            public static readonly PropertyInfo vBool = typeof(ITestTypePoco).GetProperty("vBool");
+            public static readonly PropertyInfo vByte = typeof(ITestTypePoco).GetProperty("vByte");
+            public static readonly PropertyInfo vShort = typeof(ITestTypePoco).GetProperty("vShort");
+            public static readonly PropertyInfo vChar = typeof(ITestTypePoco).GetProperty("vChar");
+            public static readonly PropertyInfo vInt = typeof(ITestTypePoco).GetProperty("vInt");
+            public static readonly PropertyInfo vLong = typeof(ITestTypePoco).GetProperty("vLong");
+            public static readonly PropertyInfo vFloat = typeof(ITestTypePoco).GetProperty("vFloat");
+            public static readonly PropertyInfo vDouble = typeof(ITestTypePoco).GetProperty("vDouble");
+            public static readonly PropertyInfo vDecimal = typeof(ITestTypePoco).GetProperty("vDecimal");
+            public static readonly PropertyInfo vDateTime = typeof(ITestTypePoco).GetProperty("vDateTime");
+            public static readonly PropertyInfo vDateTimeOffset = typeof(ITestTypePoco).GetProperty("vDateTimeOffset");
+            public static readonly PropertyInfo vTimeSpan = typeof(ITestTypePoco).GetProperty("vTimeSpan");
+            public static readonly PropertyInfo vString = typeof(ITestTypePoco).GetProperty("vString");
+            public static readonly PropertyInfo vBytes = typeof(ITestTypePoco).GetProperty("vBytes");
+            public static readonly PropertyInfo vGuid = typeof(ITestTypePoco).GetProperty("vGuid");
+            public static readonly PropertyInfo vSuit = typeof(ITestTypePoco).GetProperty("vSuit");
+        }
+
+        private bool _vBool;
+
+        public bool vBool
+        {
+            get
+            {
+                return _vBool;
+            }
+            set
+            {
+                if (Tracker != null && vBool != value)
+                    Tracker.TrackSet(PropertyTable.vBool, _vBool, value);
+                _vBool = value;
+            }
+        }
+
+        private byte _vByte;
+
+        public byte vByte
+        {
+            get
+            {
+                return _vByte;
+            }
+            set
+            {
+                if (Tracker != null && vByte != value)
+                    Tracker.TrackSet(PropertyTable.vByte, _vByte, value);
+                _vByte = value;
+            }
+        }
+
+        private short _vShort;
+
+        public short vShort
+        {
+            get
+            {
+                return _vShort;
+            }
+            set
+            {
+                if (Tracker != null && vShort != value)
+                    Tracker.TrackSet(PropertyTable.vShort, _vShort, value);
+                _vShort = value;
+            }
+        }
+
+        private char _vChar;
+
+        public char vChar
+        {
+            get
+            {
+                return _vChar;
+            }
+            set
+            {
+                if (Tracker != null && vChar != value)
+                    Tracker.TrackSet(PropertyTable.vChar, _vChar, value);
+                _vChar = value;
+            }
+        }
+
+        private int _vInt;
+
+        public int vInt
+        {
+            get
+            {
+                return _vInt;
+            }
+            set
+            {
+                if (Tracker != null && vInt != value)
+                    Tracker.TrackSet(PropertyTable.vInt, _vInt, value);
+                _vInt = value;
+            }
+        }
+
+        private long _vLong;
+
+        public long vLong
+        {
+            get
+            {
+                return _vLong;
+            }
+            set
+            {
+                if (Tracker != null && vLong != value)
+                    Tracker.TrackSet(PropertyTable.vLong, _vLong, value);
+                _vLong = value;
+            }
+        }
+
+        private float _vFloat;
+
+        public float vFloat
+        {
+            get
+            {
+                return _vFloat;
+            }
+            set
+            {
+                if (Tracker != null && vFloat != value)
+                    Tracker.TrackSet(PropertyTable.vFloat, _vFloat, value);
+                _vFloat = value;
+            }
+        }
+
+        private double _vDouble;
+
+        public double vDouble
+        {
+            get
+            {
+                return _vDouble;
+            }
+            set
+            {
+                if (Tracker != null && vDouble != value)
+                    Tracker.TrackSet(PropertyTable.vDouble, _vDouble, value);
+                _vDouble = value;
+            }
+        }
+
+        private decimal _vDecimal;
+
+        public decimal vDecimal
+        {
+            get
+            {
+                return _vDecimal;
+            }
+            set
+            {
+                if (Tracker != null && vDecimal != value)
+                    Tracker.TrackSet(PropertyTable.vDecimal, _vDecimal, value);
+                _vDecimal = value;
+            }
+        }
+
+        private DateTime _vDateTime;
+
+        public DateTime vDateTime
+        {
+            get
+            {
+                return _vDateTime;
+            }
+            set
+            {
+                if (Tracker != null && vDateTime != value)
+                    Tracker.TrackSet(PropertyTable.vDateTime, _vDateTime, value);
+                _vDateTime = value;
+            }
+        }
+
+        private DateTimeOffset _vDateTimeOffset;
+
+        public DateTimeOffset vDateTimeOffset
+        {
+            get
+            {
+                return _vDateTimeOffset;
+            }
+            set
+            {
+                if (Tracker != null && vDateTimeOffset != value)
+                    Tracker.TrackSet(PropertyTable.vDateTimeOffset, _vDateTimeOffset, value);
+                _vDateTimeOffset = value;
+            }
+        }
+
+        private TimeSpan _vTimeSpan;
+
+        public TimeSpan vTimeSpan
+        {
+            get
+            {
+                return _vTimeSpan;
+            }
+            set
+            {
+                if (Tracker != null && vTimeSpan != value)
+                    Tracker.TrackSet(PropertyTable.vTimeSpan, _vTimeSpan, value);
+                _vTimeSpan = value;
+            }
+        }
+
+        private string _vString;
+
+        public string vString
+        {
+            get
+            {
+                return _vString;
+            }
+            set
+            {
+                if (Tracker != null && vString != value)
+                    Tracker.TrackSet(PropertyTable.vString, _vString, value);
+                _vString = value;
+            }
+        }
+
+        private byte[] _vBytes;
+
+        public byte[] vBytes
+        {
+            get
+            {
+                return _vBytes;
+            }
+            set
+            {
+                if (Tracker != null && vBytes != value)
+                    Tracker.TrackSet(PropertyTable.vBytes, _vBytes, value);
+                _vBytes = value;
+            }
+        }
+
+        private Guid _vGuid;
+
+        public Guid vGuid
+        {
+            get
+            {
+                return _vGuid;
+            }
+            set
+            {
+                if (Tracker != null && vGuid != value)
+                    Tracker.TrackSet(PropertyTable.vGuid, _vGuid, value);
+                _vGuid = value;
+            }
+        }
+
+        private Suit _vSuit;
+
+        public Suit vSuit
+        {
+            get
+            {
+                return _vSuit;
+            }
+            set
+            {
+                if (Tracker != null && vSuit != value)
+                    Tracker.TrackSet(PropertyTable.vSuit, _vSuit, value);
+                _vSuit = value;
+            }
+        }
+    }
+}
+
+#endregion
+
 #region ITestContainer
 
 namespace TrackableData.Redis.Tests

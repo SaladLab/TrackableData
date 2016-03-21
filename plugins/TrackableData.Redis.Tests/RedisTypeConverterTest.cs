@@ -1,4 +1,5 @@
-﻿using StackExchange.Redis;
+﻿using System;
+using StackExchange.Redis;
 using Xunit;
 
 namespace TrackableData.Redis
@@ -42,6 +43,10 @@ namespace TrackableData.Redis
             AssertConversionEqual(converter, 3.141592f);
             AssertConversionEqual(converter, 3.1415927410125732);
             AssertConversionEqual(converter, new byte[] { 0, 1, 2 });
+            AssertConversionEqual(converter, new DateTime(2001, 1, 1, 1, 1, 1));
+            AssertConversionEqual(converter, new DateTimeOffset(2001, 1, 1, 1, 1, 1, TimeSpan.FromHours(2)));
+            AssertConversionEqual(converter, new TimeSpan(1, 2, 3));
+            AssertConversionEqual(converter, Guid.NewGuid());
         }
 
         [Fact]
