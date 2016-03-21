@@ -1,9 +1,9 @@
-﻿using StackExchange.Redis;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using StackExchange.Redis;
 
 namespace TrackableData.Redis
 {
@@ -23,7 +23,7 @@ namespace TrackableData.Redis
         }
 
         private readonly PropertyItem[] _items;
-        private readonly Dictionary<RedisValue, PropertyItem> _nameToItemMap;
+        private readonly Dictionary<RedisValue, PropertyItem> _fieldNameToItemMap;
 
         public TrackableContainerHashesRedisMapper(RedisTypeConverter typeConverter = null)
         {
@@ -35,14 +35,14 @@ namespace TrackableData.Redis
                 throw new ArgumentException($"Cannot find tracker type of '{nameof(T)}'");
 
             _items = ConstructPropertyItems(typeConverter);
-            _nameToItemMap = _items.ToDictionary(x => x.FieldName, y => y);
+            _fieldNameToItemMap = _items.ToDictionary(x => x.FieldName, y => y);
         }
 
         private static PropertyItem[] ConstructPropertyItems(RedisTypeConverter typeConverter)
         {
             var trackerType = TrackerResolver.GetDefaultTracker(typeof(T));
 
-            var propertyItems = new List<PropertyItem>();
+            var items = new List<PropertyItem>();
             foreach (var property in typeof(T).GetProperties())
             {
                 var fieldName = property.Name;
@@ -68,9 +68,9 @@ namespace TrackableData.Redis
                 if (item.ConvertToRedisValue == null || item.ConvertFromRedisValue == null)
                     throw new ArgumentException("Cannot find type converter. Property=" + property.Name);
 
-                propertyItems.Add(item);
+                items.Add(item);
             }
-            return propertyItems.ToArray();
+            return items.ToArray();
         }
 
         public async Task CreateAsync(IDatabase db, T container, RedisKey key)
@@ -106,7 +106,7 @@ namespace TrackableData.Redis
             foreach (var entry in entries)
             {
                 PropertyItem item;
-                if (_nameToItemMap.TryGetValue(entry.Name, out item) == false)
+                if (_fieldNameToItemMap.TryGetValue(entry.Name, out item) == false)
                     continue;
 
                 var propertyValue = item.ConvertFromRedisValue(entry.Value);

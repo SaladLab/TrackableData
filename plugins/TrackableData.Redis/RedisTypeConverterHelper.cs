@@ -1,6 +1,6 @@
 ﻿using System;
-using StackExchange.Redis;
 using System.Linq.Expressions;
+using StackExchange.Redis;
 
 namespace TrackableData.Redis
 {

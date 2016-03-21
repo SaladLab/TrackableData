@@ -12,7 +12,7 @@ namespace TrackableData.Redis
     {
         private readonly Type _trackableType;
 
-        public class FieldProperty
+        private class PropertyItem
         {
             public string Name;
             public RedisValue FieldName;
@@ -21,9 +21,9 @@ namespace TrackableData.Redis
             public Func<RedisValue, object> ConvertFromRedisValue;
         }
 
-        private readonly FieldProperty[] _fields;
-        private readonly Dictionary<RedisValue, FieldProperty> _nameFieldMap;
-        private readonly Dictionary<PropertyInfo, FieldProperty> _valueFieldMap;
+        private readonly PropertyItem[] _items;
+        private readonly Dictionary<RedisValue, PropertyItem> _fieldNameToItemMap;
+        private readonly Dictionary<PropertyInfo, PropertyItem> _propertyInfoToItemMap;
 
         public TrackablePocoRedisMapper(RedisTypeConverter typeConverter = null)
         {
@@ -34,7 +34,14 @@ namespace TrackableData.Redis
             if (_trackableType == null)
                 throw new ArgumentException($"Cannot find type '{typeof(T).Name}'");
 
-            var fields = new List<FieldProperty>();
+            _items = ConstructPropertyItems(typeConverter);
+            _fieldNameToItemMap = _items.ToDictionary(x => x.FieldName, y => y);
+            _propertyInfoToItemMap = _items.ToDictionary(x => x.PropertyInfo, y => y);
+        }
+
+        private static PropertyItem[] ConstructPropertyItems(RedisTypeConverter typeConverter)
+        {
+            var items = new List<PropertyItem>();
             foreach (var property in typeof(T).GetProperties())
             {
                 var fieldName = property.Name;
@@ -47,7 +54,7 @@ namespace TrackableData.Redis
                     fieldName = attr["redis.field:"] ?? fieldName;
                 }
 
-                var field = new FieldProperty
+                var item = new PropertyItem
                 {
                     Name = property.Name,
                     FieldName = fieldName,
@@ -56,24 +63,21 @@ namespace TrackableData.Redis
                     ConvertFromRedisValue = typeConverter.GetFromRedisValueFunc(property.PropertyType),
                 };
 
-                if (field.ConvertToRedisValue == null || field.ConvertFromRedisValue == null)
+                if (item.ConvertToRedisValue == null || item.ConvertFromRedisValue == null)
                     throw new ArgumentException("Cannot find type converter. Property=" + property.Name);
 
-                fields.Add(field);
+                items.Add(item);
             }
-
-            _fields = fields.ToArray();
-            _nameFieldMap = _fields.ToDictionary(x => x.FieldName, y => y);
-            _valueFieldMap = _fields.ToDictionary(x => x.PropertyInfo, y => y);
+            return items.ToArray();
         }
 
         public async Task CreateAsync(IDatabase db, T value, RedisKey key)
         {
             await db.KeyDeleteAsync(key);
 
-            var entries = _fields.Select(f => new HashEntry(f.FieldName,
-                                                            f.ConvertToRedisValue(f.PropertyInfo.GetValue(value))))
-                                 .Where(e => e.Value.IsNull == false).ToArray();
+            var entries = _items.Select(f => new HashEntry(f.FieldName,
+                                                           f.ConvertToRedisValue(f.PropertyInfo.GetValue(value))))
+                                .Where(e => e.Value.IsNull == false).ToArray();
             await db.HashSetAsync(key, entries);
         }
 
@@ -99,12 +103,12 @@ namespace TrackableData.Redis
 
             foreach (var entry in entries)
             {
-                FieldProperty field;
-                if (_nameFieldMap.TryGetValue(entry.Name, out field) == false)
+                PropertyItem item;
+                if (_fieldNameToItemMap.TryGetValue(entry.Name, out item) == false)
                     continue;
 
-                var fieldValue = field.ConvertFromRedisValue(entry.Value);
-                field.PropertyInfo.SetValue(value, fieldValue);
+                var fieldValue = item.ConvertFromRedisValue(entry.Value);
+                item.PropertyInfo.SetValue(value, fieldValue);
             }
             return true;
         }
@@ -123,15 +127,15 @@ namespace TrackableData.Redis
             var removes = new List<RedisValue>();
             foreach (var change in tracker.ChangeMap)
             {
-                FieldProperty field;
-                if (_valueFieldMap.TryGetValue(change.Key, out field) == false)
+                PropertyItem item;
+                if (_propertyInfoToItemMap.TryGetValue(change.Key, out item) == false)
                     continue;
 
-                var redisValue = field.ConvertToRedisValue(change.Value.NewValue);
+                var redisValue = item.ConvertToRedisValue(change.Value.NewValue);
                 if (redisValue.IsNull)
-                    removes.Add(field.FieldName);
+                    removes.Add(item.FieldName);
                 else
-                    updates.Add(new HashEntry(field.FieldName, redisValue));
+                    updates.Add(new HashEntry(item.FieldName, redisValue));
             }
 
             if (updates.Any())

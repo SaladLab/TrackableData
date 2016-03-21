@@ -1,10 +1,9 @@
-﻿using StackExchange.Redis;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using StackExchange.Redis;
 
 namespace TrackableData.Redis
 {
@@ -85,8 +84,10 @@ namespace TrackableData.Redis
         {
             if (float.IsInfinity(v))
             {
-                if (double.IsPositiveInfinity(v)) return "+inf";
-                if (double.IsNegativeInfinity(v)) return "-inf";
+                if (double.IsPositiveInfinity(v))
+                    return "+inf";
+                if (double.IsNegativeInfinity(v))
+                    return "-inf";
             }
             return v.ToString("G", NumberFormatInfo.InvariantInfo);
         }

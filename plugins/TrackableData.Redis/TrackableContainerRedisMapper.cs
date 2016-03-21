@@ -1,9 +1,8 @@
-﻿using StackExchange.Redis;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using StackExchange.Redis;
 
 namespace TrackableData.Redis
 {
@@ -25,7 +24,7 @@ namespace TrackableData.Redis
             public Func<IDatabase, IContainerTracker<T>, RedisKey, Task> SaveAsync;
         }
 
-        private readonly PropertyItem[] PropertyItems;
+        private readonly PropertyItem[] _items;
 
         public TrackableContainerRedisMapper(RedisTypeConverter typeConverter = null)
         {
@@ -36,27 +35,30 @@ namespace TrackableData.Redis
             if (_trackableType == null)
                 throw new ArgumentException($"Cannot find tracker type of '{nameof(T)}'");
 
-            PropertyItems = ConstructPropertyItems(typeConverter);
+            _items = ConstructPropertyItems(typeConverter);
         }
 
         private static PropertyItem[] ConstructPropertyItems(RedisTypeConverter typeConverter)
         {
             var trackerType = TrackerResolver.GetDefaultTracker(typeof(T));
 
-            var propertyItems = new List<PropertyItem>();
+            var items = new List<PropertyItem>();
             foreach (var property in typeof(T).GetProperties())
             {
+                var keySuffix = "." + property.Name;
+
                 var attr = property.GetCustomAttribute<TrackablePropertyAttribute>();
                 if (attr != null)
                 {
                     if (attr["redis.ignore"] != null)
                         continue;
+                    keySuffix = attr["redis.keysuffix:"] ?? keySuffix;
                 }
 
                 var item = new PropertyItem
                 {
                     Name = property.Name,
-                    KeySuffix = "." + property.Name,
+                    KeySuffix = keySuffix,
                     Property = property,
                     TrackerProperty = trackerType.GetProperty(property.Name + "Tracker")
                 };
@@ -87,9 +89,9 @@ namespace TrackableData.Redis
                     throw new InvalidOperationException("Cannot resolve property: " + property.Name);
                 }
 
-                propertyItems.Add(item);
+                items.Add(item);
             }
-            return propertyItems.ToArray();
+            return items.ToArray();
         }
 
         private static void BuildTrackablePocoProperty<TPoco>(PropertyItem item,
@@ -190,7 +192,7 @@ namespace TrackableData.Redis
 
         public async Task CreateAsync(IDatabase db, T container, RedisKey key)
         {
-            foreach (var pi in PropertyItems)
+            foreach (var pi in _items)
             {
                 await pi.CreateAsync(db, container, key);
             }
@@ -199,7 +201,7 @@ namespace TrackableData.Redis
         public async Task<int> DeleteAsync(IDatabase db, RedisKey key)
         {
             var count = 0;
-            foreach (var pi in PropertyItems)
+            foreach (var pi in _items)
             {
                 count += await pi.DeleteAsync(db, key);
             }
@@ -209,7 +211,7 @@ namespace TrackableData.Redis
         public async Task<T> LoadAsync(IDatabase db, RedisKey key)
         {
             var container = (T)Activator.CreateInstance(_trackableType);
-            foreach (var pi in PropertyItems)
+            foreach (var pi in _items)
             {
                 var ok = await pi.LoadAsync(db, container, key);
                 if (ok == false)
@@ -228,7 +230,7 @@ namespace TrackableData.Redis
 
         public async Task SaveAsync(IDatabase db, IContainerTracker<T> tracker, RedisKey key)
         {
-            foreach (var pi in PropertyItems)
+            foreach (var pi in _items)
             {
                 await pi.SaveAsync(db, tracker, key);
             }
