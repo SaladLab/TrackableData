@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using StackExchange.Redis;
+using System.Linq;
 
 namespace TrackableData.Redis
 {
@@ -15,8 +16,8 @@ namespace TrackableData.Redis
         {
             public string Name;
             public RedisKey KeySuffix;
-            public PropertyInfo Property;
-            public PropertyInfo TrackerProperty;
+            public PropertyInfo PropertyInfo;
+            public PropertyInfo TrackerPropertyInfo;
             public object Mapper;
             public Func<IDatabase, T, RedisKey, Task> CreateAsync;
             public Func<IDatabase, RedisKey, Task<int>> DeleteAsync;
@@ -59,9 +60,12 @@ namespace TrackableData.Redis
                 {
                     Name = property.Name,
                     KeySuffix = keySuffix,
-                    Property = property,
-                    TrackerProperty = trackerType.GetProperty(property.Name + "Tracker")
+                    PropertyInfo = property,
+                    TrackerPropertyInfo = trackerType.GetProperty(property.Name + "Tracker")
                 };
+
+                if (item.TrackerPropertyInfo == null)
+                    throw new ArgumentException($"Cannot find tracker type of '{property.Name}'");
 
                 if (TrackableResolver.IsTrackablePoco(property.PropertyType))
                 {
@@ -103,7 +107,7 @@ namespace TrackableData.Redis
 
             item.CreateAsync = (db, container, key) =>
             {
-                var value = (TPoco)item.Property.GetValue(container);
+                var value = (TPoco)item.PropertyInfo.GetValue(container);
                 return mapper.CreateAsync(db, value, key.Prepend(item.KeySuffix));
             };
             item.DeleteAsync = (db, key) =>
@@ -112,13 +116,13 @@ namespace TrackableData.Redis
             };
             item.LoadAsync = (db, container, key) =>
             {
-                var value = (TPoco)item.Property.GetValue(container);
+                var value = (TPoco)item.PropertyInfo.GetValue(container);
                 // when there is no entry for poco, it is regarded as non-existent container.
                 return mapper.LoadAsync(db, value, key.Prepend(item.KeySuffix));
             };
             item.SaveAsync = async (db, tracker, key) =>
             {
-                var valueTracker = (TrackablePocoTracker<TPoco>)item.TrackerProperty.GetValue(tracker);
+                var valueTracker = (TrackablePocoTracker<TPoco>)item.TrackerPropertyInfo.GetValue(tracker);
                 if (valueTracker.HasChange)
                 {
                     await mapper.SaveAsync(db, valueTracker, key.Prepend(item.KeySuffix));
@@ -134,7 +138,7 @@ namespace TrackableData.Redis
 
             item.CreateAsync = (db, container, key) =>
             {
-                var dictionary = (IDictionary<TKey, TValue>)item.Property.GetValue(container);
+                var dictionary = (IDictionary<TKey, TValue>)item.PropertyInfo.GetValue(container);
                 return mapper.CreateAsync(db, dictionary, key.Prepend(item.KeySuffix));
             };
             item.DeleteAsync = (db, key) =>
@@ -143,14 +147,14 @@ namespace TrackableData.Redis
             };
             item.LoadAsync = async (db, container, key) =>
             {
-                var dictionary = (IDictionary<TKey, TValue>)item.Property.GetValue(container);
+                var dictionary = (IDictionary<TKey, TValue>)item.PropertyInfo.GetValue(container);
                 // when there is no entry for dictionary, it is regarded as an empty dictionary.
                 await mapper.LoadAsync(db, dictionary, key.Prepend(item.KeySuffix));
                 return true;
             };
             item.SaveAsync = async (db, tracker, key) =>
             {
-                var valueTracker = (TrackableDictionaryTracker<TKey, TValue>)item.TrackerProperty.GetValue(tracker);
+                var valueTracker = (TrackableDictionaryTracker<TKey, TValue>)item.TrackerPropertyInfo.GetValue(tracker);
                 if (valueTracker.HasChange)
                 {
                     await mapper.SaveAsync(db, valueTracker, key.Prepend(item.KeySuffix));
@@ -166,7 +170,7 @@ namespace TrackableData.Redis
 
             item.CreateAsync = (db, container, key) =>
             {
-                var list = (IList<TValue>)item.Property.GetValue(container);
+                var list = (IList<TValue>)item.PropertyInfo.GetValue(container);
                 return mapper.CreateAsync(db, list, key.Prepend(item.KeySuffix));
             };
             item.DeleteAsync = (db, key) =>
@@ -175,19 +179,30 @@ namespace TrackableData.Redis
             };
             item.LoadAsync = async (db, container, key) =>
             {
-                var list = (IList<TValue>)item.Property.GetValue(container);
+                var list = (IList<TValue>)item.PropertyInfo.GetValue(container);
                 // when there is no entry for list, it is regarded as an empty list.
                 await mapper.LoadAsync(db, list, key.Prepend(item.KeySuffix));
                 return true;
             };
             item.SaveAsync = async (db, tracker, key) =>
             {
-                var valueTracker = (TrackableListTracker<TValue>)item.TrackerProperty.GetValue(tracker);
+                var valueTracker = (TrackableListTracker<TValue>)item.TrackerPropertyInfo.GetValue(tracker);
                 if (valueTracker.HasChange)
                 {
                     await mapper.SaveAsync(db, valueTracker, key.Prepend(item.KeySuffix));
                 }
             };
+        }
+
+        public IEnumerable<ITrackable> GetTrackables(T container)
+        {
+            return _items.Select(item => (ITrackable)item.PropertyInfo.GetValue(container));
+        }
+
+        public IEnumerable<ITrackable> GetTrackers(T container)
+        {
+            var tracker = container.Tracker;
+            return _items.Select(item => (ITrackable)item.TrackerPropertyInfo.GetValue(tracker));
         }
 
         public async Task CreateAsync(IDatabase db, T container, RedisKey key)

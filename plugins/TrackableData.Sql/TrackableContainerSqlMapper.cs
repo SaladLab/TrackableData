@@ -17,8 +17,8 @@ namespace TrackableData.Sql
         private class PropertyItem
         {
             public string Name;
-            public PropertyInfo Property;
-            public PropertyInfo TrackerProperty;
+            public PropertyInfo PropertyInfo;
+            public PropertyInfo TrackerPropertyInfo;
             public object Mapper;
             public Func<bool, string> BuildCreateTableSql;
             public Func<T, object[], string> BuildSqlForCreate;
@@ -28,7 +28,7 @@ namespace TrackableData.Sql
             public Func<IContainerTracker<T>, object[], string> BuildSqlForSave;
         }
 
-        private readonly PropertyItem[] PropertyItems;
+        private readonly PropertyItem[] _items;
 
         public TrackableContainerSqlMapper(ISqlProvider sqlProvider, Tuple<string, object[]>[] mapperParameters)
         {
@@ -38,7 +38,7 @@ namespace TrackableData.Sql
             if (_trackableType == null)
                 throw new ArgumentException($"Cannot find tracker type of '{nameof(T)}'");
 
-            PropertyItems = ConstructPropertyItems(sqlProvider, mapperParameters);
+            _items = ConstructPropertyItems(sqlProvider, mapperParameters);
         }
 
         private static PropertyItem[] ConstructPropertyItems(ISqlProvider sqlProvider,
@@ -47,7 +47,7 @@ namespace TrackableData.Sql
             var trackerType = TrackerResolver.GetDefaultTracker(typeof(T));
             var mapperParameterMap = mapperParameters.ToDictionary(x => x.Item1, x => x.Item2);
 
-            var propertyItems = new List<PropertyItem>();
+            var items = new List<PropertyItem>();
             foreach (var property in typeof(T).GetProperties())
             {
                 var attr = property.GetCustomAttribute<TrackablePropertyAttribute>();
@@ -60,9 +60,12 @@ namespace TrackableData.Sql
                 var item = new PropertyItem
                 {
                     Name = property.Name,
-                    Property = property,
-                    TrackerProperty = trackerType.GetProperty(property.Name + "Tracker")
+                    PropertyInfo = property,
+                    TrackerPropertyInfo = trackerType.GetProperty(property.Name + "Tracker")
                 };
+
+                if (item.TrackerPropertyInfo == null)
+                    throw new ArgumentException($"Cannot find tracker type of '{property.Name}'");
 
                 object[] mapperParameter;
                 if (mapperParameterMap.TryGetValue(property.Name, out mapperParameter) == false)
@@ -87,9 +90,9 @@ namespace TrackableData.Sql
                     throw new InvalidOperationException("Cannot resolve property: " + property.Name);
                 }
 
-                propertyItems.Add(item);
+                items.Add(item);
             }
-            return propertyItems.ToArray();
+            return items.ToArray();
         }
 
         private static void BuildTrackablePocoProperty<TPoco>(ISqlProvider sqlProvider,
@@ -111,7 +114,7 @@ namespace TrackableData.Sql
             };
             item.BuildSqlForCreate = (container, keyValues) =>
             {
-                var value = (TPoco)item.Property.GetValue(container);
+                var value = (TPoco)item.PropertyInfo.GetValue(container);
                 return value != null
                            ? mapper.BuildSqlForCreate(value, keyValues)
                            : string.Empty;
@@ -127,12 +130,12 @@ namespace TrackableData.Sql
             item.LoadAndSetAsync = async (reader, container) =>
             {
                 var value = await mapper.LoadAsync(reader);
-                item.Property.SetValue(container, value);
+                item.PropertyInfo.SetValue(container, value);
                 return value != null;
             };
             item.BuildSqlForSave = (tracker, keyValues) =>
             {
-                var valueTracker = (TrackablePocoTracker<TPoco>)item.TrackerProperty.GetValue(tracker);
+                var valueTracker = (TrackablePocoTracker<TPoco>)item.TrackerPropertyInfo.GetValue(tracker);
                 return valueTracker.HasChange
                            ? mapper.BuildSqlForSave(valueTracker, keyValues)
                            : string.Empty;
@@ -166,7 +169,7 @@ namespace TrackableData.Sql
             };
             item.BuildSqlForCreate = (container, keyValues) =>
             {
-                var value = (IDictionary<TKey, TValue>)item.Property.GetValue(container);
+                var value = (IDictionary<TKey, TValue>)item.PropertyInfo.GetValue(container);
                 return value != null
                            ? mapper.BuildSqlForCreate(value, keyValues)
                            : string.Empty;
@@ -182,22 +185,33 @@ namespace TrackableData.Sql
             item.LoadAndSetAsync = async (reader, container) =>
             {
                 var value = await mapper.LoadAsync(reader);
-                item.Property.SetValue(container, value);
+                item.PropertyInfo.SetValue(container, value);
                 return value != null;
             };
             item.BuildSqlForSave = (tracker, keyValues) =>
             {
-                var valueTracker = (TrackableDictionaryTracker<TKey, TValue>)item.TrackerProperty.GetValue(tracker);
+                var valueTracker = (TrackableDictionaryTracker<TKey, TValue>)item.TrackerPropertyInfo.GetValue(tracker);
                 return valueTracker.HasChange
                            ? mapper.BuildSqlForSave(valueTracker, keyValues)
                            : string.Empty;
             };
         }
 
+        public IEnumerable<ITrackable> GetTrackables(T container)
+        {
+            return _items.Select(item => (ITrackable)item.PropertyInfo.GetValue(container));
+        }
+
+        public IEnumerable<ITrackable> GetTrackers(T container)
+        {
+            var tracker = container.Tracker;
+            return _items.Select(item => (ITrackable)item.TrackerPropertyInfo.GetValue(tracker));
+        }
+
         public string BuildCreateTableSql(bool dropIfExists = false)
         {
             var sql = new StringBuilder();
-            foreach (var pi in PropertyItems)
+            foreach (var pi in _items)
             {
                 sql.Append(pi.BuildCreateTableSql(dropIfExists));
             }
@@ -207,7 +221,7 @@ namespace TrackableData.Sql
         public string BuildSqlForCreate(T value, params object[] keyValues)
         {
             var sql = new StringBuilder();
-            foreach (var pi in PropertyItems)
+            foreach (var pi in _items)
             {
                 sql.Append(pi.BuildSqlForCreate(value, keyValues));
             }
@@ -217,7 +231,7 @@ namespace TrackableData.Sql
         public string BuildSqlForDelete(params object[] keyValues)
         {
             var sql = new StringBuilder();
-            foreach (var pi in PropertyItems)
+            foreach (var pi in _items)
             {
                 sql.Append(pi.BuildSqlForDelete(keyValues));
             }
@@ -227,7 +241,7 @@ namespace TrackableData.Sql
         public string BuildSqlForLoad(params object[] keyValues)
         {
             var sql = new StringBuilder();
-            foreach (var pi in PropertyItems)
+            foreach (var pi in _items)
             {
                 sql.Append(pi.BuildSqlForLoad(keyValues));
             }
@@ -237,7 +251,7 @@ namespace TrackableData.Sql
         public string BuildSqlForSave(IContainerTracker<T> tracker, params object[] keyValues)
         {
             var sql = new StringBuilder();
-            foreach (var pi in PropertyItems)
+            foreach (var pi in _items)
             {
                 sql.Append(pi.BuildSqlForSave(tracker, keyValues));
             }
@@ -279,7 +293,7 @@ namespace TrackableData.Sql
             {
                 using (var reader = command.ExecuteReader())
                 {
-                    foreach (var pi in PropertyItems)
+                    foreach (var pi in _items)
                     {
                         var readed = await pi.LoadAndSetAsync(reader, container);
                         if (readed == false)
@@ -294,7 +308,7 @@ namespace TrackableData.Sql
         public async Task<T> LoadSerializedAsync(DbConnection connection, params object[] keyValues)
         {
             var container = (T)Activator.CreateInstance(_trackableType);
-            foreach (var pi in PropertyItems)
+            foreach (var pi in _items)
             {
                 var sql = pi.BuildSqlForLoad(keyValues);
                 using (var command = _sqlProvider.CreateDbCommand(sql.ToString(), connection))

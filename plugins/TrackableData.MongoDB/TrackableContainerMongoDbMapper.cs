@@ -16,24 +16,22 @@ namespace TrackableData.MongoDB
         private class PropertyItem
         {
             public string Name;
-            public PropertyInfo Property;
-            public PropertyInfo TrackerProperty;
+            public PropertyInfo PropertyInfo;
+            public PropertyInfo TrackerPropertyInfo;
             public object Mapper;
             public Action<T, BsonDocument> ExportToBson;
             public Action<BsonDocument, T> ImportFromBson;
             public Func<UpdateDefinition<BsonDocument>, IContainerTracker<T>, IEnumerable<object>, UpdateDefinition<BsonDocument>> SaveChanges;
         }
 
-        private readonly PropertyItem[] PropertyItems;
+        private readonly PropertyItem[] _items;
 
         public TrackableContainerMongoDbMapper()
         {
             _trackableType = TrackableResolver.GetContainerTrackerType(typeof(T));
 
-            PropertyItems = ConstructPropertyItems();
+            _items = ConstructPropertyItems();
         }
-
-        #region Property Accessor
 
         private static PropertyItem[] ConstructPropertyItems()
         {
@@ -42,12 +40,22 @@ namespace TrackableData.MongoDB
             var propertyItems = new List<PropertyItem>();
             foreach (var property in typeof(T).GetProperties())
             {
+                var attr = property.GetCustomAttribute<TrackablePropertyAttribute>();
+                if (attr != null)
+                {
+                    if (attr["mognodb.ignore"] != null)
+                        continue;
+                }
+
                 var item = new PropertyItem
                 {
                     Name = property.Name,
-                    Property = property,
-                    TrackerProperty = trackerType.GetProperty(property.Name + "Tracker")
+                    PropertyInfo = property,
+                    TrackerPropertyInfo = trackerType.GetProperty(property.Name + "Tracker")
                 };
+
+                if (item.TrackerPropertyInfo == null)
+                    throw new ArgumentException($"Cannot find tracker type of '{property.Name}'");
 
                 if (TrackableResolver.IsTrackablePoco(property.PropertyType))
                 {
@@ -88,23 +96,23 @@ namespace TrackableData.MongoDB
 
             item.ExportToBson = (container, doc) =>
             {
-                var value = (TPoco)item.Property.GetValue(container);
+                var value = (TPoco)item.PropertyInfo.GetValue(container);
                 if (value != null)
-                    doc.Add(item.Property.Name, mapper.ConvertToBsonDocument(value));
+                    doc.Add(item.PropertyInfo.Name, mapper.ConvertToBsonDocument(value));
             };
             item.ImportFromBson = (doc, container) =>
             {
-                var value = mapper.ConvertToTrackablePoco(doc, item.Property.Name);
-                item.Property.SetValue(container, value);
+                var value = mapper.ConvertToTrackablePoco(doc, item.PropertyInfo.Name);
+                item.PropertyInfo.SetValue(container, value);
             };
             item.SaveChanges = (update, tracker, keyValues) =>
             {
-                var valueTracker = (TrackablePocoTracker<TPoco>)item.TrackerProperty.GetValue(tracker);
+                var valueTracker = (TrackablePocoTracker<TPoco>)item.TrackerPropertyInfo.GetValue(tracker);
                 if (valueTracker.HasChange)
                 {
                     update = mapper.BuildUpdatesForSave(
                         update, valueTracker,
-                        keyValues.Concat(new object[] { item.Property.Name }).ToArray());
+                        keyValues.Concat(new object[] { item.PropertyInfo.Name }).ToArray());
                 }
                 return update;
             };
@@ -117,23 +125,23 @@ namespace TrackableData.MongoDB
 
             item.ExportToBson = (container, doc) =>
             {
-                var value = (IDictionary<TKey, TValue>)item.Property.GetValue(container);
+                var value = (IDictionary<TKey, TValue>)item.PropertyInfo.GetValue(container);
                 if (value != null)
-                    doc.Add(item.Property.Name, mapper.ConvertToBsonDocument(value));
+                    doc.Add(item.PropertyInfo.Name, mapper.ConvertToBsonDocument(value));
             };
             item.ImportFromBson = (doc, container) =>
             {
-                var value = mapper.ConvertToTrackableDictionary(doc, item.Property.Name);
-                item.Property.SetValue(container, value);
+                var value = mapper.ConvertToTrackableDictionary(doc, item.PropertyInfo.Name);
+                item.PropertyInfo.SetValue(container, value);
             };
             item.SaveChanges = (update, tracker, keyValues) =>
             {
-                var valueTracker = (TrackableDictionaryTracker<TKey, TValue>)item.TrackerProperty.GetValue(tracker);
+                var valueTracker = (TrackableDictionaryTracker<TKey, TValue>)item.TrackerPropertyInfo.GetValue(tracker);
                 if (valueTracker.HasChange)
                 {
                     update = mapper.BuildUpdatesForSave(
                         update, valueTracker,
-                        keyValues.Concat(new object[] { item.Property.Name }).ToArray());
+                        keyValues.Concat(new object[] { item.PropertyInfo.Name }).ToArray());
                 }
                 return update;
             };
@@ -146,23 +154,23 @@ namespace TrackableData.MongoDB
 
             item.ExportToBson = (container, doc) =>
             {
-                var value = (IList<TValue>)item.Property.GetValue(container);
+                var value = (IList<TValue>)item.PropertyInfo.GetValue(container);
                 if (value != null)
-                    doc.Add(item.Property.Name, mapper.ConvertToBsonArray(value));
+                    doc.Add(item.PropertyInfo.Name, mapper.ConvertToBsonArray(value));
             };
             item.ImportFromBson = (doc, container) =>
             {
-                var value = mapper.ConvertToTrackableList(doc, item.Property.Name);
-                item.Property.SetValue(container, value);
+                var value = mapper.ConvertToTrackableList(doc, item.PropertyInfo.Name);
+                item.PropertyInfo.SetValue(container, value);
             };
             item.SaveChanges = (update, tracker, keyValues) =>
             {
-                var valueTracker = (TrackableListTracker<TValue>)item.TrackerProperty.GetValue(tracker);
+                var valueTracker = (TrackableListTracker<TValue>)item.TrackerPropertyInfo.GetValue(tracker);
                 if (valueTracker.HasChange)
                 {
                     var listUpdates = mapper.BuildUpdatesForSave(
                         valueTracker,
-                        keyValues.Concat(new object[] { item.Property.Name }).ToArray()).ToList();
+                        keyValues.Concat(new object[] { item.PropertyInfo.Name }).ToArray()).ToList();
                     if (listUpdates.Count > 1)
                         throw new InvalidOperationException("Container cannot save multiple changes from list.");
                     update = update == null
@@ -173,14 +181,21 @@ namespace TrackableData.MongoDB
             };
         }
 
-        #endregion
+        public IEnumerable<ITrackable> GetTrackables(T container)
+        {
+            return _items.Select(item => (ITrackable)item.PropertyInfo.GetValue(container));
+        }
 
-        #region Conversion between T and Bson
+        public IEnumerable<ITrackable> GetTrackers(T container)
+        {
+            var tracker = container.Tracker;
+            return _items.Select(item => (ITrackable)item.TrackerPropertyInfo.GetValue(tracker));
+        }
 
         public BsonDocument ConvertToBsonDocument(T container)
         {
             var bson = new BsonDocument();
-            foreach (var pi in PropertyItems)
+            foreach (var pi in _items)
             {
                 pi.ExportToBson(container, bson);
             }
@@ -190,7 +205,7 @@ namespace TrackableData.MongoDB
         public T ConvertToTrackableContainer(BsonDocument doc)
         {
             var container = (T)Activator.CreateInstance(_trackableType);
-            foreach (var pi in PropertyItems)
+            foreach (var pi in _items)
             {
                 pi.ImportFromBson(doc, container);
             }
@@ -205,10 +220,6 @@ namespace TrackableData.MongoDB
 
             return ConvertToTrackableContainer(partialDoc.AsBsonDocument);
         }
-
-        #endregion
-
-        #region Helpers
 
         public async Task CreateAsync(IMongoCollection<BsonDocument> collection, T container, params object[] keyValues)
         {
@@ -278,7 +289,7 @@ namespace TrackableData.MongoDB
 
             var partialKeys = keyValues.Skip(1).ToArray();
             UpdateDefinition<BsonDocument> update = null;
-            foreach (var pi in PropertyItems)
+            foreach (var pi in _items)
             {
                 update = pi.SaveChanges(update, tracker, partialKeys);
             }
@@ -287,7 +298,5 @@ namespace TrackableData.MongoDB
                 update,
                 new UpdateOptions { IsUpsert = true });
         }
-
-        #endregion
     }
 }
