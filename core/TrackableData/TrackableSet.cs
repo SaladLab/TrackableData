@@ -8,7 +8,8 @@ namespace TrackableData
 #if !NET35
         ISet<T>,
 #endif
-        ICollection<T>, ITrackable<ICollection<T>>
+        ICollection<T>,
+        ITrackable<ICollection<T>>
     {
         private readonly HashSet<T> _set = new HashSet<T>();
 
