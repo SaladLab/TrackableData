@@ -50,6 +50,8 @@
     <Compile Include="TrackableListTracker.cs" />
     <Compile Include="TrackablePocoTracker.cs" />
     <Compile Include="TrackableResolver.cs" />
+    <Compile Include="TrackableSet.cs" />
+    <Compile Include="TrackableSetTracker.cs" />
     <Compile Include="TrackerResolver.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

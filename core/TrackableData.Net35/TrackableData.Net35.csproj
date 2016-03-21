@@ -74,6 +74,12 @@
     <Compile Include="..\TrackableData\TrackableResolver.cs">
       <Link>TrackableResolver.cs</Link>
     </Compile>
+    <Compile Include="..\TrackableData\TrackableSet.cs">
+      <Link>TrackableSet.cs</Link>
+    </Compile>
+    <Compile Include="..\TrackableData\TrackableSetTracker.cs">
+      <Link>TrackableSetTracker.cs</Link>
+    </Compile>
     <Compile Include="..\TrackableData\TrackerResolver.cs">
       <Link>TrackerResolver.cs</Link>
     </Compile>
