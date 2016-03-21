@@ -45,6 +45,17 @@ namespace TrackableData.Redis
         }
 
         [Fact]
+        public void Nullable_WorkWell()
+        {
+            var converter = new RedisTypeConverter();
+
+            AssertConversionEqual(converter, (bool?)null, RedisValue.Null);
+            AssertConversionEqual(converter, (bool?)true, true);
+            AssertConversionEqual(converter, (int?)null, RedisValue.Null);
+            AssertConversionEqual(converter, (int?)100, 100);
+        }
+
+        [Fact]
         public void JsonFallback_WorkWell()
         {
             var converter = new RedisTypeConverter();

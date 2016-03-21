@@ -2,6 +2,8 @@
 using System;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace TrackableData.Redis
 {
@@ -10,6 +12,9 @@ namespace TrackableData.Redis
         private static RedisTypeConverter _instance = new RedisTypeConverter();
 
         public static RedisTypeConverter Instance => _instance;
+
+        private static MethodInfo _methodInfoForRegisterNullableType;
+        private static MethodInfo _methodInfoForRegisterWithJsonSerialization;
 
         internal class ConverterSet
         {
@@ -63,25 +68,6 @@ namespace TrackableData.Redis
             }
         }
 
-        public void RegisterWithJsonSerialization(Type type)
-        {
-            Func<object, RedisValue> toFunc = v => JsonConvert.SerializeObject(v, _jsonSerializerSettings);
-            Func<RedisValue, object> fromFunc = o => JsonConvert.DeserializeObject(o, type, _jsonSerializerSettings);
-
-            var cs = new ConverterSet
-            {
-                ToRedisValueFunc = RedisTypeConverterHelper.ConvertToToFunc(type, toFunc),
-                FromRedisValueFunc = RedisTypeConverterHelper.ConvertToFromFunc(type, fromFunc),
-                ObjectToRedisValueFunc = toFunc,
-                ObjectFromRedisValueFunc = fromFunc,
-            };
-
-            lock (_converterMap)
-            {
-                _converterMap[type] = cs;
-            }
-        }
-
         public Func<T, RedisValue> GetToRedisValueFunc<T>()
         {
             return (Func<T, RedisValue>)(GetConverterSet(typeof(T)).ToRedisValueFunc);
@@ -110,9 +96,91 @@ namespace TrackableData.Redis
                 if (_converterMap.TryGetValue(type, out cs))
                     return cs;
 
-                RegisterWithJsonSerialization(type);
-                return _converterMap[type];
+                var nullableUnderlyingType = Nullable.GetUnderlyingType(type);
+                if (nullableUnderlyingType != null)
+                    return RegisterNullableType(nullableUnderlyingType);
+
+                return RegisterWithJsonSerialization(type);
             }
+        }
+
+        private ConverterSet RegisterNullableType<T>() where T : struct
+        {
+            var underlyingTypeConverter = GetConverterSet(typeof(T));
+            if (underlyingTypeConverter == null)
+                throw new ArgumentException("Cannot find underlying type converter. Type=" + typeof(T).Name);
+
+            Func<T?, RedisValue> toFunc =
+                o => o == null
+                         ? RedisValue.Null
+                         : ((Func<T, RedisValue>)underlyingTypeConverter.ToRedisValueFunc)(o.Value);
+
+            Func<RedisValue, T?> fromFunc =
+                o => o.IsNull
+                         ? null
+                         : (T?)((Func<RedisValue, T>)underlyingTypeConverter.FromRedisValueFunc)(o);
+
+            var cs = new ConverterSet
+            {
+                ToRedisValueFunc = toFunc,
+                FromRedisValueFunc = fromFunc,
+                ObjectToRedisValueFunc = RedisTypeConverterHelper.ConvertToObjectToFunc(toFunc),
+                ObjectFromRedisValueFunc = RedisTypeConverterHelper.ConvertToObjectFromFunc(fromFunc),
+            };
+
+            lock (_converterMap)
+            {
+                _converterMap[typeof(T?)] = cs;
+                return cs;
+            }
+        }
+
+        private ConverterSet RegisterNullableType(Type underlyingType)
+        {
+            if (_methodInfoForRegisterNullableType == null)
+            {
+                _methodInfoForRegisterNullableType =
+                    typeof(RedisTypeConverter).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+                                              .First(m => m.Name == "RegisterNullableType" &&
+                                                          m.GetParameters().Length == 0);
+            }
+
+            return (ConverterSet)_methodInfoForRegisterNullableType.MakeGenericMethod(underlyingType)
+                                                                   .Invoke(this, new object[0]);
+        }
+
+        private ConverterSet RegisterWithJsonSerialization<T>()
+        {
+            Func<T, RedisValue> toFunc = v => JsonConvert.SerializeObject(v, _jsonSerializerSettings);
+            Func<RedisValue, T> fromFunc = o => JsonConvert.DeserializeObject<T>(o, _jsonSerializerSettings);
+
+            var cs = new ConverterSet
+            {
+                ToRedisValueFunc = toFunc,
+                FromRedisValueFunc = fromFunc,
+                ObjectToRedisValueFunc = RedisTypeConverterHelper.ConvertToObjectToFunc(toFunc),
+                ObjectFromRedisValueFunc = RedisTypeConverterHelper.ConvertToObjectFromFunc(fromFunc),
+            };
+
+            lock (_converterMap)
+            {
+                _converterMap[typeof(T)] = cs;
+                return cs;
+            }
+        }
+
+        private ConverterSet RegisterWithJsonSerialization(Type type)
+        {
+            if (_methodInfoForRegisterWithJsonSerialization == null)
+            {
+                _methodInfoForRegisterWithJsonSerialization =
+                    typeof(RedisTypeConverter).GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+                                              .First(m => m.Name == "RegisterWithJsonSerialization" &&
+                                                          m.GetParameters().Length == 0);
+            }
+
+            return (ConverterSet)_methodInfoForRegisterWithJsonSerialization.MakeGenericMethod(type)
+                                                                            .Invoke(this, new object[0]);
         }
     }
 }
