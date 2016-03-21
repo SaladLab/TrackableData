@@ -27,8 +27,6 @@ namespace TrackableData.MongoDB
             }
         }
 
-        #region Conversion between T and Bson
-
         public BsonDocument ConvertToBsonDocument(T poco)
         {
             return BsonDocumentWrapper.Create(_trackableType, poco);
@@ -47,10 +45,6 @@ namespace TrackableData.MongoDB
 
             return ConvertToTrackablePoco(partialDoc.AsBsonDocument);
         }
-
-        #endregion
-
-        #region MongoDB Command Builder
 
         public UpdateDefinition<BsonDocument> BuildUpdatesForCreate(
             UpdateDefinition<BsonDocument> update, T poco, params object[] keyValues)
@@ -74,10 +68,6 @@ namespace TrackableData.MongoDB
             }
             return update;
         }
-
-        #endregion
-
-        #region Helpers
 
         public async Task CreateAsync(IMongoCollection<BsonDocument> collection, T value, params object[] keyValues)
         {
@@ -188,7 +178,5 @@ namespace TrackableData.MongoDB
                 Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]), 
                 BuildUpdatesForSave(null, tracker, keyValues.Skip(1).ToArray()));
         }
-
-        #endregion
     }
 }

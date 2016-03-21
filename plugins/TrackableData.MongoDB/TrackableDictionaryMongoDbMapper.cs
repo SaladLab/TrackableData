@@ -15,8 +15,6 @@ namespace TrackableData.MongoDB
             TypeMapper.RegisterMap(typeof(TValue));
         }
 
-        #region Conversion between Dictionary and Bson
-
         public BsonDocument ConvertToBsonDocument(IDictionary<TKey, TValue> dictionary)
         {
             var doc = new BsonDocument();
@@ -70,10 +68,6 @@ namespace TrackableData.MongoDB
             return dictionary;
         }
 
-        #endregion
-
-        #region MongoDB Command Builder
-
         public UpdateDefinition<BsonDocument> BuildUpdatesForCreate(
             UpdateDefinition<BsonDocument> update, IDictionary<TKey, TValue> dictionary, params object[] keyValues)
         {
@@ -109,10 +103,6 @@ namespace TrackableData.MongoDB
             }
             return update;
         }
-
-        #endregion
-
-        #region Helpers
 
         // CreateAsync
 
@@ -193,7 +183,5 @@ namespace TrackableData.MongoDB
                 BuildUpdatesForSave(null, tracker, keyValues.Skip(1).ToArray()),
                 new UpdateOptions { IsUpsert = true });
         }
-
-        #endregion
     }
 }
