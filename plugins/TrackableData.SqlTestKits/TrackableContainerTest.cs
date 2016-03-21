@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TrackableData.Sql;
 using TrackableData.TestKits;
@@ -53,6 +54,16 @@ namespace TrackableData.SqlTestKits
         protected override Task SaveAsync(TrackableTestContainer container)
         {
             return _mapper.SaveAsync(_db.Connection, container.Tracker, _testId);
+        }
+
+        protected override IEnumerable<ITrackable> GetTrackables(TrackableTestContainer container)
+        {
+            return _mapper.GetTrackables(container);
+        }
+
+        protected override IEnumerable<ITracker> GetTrackers(TrackableTestContainer container)
+        {
+            return _mapper.GetTrackers(container);
         }
     }
 }

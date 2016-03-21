@@ -202,10 +202,10 @@ namespace TrackableData.Sql
             return _items.Select(item => (ITrackable)item.PropertyInfo.GetValue(container));
         }
 
-        public IEnumerable<ITrackable> GetTrackers(T container)
+        public IEnumerable<ITracker> GetTrackers(T container)
         {
             var tracker = container.Tracker;
-            return _items.Select(item => (ITrackable)item.TrackerPropertyInfo.GetValue(tracker));
+            return _items.Select(item => (ITracker)item.TrackerPropertyInfo.GetValue(tracker));
         }
 
         public string BuildCreateTableSql(bool dropIfExists = false)

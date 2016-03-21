@@ -3,6 +3,8 @@ using MongoDB.Driver;
 using System.Threading.Tasks;
 using TrackableData.TestKits;
 using Xunit;
+using System;
+using System.Collections.Generic;
 
 namespace TrackableData.MongoDB.Tests
 {
@@ -58,6 +60,16 @@ namespace TrackableData.MongoDB.Tests
         {
             return _mapper.SaveAsync(_collection, container.Tracker, _testId);
         }
+
+        protected override IEnumerable<ITrackable> GetTrackables(TrackableTestContainer person)
+        {
+            return _mapper.GetTrackables(person);
+        }
+
+        protected override IEnumerable<ITracker> GetTrackers(TrackableTestContainer person)
+        {
+            return _mapper.GetTrackers(person);
+        }
     }
 
     public class TrackableContainerTestWithHeadKeysTest :
@@ -98,6 +110,16 @@ namespace TrackableData.MongoDB.Tests
         protected override Task SaveAsync(TrackableTestContainer container)
         {
             return _mapper.SaveAsync(_collection, container.Tracker, _testId, "One");
+        }
+
+        protected override IEnumerable<ITrackable> GetTrackables(TrackableTestContainer person)
+        {
+            return _mapper.GetTrackables(person);
+        }
+
+        protected override IEnumerable<ITracker> GetTrackers(TrackableTestContainer person)
+        {
+            return _mapper.GetTrackers(person);
         }
     }
 }

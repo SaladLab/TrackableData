@@ -30,6 +30,8 @@ namespace TrackableData.TestKits
         protected abstract Task<int> DeleteAsync();
         protected abstract Task<TTrackableContainer> LoadAsync();
         protected abstract Task SaveAsync(TTrackableContainer person);
+        protected abstract IEnumerable<ITrackable> GetTrackables(TTrackableContainer person);
+        protected abstract IEnumerable<ITracker> GetTrackers(TTrackableContainer person);
 
         protected StorageContainerTestKit(bool useList)
         {
@@ -182,6 +184,58 @@ namespace TrackableData.TestKits
             AssertEqualDictionary(container.Missions, container2.Missions);
             if (_useList)
                 AssertEqualDictionary(container.Tags, container2.Tags);
+        }
+
+        [Fact]
+        public async Task Test_GetTrackables()
+        {
+            dynamic container = CreateTestContainer(false);
+            var trackables = new HashSet<ITrackable>(GetTrackables(container));
+            if (_useList)
+            {
+                Assert.Equal(new HashSet<ITrackable>(new ITrackable[]
+                             {
+                                container.Person,
+                                container.Missions,
+                                container.Tags
+                             }),
+                             trackables);
+            }
+            else
+            {
+                Assert.Equal(new HashSet<ITrackable>(new ITrackable[]
+                             {
+                                container.Person,
+                                container.Missions
+                             }),
+                             trackables);
+            }
+        }
+
+        [Fact]
+        public async Task Test_GetTrackers()
+        {
+            dynamic container = CreateTestContainer(true);
+            var trackers = new HashSet<ITracker>(GetTrackers(container));
+            if (_useList)
+            {
+                Assert.Equal(new HashSet<ITracker>(new ITracker[]
+                             {
+                                container.Person.Tracker,
+                                container.Missions.Tracker,
+                                container.Tags.Tracker
+                             }),
+                             trackers);
+            }
+            else
+            {
+                Assert.Equal(new HashSet<ITracker>(new ITracker[]
+                            {
+                                container.Person.Tracker,
+                                container.Missions.Tracker
+                            }),
+                            trackers);
+            }
         }
     }
 }

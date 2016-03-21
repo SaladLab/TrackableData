@@ -2,6 +2,7 @@
 using StackExchange.Redis;
 using TrackableData.TestKits;
 using Xunit;
+using System.Collections.Generic;
 
 namespace TrackableData.Redis.Tests
 {
@@ -39,6 +40,16 @@ namespace TrackableData.Redis.Tests
         protected override Task SaveAsync(TrackableTestContainer container)
         {
             return _mapper.SaveAsync(_db, container, _testId);
+        }
+
+        protected override IEnumerable<ITrackable> GetTrackables(TrackableTestContainer container)
+        {
+            return _mapper.GetTrackables(container);
+        }
+
+        protected override IEnumerable<ITracker> GetTrackers(TrackableTestContainer container)
+        {
+            return _mapper.GetTrackers(container);
         }
     }
 }
