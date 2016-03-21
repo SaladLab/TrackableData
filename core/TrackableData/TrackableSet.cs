@@ -70,22 +70,70 @@ namespace TrackableData
 
         public void UnionWith(IEnumerable<T> other)
         {
-            throw new NotImplementedException();
+            if (other == null)
+                throw new ArgumentNullException(nameof(other));
+
+            foreach (var item in other)
+                Add(item);
         }
 
         public void IntersectWith(IEnumerable<T> other)
         {
-            throw new NotImplementedException();
+            if (other == null)
+                throw new ArgumentNullException(nameof(other));
+
+            if (_set.Count == 0 || other == this)
+                return;
+
+            var removes = new HashSet<T>(this);
+            removes.ExceptWith(other);
+
+            foreach (var item in removes)
+                Remove(item);
         }
 
         public void ExceptWith(IEnumerable<T> other)
         {
-            throw new NotImplementedException();
+            if (other == null)
+                throw new ArgumentNullException(nameof(other));
+
+            if (_set.Count == 0)
+                return;
+
+            if (other == this)
+            {
+                Clear();
+                return;
+            }
+
+            foreach (var element in other)
+                Remove(element);
         }
 
         public void SymmetricExceptWith(IEnumerable<T> other)
         {
-            throw new NotImplementedException();
+            if (other == null)
+                throw new ArgumentNullException(nameof(other));
+
+            if (_set.Count == 0)
+            {
+                UnionWith(other);
+                return;
+            }
+
+            if (other == this)
+            {
+                Clear();
+                return;
+            }
+
+            foreach (var item in other)
+            {
+                if (_set.Contains(item))
+                    Remove(item);
+                else
+                    Add(item);
+            }
         }
 
         public bool IsSubsetOf(IEnumerable<T> other)

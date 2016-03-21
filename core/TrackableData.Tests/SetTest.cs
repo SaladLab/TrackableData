@@ -20,6 +20,82 @@ namespace TrackableData.Tests
         }
 
         [Fact]
+        public void TestSet_UnionWith_Work()
+        {
+            var evenNumbers = new TrackableSet<int>() { 0, 2, 4, 6, 8 };
+            var oddNumbers = new TrackableSet<int>() { 1, 3, 5, 7, 9 };
+
+            evenNumbers.SetDefaultTrackerDeep();
+            evenNumbers.UnionWith(oddNumbers);
+
+            Assert.Equal(new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+                         evenNumbers.OrderBy(x => x));
+
+            var tracker = (TrackableSetTracker<int>)evenNumbers.Tracker;
+            Assert.Equal(new[] { 1, 3, 5, 7, 9 },
+                         tracker.AddValues.OrderBy(x => x));
+            Assert.Equal(new int[0],
+                         tracker.RemoveValues.OrderBy(x => x));
+        }
+
+        [Fact]
+        public void TestSet_IntersectWith_Work()
+        {
+            var lowNumbers = new TrackableSet<int>() { 0, 1, 2, 3, 4, 5 };
+            var highNumbers = new TrackableSet<int>() { 3, 4, 5, 6, 7, 8, 9 };
+
+            lowNumbers.SetDefaultTrackerDeep();
+            lowNumbers.IntersectWith(highNumbers);
+
+            Assert.Equal(new[] { 3, 4, 5 },
+                         lowNumbers.OrderBy(x => x));
+
+            var tracker = (TrackableSetTracker<int>)lowNumbers.Tracker;
+            Assert.Equal(new int[0],
+                         tracker.AddValues.OrderBy(x => x));
+            Assert.Equal(new[] { 0, 1, 2 },
+                         tracker.RemoveValues.OrderBy(x => x));
+        }
+
+        [Fact]
+        public void TestSet_ExceptWith_Work()
+        {
+            var lowNumbers = new TrackableSet<int>() { 0, 1, 2, 3, 4, 5 };
+            var highNumbers = new TrackableSet<int>() { 3, 4, 5, 6, 7, 8, 9 };
+
+            lowNumbers.SetDefaultTrackerDeep();
+            lowNumbers.ExceptWith(highNumbers);
+
+            Assert.Equal(new[] { 0, 1, 2 },
+                         lowNumbers.OrderBy(x => x));
+
+            var tracker = (TrackableSetTracker<int>)lowNumbers.Tracker;
+            Assert.Equal(new int[0],
+                         tracker.AddValues.OrderBy(x => x));
+            Assert.Equal(new[] { 3, 4, 5 },
+                         tracker.RemoveValues.OrderBy(x => x));
+        }
+
+        [Fact]
+        public void TestSet_SymmetricExceptWith_Work()
+        {
+            var lowNumbers = new TrackableSet<int>() { 0, 1, 2, 3, 4, 5 };
+            var highNumbers = new TrackableSet<int>() { 3, 4, 5, 6, 7, 8, 9 };
+
+            lowNumbers.SetDefaultTrackerDeep();
+            lowNumbers.SymmetricExceptWith(highNumbers);
+
+            Assert.Equal(new[] { 0, 1, 2, 6, 7, 8, 9 },
+                         lowNumbers.OrderBy(x => x));
+
+            var tracker = (TrackableSetTracker<int>)lowNumbers.Tracker;
+            Assert.Equal(new[] { 6, 7, 8, 9 },
+                         tracker.AddValues.OrderBy(x => x));
+            Assert.Equal(new[] { 3, 4, 5 },
+                         tracker.RemoveValues.OrderBy(x => x));
+        }
+
+        [Fact]
         public void TestSet_Tracking_Work()
         {
             var set = CreateTestSetWithTracker();
