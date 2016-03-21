@@ -35,80 +35,65 @@ let decoratePackageVersion v =
     else
         v
 
-let projects = ([
-    // Core Libraries
-    {   emptyProject with
-        Name="TrackableData";
-        Folder="./core/TrackableData";
-    };
-    {   emptyProject with
-        Name="TrackableData.Templates";
-        Folder="./core/CodeGenerator-Templates";
-        Template=true;
-        Dependencies=[("TrackableData", "")];
-    };    
-    // Plugin Libraries
-    {   emptyProject with
-        Name="TrackableData.Json";
-        Folder="./plugins/TrackableData.Json";
-        Dependencies=[("TrackableData", "");
-                      ("Newtonsoft.Json", "")];
-    };
-    {   emptyProject with
-        Name="TrackableData.MongoDB";
-        Folder="./plugins/TrackableData.MongoDB";
-        Dependencies=[("TrackableData", "");
-                      ("MongoDB.Bson", "");
-                      ("MongoDB.Driver", "");
-                      ("MongoDB.Driver.Core", "");];
-    };
-    {   emptyProject with
-        Name="TrackableData.MsSql";
-        Folder="./plugins/TrackableData.MsSql";
-        Dependencies=[("TrackableData", "");
-                      ("TrackableData.Sql", "");];
-    };
-    {   emptyProject with
-        Name="TrackableData.MySql";
-        Folder="./plugins/TrackableData.MySql";
-        Dependencies=[("TrackableData", "");
-                      ("TrackableData.Sql", "");
-                      ("MySql.Data", "")];
-    };
-    {   emptyProject with
-        Name="TrackableData.PostgreSql";
-        Folder="./plugins/TrackableData.PostgreSql";
-        Dependencies=[("TrackableData", "");
-                      ("TrackableData.Sql", "");
-                      ("Npgsql", "");];
-    };
-    {   emptyProject with
-        Name="TrackableData.Protobuf";
-        Folder="./plugins/TrackableData.Protobuf";
-        Dependencies=[("TrackableData", "");
-                      ("protobuf-net", "")];
-    };
-    {   emptyProject with
-        Name="TrackableData.Redis";
-        Folder="./plugins/TrackableData.Redis";
-        Dependencies=[("TrackableData", "");
-                      ("StackExchange.Redis", "");
-                      ("Newtonsoft.Json", "")];
-    };
-    {   emptyProject with
-        Name="TrackableData.Sql";
-        Folder="./plugins/TrackableData.Sql";
-        Dependencies=[("TrackableData", "");];
-    };]
-    |> List.map (fun p -> 
-        let parsedReleases =
-            File.ReadLines (p.Folder @@ (p.Name + ".Release.md"))
-            |> ReleaseNotesHelper.parseAllReleaseNotes
-        let latest = List.head parsedReleases
-        { p with AssemblyVersion = latest.AssemblyVersion;
-                 PackageVersion = decoratePackageVersion(latest.AssemblyVersion);
-                 Releases = parsedReleases }
-    ))
+let projects = 
+    ([ { // Core Libraries
+         emptyProject with Name = "TrackableData"
+                           Folder = "./core/TrackableData" }
+       { emptyProject with Name = "TrackableData.Templates"
+                           Folder = "./core/CodeGenerator-Templates"
+                           Template = true
+                           Dependencies = [ ("TrackableData", "") ] }
+       { // Plugin Libraries
+         emptyProject with Name = "TrackableData.Json"
+                           Folder = "./plugins/TrackableData.Json"
+                           Dependencies = 
+                               [ ("TrackableData", "")
+                                 ("Newtonsoft.Json", "") ] }
+       { emptyProject with Name = "TrackableData.MongoDB"
+                           Folder = "./plugins/TrackableData.MongoDB"
+                           Dependencies = 
+                               [ ("TrackableData", "")
+                                 ("MongoDB.Bson", "")
+                                 ("MongoDB.Driver", "")
+                                 ("MongoDB.Driver.Core", "") ] }
+       { emptyProject with Name = "TrackableData.MsSql"
+                           Folder = "./plugins/TrackableData.MsSql"
+                           Dependencies = 
+                               [ ("TrackableData", "")
+                                 ("TrackableData.Sql", "") ] }
+       { emptyProject with Name = "TrackableData.MySql"
+                           Folder = "./plugins/TrackableData.MySql"
+                           Dependencies = 
+                               [ ("TrackableData", "")
+                                 ("TrackableData.Sql", "")
+                                 ("MySql.Data", "") ] }
+       { emptyProject with Name = "TrackableData.PostgreSql"
+                           Folder = "./plugins/TrackableData.PostgreSql"
+                           Dependencies = 
+                               [ ("TrackableData", "")
+                                 ("TrackableData.Sql", "")
+                                 ("Npgsql", "") ] }
+       { emptyProject with Name = "TrackableData.Protobuf"
+                           Folder = "./plugins/TrackableData.Protobuf"
+                           Dependencies = 
+                               [ ("TrackableData", "")
+                                 ("protobuf-net", "") ] }
+       { emptyProject with Name = "TrackableData.Redis"
+                           Folder = "./plugins/TrackableData.Redis"
+                           Dependencies = 
+                               [ ("TrackableData", "")
+                                 ("StackExchange.Redis", "")
+                                 ("Newtonsoft.Json", "") ] }
+       { emptyProject with Name = "TrackableData.Sql"
+                           Folder = "./plugins/TrackableData.Sql"
+                           Dependencies = [ ("TrackableData", "") ] } ]
+     |> List.map (fun p -> 
+            let parsedReleases = 
+                File.ReadLines(p.Folder @@ (p.Name + ".Release.md")) |> ReleaseNotesHelper.parseAllReleaseNotes
+            let latest = List.head parsedReleases
+            { p with AssemblyVersion = latest.AssemblyVersion
+                     PackageVersion = decoratePackageVersion (latest.AssemblyVersion)
+                     Releases = parsedReleases }))
 
 let project name =
     List.filter (fun p -> p.Name = name) projects |> List.head
@@ -172,7 +157,7 @@ Target "Test" (fun _ ->
 )
 
 Target "UnityPackage" (fun _ ->
-    Shell.Exec(".\core\UnityPackage\UpdateDll.bat")
+    Shell.Exec(".\core\UnityPackage\UpdateDll.bat") |> ignore
     Unity (Path.GetFullPath "core/UnityPackage") "-executeMethod PackageBuilder.BuildPackage"
     Unity (Path.GetFullPath "core/UnityPackage") "-executeMethod PackageBuilder.BuildPackageFull"
     (!! "core/UnityPackage/*.unitypackage") |> Seq.iter (fun p -> MoveFile binDir p)
