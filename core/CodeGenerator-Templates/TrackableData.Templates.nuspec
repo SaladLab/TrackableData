@@ -9,6 +9,7 @@
     <description>Visual Studio project template to generate codes for POCO and container of TrackableData.</description>
     <licenseUrl>https://raw.githubusercontent.com/SaladLab/TrackableData/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/SaladLab/TrackableData</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/SaladLab/TrackableData/master/docs/Icon_64.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes>@releaseNotes@</releaseNotes>
     <copyright>Copyright © 2016 SaladLab</copyright>
