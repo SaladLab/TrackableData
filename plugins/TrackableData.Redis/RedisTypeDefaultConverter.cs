@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -60,22 +61,41 @@ namespace TrackableData.Redis
 
         public static Dictionary<Type, RedisTypeConverter.ConverterSet> ConvertMap => _converterMap.Value;
 
-        private static RedisValue ToRedisValue(bool v) => v;
-        private static RedisValue ToRedisValue(short v) => v;
-        private static RedisValue ToRedisValue(int v) => v;
-        private static RedisValue ToRedisValue(long v) => v;
-        private static RedisValue ToRedisValue(string v) => v;
-        private static RedisValue ToRedisValue(float v) => v;
-        private static RedisValue ToRedisValue(double v) => v;
-        private static RedisValue ToRedisValue(byte[] v) => v;
+        // default converters
 
+        private static RedisValue ToRedisValue(bool v) => v;
         private static bool ToBool(RedisValue v) => (bool)v;
+
+        private static RedisValue ToRedisValue(short v) => v;
         private static short ToShort(RedisValue v) => (short)v;
+
+        private static RedisValue ToRedisValue(int v) => v;
         private static int ToInt(RedisValue v) => (int)v;
+
+        private static RedisValue ToRedisValue(long v) => v;
         private static long ToLong(RedisValue v) => (long)v;
+
+        private static RedisValue ToRedisValue(string v) => v;
         private static string ToString(RedisValue v) => v;
-        private static float ToFloat(RedisValue v) => (float)v;
+
+        private static RedisValue ToRedisValue(char v) => new string(v, 1);
+        private static char ToChar(RedisValue v) => ((string)v)[0];
+
+        private static RedisValue ToRedisValue(float v)
+        {
+            if (float.IsInfinity(v))
+            {
+                if (double.IsPositiveInfinity(v)) return "+inf";
+                if (double.IsNegativeInfinity(v)) return "-inf";
+            }
+            return v.ToString("G", NumberFormatInfo.InvariantInfo);
+        }
+        private static float ToFloat(RedisValue v) => (float)(double)v;
+
+        private static RedisValue ToRedisValue(double v) => v;
         private static double ToDouble(RedisValue v) => (double)v;
+
+        private static RedisValue ToRedisValue(byte[] v) => v;
         private static byte[] ToBytes(RedisValue v) => (byte[])v;
     }
 }
