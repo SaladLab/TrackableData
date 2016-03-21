@@ -85,6 +85,13 @@ namespace TrackableData.Sql
                         .MakeGenericMethod(property.PropertyType.GetGenericArguments())
                         .Invoke(null, new object[] { sqlProvider, item, mapperParameter });
                 }
+                else if (TrackableResolver.IsTrackableSet(property.PropertyType))
+                {
+                    typeof(TrackableContainerSqlMapper<T>)
+                        .GetMethod("BuildTrackableSetProperty", BindingFlags.Static | BindingFlags.NonPublic)
+                        .MakeGenericMethod(property.PropertyType.GetGenericArguments())
+                        .Invoke(null, new object[] { sqlProvider, item, mapperParameter });
+                }
                 else
                 {
                     throw new InvalidOperationException("Cannot resolve property: " + property.Name);
@@ -191,6 +198,54 @@ namespace TrackableData.Sql
             item.BuildSqlForSave = (tracker, keyValues) =>
             {
                 var valueTracker = (TrackableDictionaryTracker<TKey, TValue>)item.TrackerPropertyInfo.GetValue(tracker);
+                return valueTracker.HasChange
+                           ? mapper.BuildSqlForSave(valueTracker, keyValues)
+                           : string.Empty;
+            };
+        }
+
+        private static void BuildTrackableSetProperty<TValue>(ISqlProvider sqlProvider,
+                                                              PropertyItem item,
+                                                              object[] mapperParameters)
+        {
+            if (mapperParameters.Length != 3)
+                throw new ArgumentException("The length of mapperParameters should be 3");
+
+            var mapper = new TrackableSetSqlMapper<TValue>(
+                sqlProvider,
+                (string)mapperParameters[0],
+                (ColumnDefinition)mapperParameters[1],
+                (ColumnDefinition[])mapperParameters[2]);
+            item.Mapper = mapper;
+
+            item.BuildCreateTableSql = (dropIfExists) =>
+            {
+                return mapper.BuildCreateTableSql(dropIfExists);
+            };
+            item.BuildSqlForCreate = (container, keyValues) =>
+            {
+                var value = (ICollection<TValue>)item.PropertyInfo.GetValue(container);
+                return value != null
+                           ? mapper.BuildSqlForCreate(value, keyValues)
+                           : string.Empty;
+            };
+            item.BuildSqlForDelete = (keyValues) =>
+            {
+                return mapper.BuildSqlForDelete(keyValues);
+            };
+            item.BuildSqlForLoad = (keyValues) =>
+            {
+                return mapper.BuildSqlForLoad(keyValues);
+            };
+            item.LoadAndSetAsync = async (reader, container) =>
+            {
+                var value = await mapper.LoadAsync(reader);
+                item.PropertyInfo.SetValue(container, value);
+                return value != null;
+            };
+            item.BuildSqlForSave = (tracker, keyValues) =>
+            {
+                var valueTracker = (TrackableSetTracker<TValue>)item.TrackerPropertyInfo.GetValue(tracker);
                 return valueTracker.HasChange
                            ? mapper.BuildSqlForSave(valueTracker, keyValues)
                            : string.Empty;

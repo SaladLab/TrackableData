@@ -49,6 +49,7 @@
     <Compile Include="TrackableContainerSqlMapper.cs" />
     <Compile Include="TrackableDictionarySqlMapper.cs" />
     <Compile Include="TrackablePocoSqlMapper.cs" />
+    <Compile Include="TrackableSetSqlMapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\core\TrackableData\TrackableData.csproj">

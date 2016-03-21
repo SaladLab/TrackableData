@@ -76,6 +76,8 @@
     <Compile Include="TrackablePocoTest.cs" />
     <Compile Include="TrackablePocoWithAutoIdTest.cs" />
     <Compile Include="TrackablePocoWithHeadKeysTest.cs" />
+    <Compile Include="TrackableSetValueTest.cs" />
+    <Compile Include="TrackableSetValueWithHeadKeysTest.cs" />
     <Compile Include="TrackableTestTypeNullablePocoTest.cs" />
     <Compile Include="TrackableTestTypePocoTest.cs" />
   </ItemGroup>

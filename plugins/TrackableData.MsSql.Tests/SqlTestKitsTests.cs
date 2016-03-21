@@ -34,7 +34,8 @@ namespace TrackableData.MsSql.Tests
         }
     }
 
-    public class TrackableTestTypeNullablePocoTest : SqlTestKits.TrackableTestTypeNullablePocoTest, IClassFixture<Database>
+    public class TrackableTestTypeNullablePocoTest : SqlTestKits.TrackableTestTypeNullablePocoTest,
+        IClassFixture<Database>
     {
         public TrackableTestTypeNullablePocoTest(Database db)
             : base(db, Database.SqlProvider)
@@ -50,7 +51,8 @@ namespace TrackableData.MsSql.Tests
         }
     }
 
-    public class TrackableDictionaryDataWithHeadKeysTest : SqlTestKits.TrackableDictionaryDataWithHeadKeysTest, IClassFixture<Database>
+    public class TrackableDictionaryDataWithHeadKeysTest : SqlTestKits.TrackableDictionaryDataWithHeadKeysTest,
+        IClassFixture<Database>
     {
         public TrackableDictionaryDataWithHeadKeysTest(Database db)
             : base(db, Database.SqlProvider)
@@ -61,6 +63,23 @@ namespace TrackableData.MsSql.Tests
     public class TrackableDictionaryStringTest : SqlTestKits.TrackableDictionaryStringTest, IClassFixture<Database>
     {
         public TrackableDictionaryStringTest(Database db)
+            : base(db, Database.SqlProvider)
+        {
+        }
+    }
+
+    public class TrackableSetValueTest : SqlTestKits.TrackableSetValueTest, IClassFixture<Database>
+    {
+        public TrackableSetValueTest(Database db)
+            : base(db, Database.SqlProvider)
+        {
+        }
+    }
+
+    public class TrackableSetValueWithHeadKeysTest : SqlTestKits.TrackableSetValueWithHeadKeysTest,
+        IClassFixture<Database>
+    {
+        public TrackableSetValueWithHeadKeysTest(Database db)
             : base(db, Database.SqlProvider)
         {
         }

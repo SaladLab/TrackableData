@@ -64,6 +64,7 @@
     <Compile Include="StorageListValueTestKit.cs" />
     <Compile Include="StoragePocoTestKit.cs" />
     <Compile Include="StoragePocoWithAutoIdTestKit.cs" />
+    <Compile Include="StorageSetValueTestKit.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
