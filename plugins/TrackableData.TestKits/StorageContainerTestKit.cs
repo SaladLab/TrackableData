@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -86,7 +83,8 @@ namespace TrackableData.TestKits
             return container;
         }
 
-        private void AssertEqualDictionary(TrackableDictionary<int, MissionData> a, TrackableDictionary<int, MissionData> b)
+        private void AssertEqualDictionary(TrackableDictionary<int, MissionData> a,
+                                           TrackableDictionary<int, MissionData> b)
         {
             Assert.Equal(a.Count, b.Count);
             foreach (var item in a)
@@ -193,21 +191,23 @@ namespace TrackableData.TestKits
             var trackables = new HashSet<ITrackable>(GetTrackables(container));
             if (_useList)
             {
-                Assert.Equal(new HashSet<ITrackable>(new ITrackable[]
-                             {
-                                container.Person,
-                                container.Missions,
-                                container.Tags
-                             }),
+                Assert.Equal(new HashSet<ITrackable>(
+                                 new ITrackable[]
+                                 {
+                                     container.Person,
+                                     container.Missions,
+                                     container.Tags
+                                 }),
                              trackables);
             }
             else
             {
-                Assert.Equal(new HashSet<ITrackable>(new ITrackable[]
-                             {
-                                container.Person,
-                                container.Missions
-                             }),
+                Assert.Equal(new HashSet<ITrackable>(
+                                 new ITrackable[]
+                                 {
+                                     container.Person,
+                                     container.Missions
+                                 }),
                              trackables);
             }
         }
@@ -219,22 +219,24 @@ namespace TrackableData.TestKits
             var trackers = new HashSet<ITracker>(GetTrackers(container));
             if (_useList)
             {
-                Assert.Equal(new HashSet<ITracker>(new ITracker[]
-                             {
-                                container.Person.Tracker,
-                                container.Missions.Tracker,
-                                container.Tags.Tracker
-                             }),
+                Assert.Equal(new HashSet<ITracker>(
+                                 new ITracker[]
+                                 {
+                                     container.Person.Tracker,
+                                     container.Missions.Tracker,
+                                     container.Tags.Tracker
+                                 }),
                              trackers);
             }
             else
             {
-                Assert.Equal(new HashSet<ITracker>(new ITracker[]
-                            {
-                                container.Person.Tracker,
-                                container.Missions.Tracker
-                            }),
-                            trackers);
+                Assert.Equal(new HashSet<ITracker>(
+                                 new ITracker[]
+                                 {
+                                     container.Person.Tracker,
+                                     container.Missions.Tracker
+                                 }),
+                             trackers);
             }
         }
     }

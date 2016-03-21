@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -58,13 +55,6 @@ namespace TrackableData.TestKits
             value3.Count = 3;
             value3.Note = "Just Arrived";
             list.Add(value3);
-        }
-
-        private List<JobData> GetModifiedList()
-        {
-            var list = new List<JobData>(CreateTestList(false));
-            ModifyListForTest(list);
-            return list;
         }
 
         private void AssertEqualDictionary(TrackableList<JobData> a, TrackableList<JobData> b)

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -34,13 +31,6 @@ namespace TrackableData.TestKits
             list.Insert(4, "Four");
             list.RemoveAt(4);
             list.Insert(4, "FourAgain");
-        }
-
-        private List<string> GetModifiedList()
-        {
-            var list = new List<string>(CreateTestList(false));
-            ModifyListForTest(list);
-            return list;
         }
 
         [Fact]
