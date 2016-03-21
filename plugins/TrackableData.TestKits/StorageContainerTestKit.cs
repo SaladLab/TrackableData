@@ -187,7 +187,7 @@ namespace TrackableData.TestKits
         }
 
         [Fact]
-        public async Task Test_GetTrackables()
+        public void Test_GetTrackables()
         {
             dynamic container = CreateTestContainer(false);
             var trackables = new HashSet<ITrackable>(GetTrackables(container));
@@ -213,7 +213,7 @@ namespace TrackableData.TestKits
         }
 
         [Fact]
-        public async Task Test_GetTrackers()
+        public void Test_GetTrackers()
         {
             dynamic container = CreateTestContainer(true);
             var trackers = new HashSet<ITracker>(GetTrackers(container));
