@@ -105,7 +105,7 @@ let dependencies p deps =
                                           | Some (_, ver) -> ver
                                           | None -> ((project id).PackageVersion))
                        | (id, ver) -> (id, ver))
-    
+
 // ---------------------------------------------------------------------------- Variables
 
 let binDir = "bin"
