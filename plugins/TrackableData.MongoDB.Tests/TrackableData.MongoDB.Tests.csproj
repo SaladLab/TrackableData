@@ -82,6 +82,7 @@
     <Compile Include="TrackableDictionaryTest.cs" />
     <Compile Include="TrackableListTest.cs" />
     <Compile Include="TrackablePocoTest.cs" />
+    <Compile Include="TrackableSetTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

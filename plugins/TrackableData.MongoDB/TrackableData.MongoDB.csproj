@@ -58,6 +58,7 @@
     <Compile Include="TrackableDictionaryMongoDbMapper.cs" />
     <Compile Include="TrackableListMongoDbMapper.cs" />
     <Compile Include="TrackableMongoDbMapper.cs" />
+    <Compile Include="TrackableSetMongoDbMapper.cs" />
     <Compile Include="TypeMapper.cs" />
     <Compile Include="UniqueInt64Id.cs" />
     <Compile Include="TrackablePocoMongoDbMapper.cs" />
