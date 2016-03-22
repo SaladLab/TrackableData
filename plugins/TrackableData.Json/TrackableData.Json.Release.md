@@ -1,3 +1,8 @@
+## 1.1.0 (Released 2016/03/22)
+
+* Add TrackableSet
+
+
 ## 1.0.0 (Released 2016/03/10)
 
 * Initial Release
