@@ -83,7 +83,11 @@ namespace TrackableData.Redis
 
         public IEnumerable<ITracker> GetTrackers(T container)
         {
-            var tracker = container.Tracker;
+            return GetTrackers(container.Tracker);
+        }
+
+        public IEnumerable<ITracker> GetTrackers(IContainerTracker<T> tracker)
+        {
             return _items.Select(item => (ITracker)item.TrackerPropertyInfo.GetValue(tracker));
         }
 
@@ -134,9 +138,14 @@ namespace TrackableData.Redis
             return SaveAsync(db, (ITrackableContainer<T>)container, key);
         }
 
-        public async Task SaveAsync(IDatabase db, ITrackableContainer<T> container, RedisKey key)
+        public Task SaveAsync(IDatabase db, ITrackableContainer<T> container, RedisKey key)
         {
-            var tracker = container.Tracker;
+            return SaveAsync(db, container.Tracker, container, key);
+        }
+
+        public async Task SaveAsync(IDatabase db, IContainerTracker<T> tracker,
+                                    ITrackableContainer<T> container, RedisKey key)
+        {
             if (tracker.HasChange == false)
                 return;
 

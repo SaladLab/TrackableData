@@ -240,7 +240,11 @@ namespace TrackableData.Redis
 
         public IEnumerable<ITracker> GetTrackers(T container)
         {
-            var tracker = container.Tracker;
+            return GetTrackers(container.Tracker);
+        }
+
+        public IEnumerable<ITracker> GetTrackers(IContainerTracker<T> tracker)
+        {
             return _items.Select(item => (ITracker)item.TrackerPropertyInfo.GetValue(tracker));
         }
 

@@ -1,3 +1,7 @@
+## 1.1.1 (Released 2016/03/22)
+
+* Add GetTrackers(tracker) to ContainerMapper
+
 ## 1.1.0 (Released 2016/03/22)
 
 * Add TrackableSet
