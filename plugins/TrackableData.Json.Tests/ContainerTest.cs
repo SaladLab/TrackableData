@@ -25,6 +25,10 @@ namespace TrackableData.Json.Tests
                     "One",
                     "Two",
                     "Three"
+                },
+                Set = new TrackableSet<int>()
+                {
+                    1, 2, 3
                 }
             };
         }
@@ -47,6 +51,7 @@ namespace TrackableData.Json.Tests
                     new TrackableContainerTrackerJsonConverter(),
                     new TrackablePocoTrackerJsonConverter<IPerson>(),
                     new TrackableDictionaryTrackerJsonConverter<int, string>(),
+                    new TrackableSetTrackerJsonConverter<int>(),
                     new TrackableListTrackerJsonConverter<string>(),
                 }
             };
@@ -80,6 +85,11 @@ namespace TrackableData.Json.Tests
             c.List[0] = "OneModified";
             c.List.RemoveAt(1);
             c.List.Insert(1, "TwoInserted");
+
+            c.Set.Remove(1);
+            c.Set.Remove(2);
+            c.Set.Add(4);
+            c.Set.Add(5);
 
             // Assert
 

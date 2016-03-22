@@ -49,6 +49,7 @@
     <Compile Include="TrackableJsonExtentions.cs" />
     <Compile Include="TrackableListTrackerJsonConverter.cs" />
     <Compile Include="TrackablePocoTrackerJsonConverter.cs" />
+    <Compile Include="TrackableSetTrackerJsonConverter.cs" />
     <Compile Include="TrackerJsonConverter.cs" />
   </ItemGroup>
   <ItemGroup>

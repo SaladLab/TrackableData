@@ -34,6 +34,11 @@ namespace CodeGen
                 return $"TrackableDictionaryTracker{genericType.TypeArgumentList}";
             }
             else if (CodeAnalaysisExtensions.CompareTypeName(genericType.Identifier.ToString(),
+                                                             "TrackableData.TrackableSet"))
+            {
+                return $"TrackableSetTracker{genericType.TypeArgumentList}";
+            }
+            else if (CodeAnalaysisExtensions.CompareTypeName(genericType.Identifier.ToString(),
                                                              "TrackableData.TrackableList"))
             {
                 return $"TrackableListTracker{genericType.TypeArgumentList}";

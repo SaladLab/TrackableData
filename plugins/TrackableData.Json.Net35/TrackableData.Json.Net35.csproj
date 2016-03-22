@@ -63,6 +63,9 @@
     <Compile Include="..\TrackableData.Json\TrackablePocoTrackerJsonConverter.cs">
       <Link>TrackablePocoTrackerJsonConverter.cs</Link>
     </Compile>
+    <Compile Include="..\TrackableData.Json\TrackableSetTrackerJsonConverter.cs">
+      <Link>TrackableSetTrackerJsonConverter.cs</Link>
+    </Compile>
     <Compile Include="..\TrackableData.Json\TrackerJsonConverter.cs">
       <Link>TrackerJsonConverter.cs</Link>
     </Compile>

@@ -367,6 +367,7 @@ namespace TrackableData.Json.Tests
                 _tracker = value;
                 Person.Tracker = value?.PersonTracker;
                 Dictionary.Tracker = value?.DictionaryTracker;
+                Set.Tracker = value?.SetTracker;
                 List.Tracker = value?.ListTracker;
             }
         }
@@ -420,6 +421,8 @@ namespace TrackableData.Json.Tests
                     return Person as ITrackable;
                 case "Dictionary":
                     return Dictionary as ITrackable;
+                case "Set":
+                    return Set as ITrackable;
                 case "List":
                     return List as ITrackable;
                 default:
@@ -435,6 +438,9 @@ namespace TrackableData.Json.Tests
             var trackableDictionary = Dictionary as ITrackable;
             if (trackableDictionary != null && (changedOnly == false || trackableDictionary.Changed))
                 yield return new KeyValuePair<object, ITrackable>("Dictionary", trackableDictionary);
+            var trackableSet = Set as ITrackable;
+            if (trackableSet != null && (changedOnly == false || trackableSet.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Set", trackableSet);
             var trackableList = List as ITrackable;
             if (trackableList != null && (changedOnly == false || trackableList.Changed))
                 yield return new KeyValuePair<object, ITrackable>("List", trackableList);
@@ -488,6 +494,30 @@ namespace TrackableData.Json.Tests
             set { _Dictionary = (TrackableDictionary<int, string>)value; }
         }
 
+        private TrackableSet<int> _Set = new TrackableSet<int>();
+
+        public TrackableSet<int> Set
+        {
+            get
+            {
+                return _Set;
+            }
+            set
+            {
+                if (_Set != null)
+                    _Set.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.SetTracker;
+                _Set = value;
+            }
+        }
+
+        TrackableSet<int> IDataContainer.Set
+        {
+            get { return _Set; }
+            set { _Set = (TrackableSet<int>)value; }
+        }
+
         private TrackableList<string> _List = new TrackableList<string>();
 
         public TrackableList<string> List
@@ -517,6 +547,7 @@ namespace TrackableData.Json.Tests
     {
         public TrackablePocoTracker<IPerson> PersonTracker { get; set; } = new TrackablePocoTracker<IPerson>();
         public TrackableDictionaryTracker<int, string> DictionaryTracker { get; set; } = new TrackableDictionaryTracker<int, string>();
+        public TrackableSetTracker<int> SetTracker { get; set; } = new TrackableSetTracker<int>();
         public TrackableListTracker<string> ListTracker { get; set; } = new TrackableListTracker<string>();
 
         public override string ToString()
@@ -542,6 +573,15 @@ namespace TrackableData.Json.Tests
                 sb.Append("Dictionary:");
                 sb.Append(DictionaryTracker);
             }
+            if (SetTracker != null && SetTracker.HasChange)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(", ");
+                sb.Append("Set:");
+                sb.Append(SetTracker);
+            }
             if (ListTracker != null && ListTracker.HasChange)
             {
                 if (first)
@@ -562,6 +602,7 @@ namespace TrackableData.Json.Tests
                 return
                     (PersonTracker != null && PersonTracker.HasChange) ||
                     (DictionaryTracker != null && DictionaryTracker.HasChange) ||
+                    (SetTracker != null && SetTracker.HasChange) ||
                     (ListTracker != null && ListTracker.HasChange) ||
                     false;
             }
@@ -579,6 +620,8 @@ namespace TrackableData.Json.Tests
                 PersonTracker.Clear();
             if (DictionaryTracker != null)
                 DictionaryTracker.Clear();
+            if (SetTracker != null)
+                SetTracker.Clear();
             if (ListTracker != null)
                 ListTracker.Clear();
         }
@@ -594,6 +637,8 @@ namespace TrackableData.Json.Tests
                 PersonTracker.ApplyTo(trackable.Person);
             if (DictionaryTracker != null)
                 DictionaryTracker.ApplyTo(trackable.Dictionary);
+            if (SetTracker != null)
+                SetTracker.ApplyTo(trackable.Set);
             if (ListTracker != null)
                 ListTracker.ApplyTo(trackable.List);
         }
@@ -614,6 +659,8 @@ namespace TrackableData.Json.Tests
                 PersonTracker.ApplyTo(tracker.PersonTracker);
             if (DictionaryTracker != null)
                 DictionaryTracker.ApplyTo(tracker.DictionaryTracker);
+            if (SetTracker != null)
+                SetTracker.ApplyTo(tracker.SetTracker);
             if (ListTracker != null)
                 ListTracker.ApplyTo(tracker.ListTracker);
         }
@@ -629,6 +676,8 @@ namespace TrackableData.Json.Tests
                 PersonTracker.RollbackTo(trackable.Person);
             if (DictionaryTracker != null)
                 DictionaryTracker.RollbackTo(trackable.Dictionary);
+            if (SetTracker != null)
+                SetTracker.RollbackTo(trackable.Set);
             if (ListTracker != null)
                 ListTracker.RollbackTo(trackable.List);
         }
@@ -649,6 +698,8 @@ namespace TrackableData.Json.Tests
                 PersonTracker.RollbackTo(tracker.PersonTracker);
             if (DictionaryTracker != null)
                 DictionaryTracker.RollbackTo(tracker.DictionaryTracker);
+            if (SetTracker != null)
+                SetTracker.RollbackTo(tracker.SetTracker);
             if (ListTracker != null)
                 ListTracker.RollbackTo(tracker.ListTracker);
         }
