@@ -70,6 +70,7 @@
   <Import Project="$(SolutionDir)core\CodeGenerator-Templates\TrackableData.Templates.targets" Condition="Exists('$(SolutionDir)core\CodeGenerator-Templates\TrackableData.Templates.targets')" />
   <PropertyGroup>
     <PostBuildEvent>"$(ProtobufNetPrecompileExe)" "$(TargetPath)" -o:Unity.Data.ProtobufSerializer.dll -t:DataProtobufSerializer "-f:.NETFramework\v3.5\Profile\Unity Subset v3.5" -autosurrogate
+"$(SolutionDir)tools\sfk\sfk.exe" rep "$(TargetPath)" -pat -bin /0830ad4fe6b2a6aeed/000000000000000000/ -yes
 COPY /Y "$(TargetDir)Unity.Data.ProtobufSerializer.dll" "$(ProjectDir)..\Program\Assets\Scripts"
 COPY /Y "$(TargetPath)" "$(ProjectDir)..\Program\Assets\Scripts"
 </PostBuildEvent>

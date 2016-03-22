@@ -32,6 +32,7 @@ public static class Il2cppWorkaround
         {
             new TrackablePocoTracker<IUserData>(),
             new TrackableDictionaryTracker<int, ItemData>(),
+            new TrackableSetTracker<int>(),
             new TrackableList<string>()
         };
     }

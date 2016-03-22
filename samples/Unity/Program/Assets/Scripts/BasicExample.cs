@@ -56,6 +56,29 @@ namespace Basic
             Log.WriteLine();
         }
 
+        private static void RunTrackableSet()
+        {
+            Log.WriteLine("***** TrackableSet *****");
+
+            var set = new TrackableSet<int>();
+            set.SetDefaultTracker();
+
+            set.Add(1);
+            set.Add(2);
+            set.Add(3);
+
+            Log.WriteLine(set.Tracker.ToString());
+            set.Tracker.Clear();
+
+            set.Remove(1);
+            set.Add(4);
+
+            Log.WriteLine(set.Tracker.ToString());
+            set.Tracker.Clear();
+
+            Log.WriteLine();
+        }
+
         private static void RunTrackableList()
         {
             Log.WriteLine("***** TrackableList *****");
@@ -84,6 +107,7 @@ namespace Basic
         {
             RunTrackablePoco();
             RunTrackableDictionary();
+            RunTrackableSet();
             RunTrackableList();
         }
     }

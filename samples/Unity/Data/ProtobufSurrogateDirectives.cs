@@ -13,6 +13,7 @@ namespace Unity.Data
     {
         public TrackableDictionaryTrackerSurrogate<int, ItemData> T1;
         public TrackableDictionaryTrackerSurrogate<int, string> T2;
-        public TrackableListTrackerSurrogate<string> T3;
+        public TrackableSetTrackerSurrogate<int> T3;
+        public TrackableListTrackerSurrogate<string> T4;
     }
 }

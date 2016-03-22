@@ -31,6 +31,8 @@ namespace Basic
                      .SetSurrogate(typeof(TrackableUserDataTrackerSurrogate));
                 model.Add(typeof(TrackableDictionaryTracker<int, string>), false)
                      .SetSurrogate(typeof(TrackableDictionaryTrackerSurrogate<int, string>));
+                model.Add(typeof(TrackableSetTracker<int>), false)
+                     .SetSurrogate(typeof(TrackableSetTrackerSurrogate<int>));
                 model.Add(typeof(TrackableListTracker<string>), false)
                      .SetSurrogate(typeof(TrackableListTrackerSurrogate<string>));
 #endif
@@ -121,6 +123,31 @@ namespace Basic
             Log.WriteLine();
         }
 
+        private static void RunTrackableSet()
+        {
+            Log.WriteLine("***** TrackableSet (Protobuf) *****");
+
+            var set = new TrackableSet<int>();
+            set.SetDefaultTracker();
+
+            set.Add(1);
+            set.Add(2);
+            set.Add(3);
+
+            var buf = PrintBytes(Serialize(set.Tracker));
+            Log.WriteLine(Deserialize<TrackableSetTracker<int>>(buf).ToString());
+            set.Tracker.Clear();
+
+            set.Remove(1);
+            set.Add(4);
+
+            var buf2 = PrintBytes(Serialize(set.Tracker));
+            Log.WriteLine(Deserialize<TrackableSetTracker<int>>(buf2).ToString());
+            set.Tracker.Clear();
+
+            Log.WriteLine();
+        }
+
         private static void RunTrackableList()
         {
             Log.WriteLine("***** TrackableList (Protobuf) *****");
@@ -151,6 +178,7 @@ namespace Basic
         {
             RunTrackablePoco();
             RunTrackableDictionary();
+            RunTrackableSet();
             RunTrackableList();
         }
     }
