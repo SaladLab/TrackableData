@@ -19,6 +19,7 @@ namespace Basic
                 {
                     new TrackablePocoTrackerJsonConverter<IUserData>(),
                     new TrackableDictionaryTrackerJsonConverter<int, string>(),
+                    new TrackableSetTrackerJsonConverter<int>(),
                     new TrackableListTrackerJsonConverter<string>(),
                 }
             };
@@ -74,6 +75,31 @@ namespace Basic
             Console.WriteLine();
         }
 
+        private static void RunTrackableSet()
+        {
+            Console.WriteLine("***** TrackableSet (Json) *****");
+
+            var set = new TrackableSet<int>();
+            set.SetDefaultTracker();
+
+            set.Add(1);
+            set.Add(2);
+            set.Add(3);
+
+            var json = JsonConvert.SerializeObject(set.Tracker, JsonSerializerSettings);
+            Console.WriteLine(json);
+            set.Tracker.Clear();
+
+            set.Remove(1);
+            set.Add(4);
+
+            var json2 = JsonConvert.SerializeObject(set.Tracker, JsonSerializerSettings);
+            Console.WriteLine(json2);
+            set.Tracker.Clear();
+
+            Console.WriteLine();
+        }
+
         private static void RunTrackableList()
         {
             Console.WriteLine("***** TrackableList (Json) *****");
@@ -104,6 +130,7 @@ namespace Basic
         {
             RunTrackablePoco();
             RunTrackableDictionary();
+            RunTrackableSet();
             RunTrackableList();
         }
     }
