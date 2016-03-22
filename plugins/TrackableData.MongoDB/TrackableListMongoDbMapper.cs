@@ -69,7 +69,8 @@ namespace TrackableData.MongoDB
             var keyNamespace = DocumentHelper.ToDotPath(keyValues);
 
             // Multiple push-back batching optimization
-            if (tracker.ChangeList.Count > 1 && tracker.ChangeList.All(c => c.Operation == TrackableListOperation.PushBack))
+            if (tracker.ChangeList.Count > 1 &&
+                tracker.ChangeList.All(c => c.Operation == TrackableListOperation.PushBack))
             {
                 yield return Builders<BsonDocument>.Update.PushEach(
                     keyNamespace, tracker.ChangeList.Select(c => c.NewValue));
@@ -77,10 +78,11 @@ namespace TrackableData.MongoDB
             }
 
             // Multiple push-front batching optimization
-            if (tracker.ChangeList.Count > 1 && tracker.ChangeList.All(c => c.Operation == TrackableListOperation.PushFront))
+            if (tracker.ChangeList.Count > 1 &&
+                tracker.ChangeList.All(c => c.Operation == TrackableListOperation.PushFront))
             {
                 yield return Builders<BsonDocument>.Update.PushEach(
-                    keyNamespace, tracker.ChangeList.Select(c => c.NewValue).Reverse());
+                    keyNamespace, tracker.ChangeList.Select(c => c.NewValue).Reverse(), position: 0);
                 yield break;
             }
 
@@ -90,18 +92,21 @@ namespace TrackableData.MongoDB
                 switch (change.Operation)
                 {
                     case TrackableListOperation.Insert:
-                        yield return Builders<BsonDocument>.Update.PushEach(keyNamespace, new[] { change.NewValue }, position: change.Index);
+                        yield return Builders<BsonDocument>.Update.PushEach(
+                            keyNamespace, new[] { change.NewValue }, position: change.Index);
                         break;
 
                     case TrackableListOperation.Remove:
                         throw new Exception("Remove operation is not supported!");
 
                     case TrackableListOperation.Modify:
-                        yield return Builders<BsonDocument>.Update.Set(keyNamespace + "." + change.Index, change.NewValue);
+                        yield return Builders<BsonDocument>.Update.Set(
+                            keyNamespace + "." + change.Index, change.NewValue);
                         break;
 
                     case TrackableListOperation.PushFront:
-                        yield return Builders<BsonDocument>.Update.PushEach(keyNamespace, new[] { change.NewValue }, position: 0);
+                        yield return Builders<BsonDocument>.Update.PushEach(
+                            keyNamespace, new[] { change.NewValue }, position: 0);
                         break;
 
                     case TrackableListOperation.PushBack:
@@ -136,7 +141,8 @@ namespace TrackableData.MongoDB
             return DocumentHelper.DeleteAsync(collection, keyValues);
         }
 
-        public async Task<TrackableList<T>> LoadAsync(IMongoCollection<BsonDocument> collection, params object[] keyValues)
+        public async Task<TrackableList<T>> LoadAsync(IMongoCollection<BsonDocument> collection,
+                                                      params object[] keyValues)
         {
             if (keyValues.Length < 2)
                 throw new ArgumentException("At least 2 keyValue required.");
@@ -145,8 +151,8 @@ namespace TrackableData.MongoDB
 
             var keyPath = keyValues.Length > 1 ? DocumentHelper.ToDotPath(keyValues.Skip(1)) : "";
             var partialDoc = await collection.Find(Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]))
-                                                .Project(Builders<BsonDocument>.Projection.Include(keyPath))
-                                                .FirstOrDefaultAsync();
+                                             .Project(Builders<BsonDocument>.Projection.Include(keyPath))
+                                             .FirstOrDefaultAsync();
             if (partialDoc == null)
                 return null;
 

@@ -85,10 +85,10 @@ namespace TrackableData.MongoDB
             classMap.SetIgnoreExtraElements(true);
 
             // unmap all members which has mongodb.ignore attribute
-            var deletingMembers = classMap.DeclaredMemberMaps.Where(m =>
-            {
-                return TrackablePropertyAttribute.GetParameter(m.MemberInfo, "mongodb.ignore") != null;
-            }).ToList();
+            var deletingMembers = classMap
+                .DeclaredMemberMaps
+                .Where(m => { return TrackablePropertyAttribute.GetParameter(m.MemberInfo, "mongodb.ignore") != null; })
+                .ToList();
             foreach (var m in deletingMembers)
                 classMap.UnmapMember(m.MemberInfo);
 

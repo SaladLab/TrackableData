@@ -1,10 +1,9 @@
-﻿using MongoDB.Bson;
-using MongoDB.Driver;
-using System;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using TrackableData.TestKits;
 using Xunit;
-using System.Collections.Generic;
 
 namespace TrackableData.MongoDB.Tests
 {

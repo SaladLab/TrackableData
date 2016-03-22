@@ -1,7 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Xunit;
@@ -18,8 +15,7 @@ namespace TrackableData.MongoDB.Tests
 
     public interface ITestPocoWithCustomId : ITrackablePoco<ITestPocoWithCustomId>
     {
-        [TrackableProperty("mongodb.identity")]
-        long CustomId { get; set; }
+        [TrackableProperty("mongodb.identity")] long CustomId { get; set; }
         string Name { get; set; }
         int Age { get; set; }
         int Extra { get; set; }
@@ -61,10 +57,11 @@ namespace TrackableData.MongoDB.Tests
         }
     }
 
-    public class TrackablePocoWithHeadKeysTest : TestKits.StoragePocoTestKit<TrackableTestPoco, ObjectId>, IClassFixture<Database>
+    public class TrackablePocoWithHeadKeysTest : TestKits.StoragePocoTestKit<TrackableTestPoco, ObjectId>,
+        IClassFixture<Database>
     {
         private static TrackablePocoMongoDbMapper<ITestPoco> _mapper =
-                   new TrackablePocoMongoDbMapper<ITestPoco>();
+            new TrackablePocoMongoDbMapper<ITestPoco>();
 
         private Database _db;
         private IMongoCollection<BsonDocument> _collection;

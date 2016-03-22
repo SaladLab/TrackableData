@@ -52,8 +52,8 @@ namespace TrackableData.MongoDB
             var keyPath = DocumentHelper.ToDotPath(keyValues);
             var bson = ConvertToBsonDocument(poco);
             return (update == null)
-                    ? Builders<BsonDocument>.Update.Set(keyPath, bson)
-                    : update.Set(keyPath, bson);
+                       ? Builders<BsonDocument>.Update.Set(keyPath, bson)
+                       : update.Set(keyPath, bson);
         }
 
         public UpdateDefinition<BsonDocument> BuildUpdatesForSave(
@@ -63,8 +63,8 @@ namespace TrackableData.MongoDB
             foreach (var change in tracker.ChangeMap)
             {
                 update = (update == null)
-                    ? Builders<BsonDocument>.Update.Set(keyNamespace + change.Key.Name, change.Value.NewValue)
-                    : update.Set(keyNamespace + change.Key.Name, change.Value.NewValue);
+                             ? Builders<BsonDocument>.Update.Set(keyNamespace + change.Key.Name, change.Value.NewValue)
+                             : update.Set(keyNamespace + change.Key.Name, change.Value.NewValue);
             }
             return update;
         }
@@ -175,7 +175,7 @@ namespace TrackableData.MongoDB
                 return Task.FromResult((UpdateResult)null);
 
             return collection.UpdateOneAsync(
-                Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]), 
+                Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
                 BuildUpdatesForSave(null, tracker, keyValues.Skip(1).ToArray()));
         }
     }

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using System.Reflection;
 
 namespace TrackableData.MongoDB
 {
@@ -21,7 +21,8 @@ namespace TrackableData.MongoDB
             public object Mapper;
             public Action<T, BsonDocument> ExportToBson;
             public Action<BsonDocument, T> ImportFromBson;
-            public Func<UpdateDefinition<BsonDocument>, IContainerTracker<T>, IEnumerable<object>, UpdateDefinition<BsonDocument>> SaveChanges;
+            public Func<UpdateDefinition<BsonDocument>, IContainerTracker<T>, IEnumerable<object>,
+                UpdateDefinition<BsonDocument>> SaveChanges;
         }
 
         private readonly PropertyItem[] _items;
@@ -89,7 +90,7 @@ namespace TrackableData.MongoDB
         }
 
         private static void BuildTrackablePocoProperty<TPoco>(PropertyItem item)
-              where TPoco : ITrackablePoco<TPoco>
+            where TPoco : ITrackablePoco<TPoco>
         {
             var mapper = new TrackablePocoMongoDbMapper<TPoco>();
             item.Mapper = mapper;

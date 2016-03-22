@@ -57,7 +57,8 @@ namespace TrackableData.MongoDB
             return dictionary;
         }
 
-        public TrackableDictionary<TKey, TValue> ConvertToTrackableDictionary(BsonDocument doc, params object[] partialKeys)
+        public TrackableDictionary<TKey, TValue> ConvertToTrackableDictionary(BsonDocument doc,
+                                                                              params object[] partialKeys)
         {
             var partialDoc = DocumentHelper.QueryValue(doc, partialKeys);
             if (partialDoc == null)
@@ -68,8 +69,9 @@ namespace TrackableData.MongoDB
             return dictionary;
         }
 
-        public UpdateDefinition<BsonDocument> BuildUpdatesForCreate(
-            UpdateDefinition<BsonDocument> update, IDictionary<TKey, TValue> dictionary, params object[] keyValues)
+        public UpdateDefinition<BsonDocument> BuildUpdatesForCreate(UpdateDefinition<BsonDocument> update,
+                                                                    IDictionary<TKey, TValue> dictionary,
+                                                                    params object[] keyValues)
         {
             var valuePath = DocumentHelper.ToDotPath(keyValues);
             var bson = ConvertToBsonDocument(dictionary);
@@ -78,8 +80,9 @@ namespace TrackableData.MongoDB
                        : update.Set(valuePath, bson);
         }
 
-        public UpdateDefinition<BsonDocument> BuildUpdatesForSave(
-            UpdateDefinition<BsonDocument> update, TrackableDictionaryTracker<TKey, TValue> tracker, params object[] keyValues)
+        public UpdateDefinition<BsonDocument> BuildUpdatesForSave(UpdateDefinition<BsonDocument> update,
+                                                                  TrackableDictionaryTracker<TKey, TValue> tracker,
+                                                                  params object[] keyValues)
         {
             var keyNamespace = DocumentHelper.ToDotPathWithTrailer(keyValues);
             foreach (var change in tracker.ChangeMap)
@@ -106,7 +109,8 @@ namespace TrackableData.MongoDB
 
         // CreateAsync
 
-        public Task CreateAsync(IMongoCollection<BsonDocument> collection, IDictionary<TKey, TValue> dictionary, params object[] keyValues)
+        public Task CreateAsync(IMongoCollection<BsonDocument> collection, IDictionary<TKey, TValue> dictionary,
+                                params object[] keyValues)
         {
             if (keyValues.Length == 0)
                 throw new ArgumentException("At least 1 keyValue required.");
@@ -132,7 +136,8 @@ namespace TrackableData.MongoDB
             return DocumentHelper.DeleteAsync(collection, keyValues);
         }
 
-        public async Task<TrackableDictionary<TKey, TValue>> LoadAsync(IMongoCollection<BsonDocument> collection, params object[] keyValues)
+        public async Task<TrackableDictionary<TKey, TValue>> LoadAsync(IMongoCollection<BsonDocument> collection,
+                                                                       params object[] keyValues)
         {
             if (keyValues.Length == 0)
                 throw new ArgumentException("At least 1 keyValue required.");

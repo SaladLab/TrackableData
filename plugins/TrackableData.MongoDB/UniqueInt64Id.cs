@@ -6,7 +6,7 @@ namespace TrackableData.MongoDB
 {
     public static class UniqueInt64Id
     {
-        private readonly static ulong _baseId;
+        private static readonly ulong _baseId;
         private static int _staticIncrement;
 
         static UniqueInt64Id()
@@ -29,7 +29,8 @@ namespace TrackableData.MongoDB
 
         private static int GetTimestampFromDateTime(DateTime timestamp)
         {
-            var secondsSinceEpoch = (long)Math.Floor((BsonUtils.ToUniversalTime(timestamp) - BsonConstants.UnixEpoch).TotalSeconds);
+            var secondsSinceEpoch = (long)Math.Floor((BsonUtils.ToUniversalTime(timestamp) -
+                                                      BsonConstants.UnixEpoch).TotalSeconds);
             if (secondsSinceEpoch < int.MinValue || secondsSinceEpoch > int.MaxValue)
             {
                 throw new ArgumentOutOfRangeException(nameof(timestamp));
