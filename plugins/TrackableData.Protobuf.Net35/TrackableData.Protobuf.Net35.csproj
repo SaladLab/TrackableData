@@ -57,6 +57,9 @@
     <Compile Include="..\TrackableData.Protobuf\TrackableListTrackerSurrogate.cs">
       <Link>TrackableListTrackerSurrogate.cs</Link>
     </Compile>
+    <Compile Include="..\TrackableData.Protobuf\TrackableSetTrackerSurrogate.cs">
+      <Link>TrackableSetTrackerSurrogate.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\core\TrackableData.Net35\TrackableData.Net35.csproj">
