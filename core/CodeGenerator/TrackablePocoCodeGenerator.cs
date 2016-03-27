@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CodeWriter;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeGen
 {
@@ -20,8 +20,8 @@ namespace CodeGen
 
             var namespaceScope = idecl.GetNamespaceScope();
             var namespaceHandle = (string.IsNullOrEmpty(namespaceScope) == false)
-                ? w.B($"namespace {idecl.GetNamespaceScope()}")
-                : null;
+                                      ? w.B($"namespace {idecl.GetNamespaceScope()}")
+                                      : null;
 
             var useProtoContract = idecl.AttributeLists.GetAttribute("ProtoContractAttribute") != null;
             GenerateTrackablePocoCode(idecl, w, useProtoContract);
@@ -35,7 +35,8 @@ namespace CodeGen
             w._($"#endregion");
         }
 
-        private void GenerateTrackablePocoCode(InterfaceDeclarationSyntax idecl, CodeWriter.CodeWriter w, bool useProtoContract)
+        private void GenerateTrackablePocoCode(InterfaceDeclarationSyntax idecl, CodeWriter.CodeWriter w,
+                                               bool useProtoContract)
         {
             var typeName = idecl.GetTypeName();
             var className = "Trackable" + typeName.Substring(1);
@@ -107,7 +108,8 @@ namespace CodeGen
 
                 // ITrackable.GetChildTrackables
 
-                using (w.B($"public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)"))
+                using (w.B($"public IEnumerable<KeyValuePair<object, ITrackable>> " + $"" +
+                           $"GetChildTrackables(bool changedOnly = false)"))
                 {
                     if (trackableProperties.Any())
                     {

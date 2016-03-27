@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using CodeWriter;
 using CommandLine;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis;
-using CodeWriter;
 
 namespace CodeGen
 {
@@ -101,7 +101,6 @@ namespace CodeGen
                     "// </auto-generated>",
                     "// ------------------------------------------------------------------------------",
                     "",
-
                     "using System;",
                     "using System.Collections.Generic;",
                     "using System.Reflection;",

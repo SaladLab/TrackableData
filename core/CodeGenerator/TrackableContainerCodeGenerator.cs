@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
-using System.Text;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CodeWriter;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CodeGen
 {
@@ -20,8 +19,8 @@ namespace CodeGen
 
             var namespaceScope = idecl.GetNamespaceScope();
             var namespaceHandle = (string.IsNullOrEmpty(namespaceScope) == false)
-                ? w.B($"namespace {idecl.GetNamespaceScope()}")
-                : null;
+                                      ? w.B($"namespace {idecl.GetNamespaceScope()}")
+                                      : null;
 
             GenerateTrackableContainerCode(idecl, w);
             GenerateTrackableContainerTrackerCode(idecl, w);
@@ -138,7 +137,8 @@ namespace CodeGen
 
                 // ITrackable.GetChildTrackables
 
-                using (w.B($"public IEnumerable<KeyValuePair<object, ITrackable>> GetChildTrackables(bool changedOnly = false)"))
+                using (w.B($"public IEnumerable<KeyValuePair<object, ITrackable>> " +
+                           $"GetChildTrackables(bool changedOnly = false)"))
                 {
                     if (properties.Any())
                     {
