@@ -34,6 +34,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CodeWriter, Version=0.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\CodeWriter.0.2.1\lib\net45\CodeWriter.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="CommandLine, Version=2.0.275.0, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
       <HintPath>..\..\packages\CommandLineParser.2.0.275-beta\lib\net45\CommandLine.dll</HintPath>
       <Private>True</Private>
@@ -66,13 +70,11 @@
   <ItemGroup>
     <Compile Include="AssemblyLoader.cs" />
     <Compile Include="CodeAnalaysisExtensions.cs" />
-    <Compile Include="ICodeGenWriter.cs" />
     <Compile Include="TrackableContainerCodeGenerator.cs" />
     <Compile Include="TrackablePocoCodeGenerator.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TextCodeGenWriter.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>
