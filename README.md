@@ -2,6 +2,11 @@
 
 # TrackableData
 
+[![NuGet Status](http://img.shields.io/nuget/v/TrackableData.svg?style=flat)](https://www.nuget.org/packages/TrackableData/)
+[![Build status](https://ci.appveyor.com/api/projects/status/xbn2h0704qd7orad?svg=true)](https://ci.appveyor.com/project/veblush/TrackableData)
+[![Coverage Status](https://coveralls.io/repos/github/SaladLab/TrackableData/badge.svg?branch=master)](https://coveralls.io/github/SaladLab/TrackableData?branch=master)
+[![Coverity Status](https://scan.coverity.com/projects/8371/badge.svg?flat=1)](https://scan.coverity.com/projects/saladlab-trackabledata)
+
 Simple library to track changes of poco, list and dictionary.
 
 ## Example

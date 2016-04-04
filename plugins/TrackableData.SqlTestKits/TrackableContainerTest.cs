@@ -6,7 +6,7 @@ using TrackableData.TestKits;
 
 namespace TrackableData.SqlTestKits
 {
-    public abstract class TrackableContainerTest 
+    public abstract class TrackableContainerTest
         : StorageContainerTestKit<TrackableTestContainer, TrackableTestPocoForContainer>
     {
         private IDbConnectionProvider _db;

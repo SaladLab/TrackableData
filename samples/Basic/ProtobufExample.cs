@@ -9,7 +9,7 @@ using TrackableData.Protobuf;
 
 namespace Basic
 {
-    class ProtobufExample
+    internal class ProtobufExample
     {
         private static TypeModel _protobufTypeModel;
 

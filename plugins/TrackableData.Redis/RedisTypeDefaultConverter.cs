@@ -50,10 +50,8 @@ namespace TrackableData.Redis
                         {
                             ToRedisValueFunc = toFunc,
                             FromRedisValueFunc = fromFunc,
-                            ObjectToRedisValueFunc = (Func<object, RedisValue>)
-                                                     convertToObjectToFunc.Invoke(null, new object[] { toFunc }),
-                            ObjectFromRedisValueFunc = (Func<RedisValue, object>)
-                                                       convertToObjectFromFunc.Invoke(null, new object[] { fromFunc })
+                            ObjectToRedisValueFunc = (Func<object, RedisValue>)convertToObjectToFunc.Invoke(null, new object[] { toFunc }),
+                            ObjectFromRedisValueFunc = (Func<RedisValue, object>)convertToObjectFromFunc.Invoke(null, new object[] { fromFunc })
                         };
                     });
             });

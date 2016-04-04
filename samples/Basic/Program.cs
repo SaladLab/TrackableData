@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Basic
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             BasicExample.Run();
             JsonExample.Run();

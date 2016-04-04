@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
-using StackExchange.Redis;
 using System.Linq;
+using StackExchange.Redis;
 
 namespace TrackableData.Redis
 {

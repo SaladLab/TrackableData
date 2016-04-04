@@ -1,9 +1,9 @@
 ﻿#if !NET35
 
 using System;
+using System.Collections.Concurrent;
 using System.Reflection;
 using Newtonsoft.Json;
-using System.Collections.Concurrent;
 
 namespace TrackableData.Json
 {

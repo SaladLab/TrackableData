@@ -21,8 +21,10 @@ namespace TrackableData
 
         ITracker ITrackable.Tracker
         {
-            get { return Tracker; }
-
+            get
+            {
+                return Tracker;
+            }
             set
             {
                 var tracker = (IListTracker<T>)value;
@@ -32,8 +34,10 @@ namespace TrackableData
 
         ITracker<IList<T>> ITrackable<IList<T>>.Tracker
         {
-            get { return Tracker; }
-
+            get
+            {
+                return Tracker;
+            }
             set
             {
                 var tracker = (IListTracker<T>)value;
@@ -70,12 +74,14 @@ namespace TrackableData
 
         public T this[int index]
         {
-            get { return _list[index]; }
+            get
+            {
+                return _list[index];
+            }
             set
             {
                 if (Tracker != null)
                     Tracker.TrackModify(index, _list[index], value);
-
                 _list[index] = value;
             }
         }

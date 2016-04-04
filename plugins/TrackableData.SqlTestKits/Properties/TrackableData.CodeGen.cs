@@ -397,22 +397,22 @@ namespace TrackableData.SqlTestKits
         public static class PropertyTable
         {
             public static readonly PropertyInfo Id = typeof(ITestTypePoco).GetProperty("Id");
-            public static readonly PropertyInfo vBool = typeof(ITestTypePoco).GetProperty("vBool");
-            public static readonly PropertyInfo vByte = typeof(ITestTypePoco).GetProperty("vByte");
-            public static readonly PropertyInfo vShort = typeof(ITestTypePoco).GetProperty("vShort");
-            public static readonly PropertyInfo vChar = typeof(ITestTypePoco).GetProperty("vChar");
-            public static readonly PropertyInfo vInt = typeof(ITestTypePoco).GetProperty("vInt");
-            public static readonly PropertyInfo vLong = typeof(ITestTypePoco).GetProperty("vLong");
-            public static readonly PropertyInfo vFloat = typeof(ITestTypePoco).GetProperty("vFloat");
-            public static readonly PropertyInfo vDouble = typeof(ITestTypePoco).GetProperty("vDouble");
-            public static readonly PropertyInfo vDecimal = typeof(ITestTypePoco).GetProperty("vDecimal");
-            public static readonly PropertyInfo vDateTime = typeof(ITestTypePoco).GetProperty("vDateTime");
-            public static readonly PropertyInfo vDateTimeOffset = typeof(ITestTypePoco).GetProperty("vDateTimeOffset");
-            public static readonly PropertyInfo vTimeSpan = typeof(ITestTypePoco).GetProperty("vTimeSpan");
-            public static readonly PropertyInfo vString = typeof(ITestTypePoco).GetProperty("vString");
-            public static readonly PropertyInfo vBytes = typeof(ITestTypePoco).GetProperty("vBytes");
-            public static readonly PropertyInfo vGuid = typeof(ITestTypePoco).GetProperty("vGuid");
-            public static readonly PropertyInfo vSuit = typeof(ITestTypePoco).GetProperty("vSuit");
+            public static readonly PropertyInfo ValBool = typeof(ITestTypePoco).GetProperty("ValBool");
+            public static readonly PropertyInfo ValByte = typeof(ITestTypePoco).GetProperty("ValByte");
+            public static readonly PropertyInfo ValShort = typeof(ITestTypePoco).GetProperty("ValShort");
+            public static readonly PropertyInfo ValChar = typeof(ITestTypePoco).GetProperty("ValChar");
+            public static readonly PropertyInfo ValInt = typeof(ITestTypePoco).GetProperty("ValInt");
+            public static readonly PropertyInfo ValLong = typeof(ITestTypePoco).GetProperty("ValLong");
+            public static readonly PropertyInfo ValFloat = typeof(ITestTypePoco).GetProperty("ValFloat");
+            public static readonly PropertyInfo ValDouble = typeof(ITestTypePoco).GetProperty("ValDouble");
+            public static readonly PropertyInfo ValDecimal = typeof(ITestTypePoco).GetProperty("ValDecimal");
+            public static readonly PropertyInfo ValDateTime = typeof(ITestTypePoco).GetProperty("ValDateTime");
+            public static readonly PropertyInfo ValDateTimeOffset = typeof(ITestTypePoco).GetProperty("ValDateTimeOffset");
+            public static readonly PropertyInfo ValTimeSpan = typeof(ITestTypePoco).GetProperty("ValTimeSpan");
+            public static readonly PropertyInfo ValString = typeof(ITestTypePoco).GetProperty("ValString");
+            public static readonly PropertyInfo ValBytes = typeof(ITestTypePoco).GetProperty("ValBytes");
+            public static readonly PropertyInfo ValGuid = typeof(ITestTypePoco).GetProperty("ValGuid");
+            public static readonly PropertyInfo ValSuit = typeof(ITestTypePoco).GetProperty("ValSuit");
         }
 
         private int _Id;
@@ -431,259 +431,259 @@ namespace TrackableData.SqlTestKits
             }
         }
 
-        private bool _vBool;
+        private bool _ValBool;
 
-        public bool vBool
+        public bool ValBool
         {
             get
             {
-                return _vBool;
+                return _ValBool;
             }
             set
             {
-                if (Tracker != null && vBool != value)
-                    Tracker.TrackSet(PropertyTable.vBool, _vBool, value);
-                _vBool = value;
+                if (Tracker != null && ValBool != value)
+                    Tracker.TrackSet(PropertyTable.ValBool, _ValBool, value);
+                _ValBool = value;
             }
         }
 
-        private byte _vByte;
+        private byte _ValByte;
 
-        public byte vByte
+        public byte ValByte
         {
             get
             {
-                return _vByte;
+                return _ValByte;
             }
             set
             {
-                if (Tracker != null && vByte != value)
-                    Tracker.TrackSet(PropertyTable.vByte, _vByte, value);
-                _vByte = value;
+                if (Tracker != null && ValByte != value)
+                    Tracker.TrackSet(PropertyTable.ValByte, _ValByte, value);
+                _ValByte = value;
             }
         }
 
-        private short _vShort;
+        private short _ValShort;
 
-        public short vShort
+        public short ValShort
         {
             get
             {
-                return _vShort;
+                return _ValShort;
             }
             set
             {
-                if (Tracker != null && vShort != value)
-                    Tracker.TrackSet(PropertyTable.vShort, _vShort, value);
-                _vShort = value;
+                if (Tracker != null && ValShort != value)
+                    Tracker.TrackSet(PropertyTable.ValShort, _ValShort, value);
+                _ValShort = value;
             }
         }
 
-        private char _vChar;
+        private char _ValChar;
 
-        public char vChar
+        public char ValChar
         {
             get
             {
-                return _vChar;
+                return _ValChar;
             }
             set
             {
-                if (Tracker != null && vChar != value)
-                    Tracker.TrackSet(PropertyTable.vChar, _vChar, value);
-                _vChar = value;
+                if (Tracker != null && ValChar != value)
+                    Tracker.TrackSet(PropertyTable.ValChar, _ValChar, value);
+                _ValChar = value;
             }
         }
 
-        private int _vInt;
+        private int _ValInt;
 
-        public int vInt
+        public int ValInt
         {
             get
             {
-                return _vInt;
+                return _ValInt;
             }
             set
             {
-                if (Tracker != null && vInt != value)
-                    Tracker.TrackSet(PropertyTable.vInt, _vInt, value);
-                _vInt = value;
+                if (Tracker != null && ValInt != value)
+                    Tracker.TrackSet(PropertyTable.ValInt, _ValInt, value);
+                _ValInt = value;
             }
         }
 
-        private long _vLong;
+        private long _ValLong;
 
-        public long vLong
+        public long ValLong
         {
             get
             {
-                return _vLong;
+                return _ValLong;
             }
             set
             {
-                if (Tracker != null && vLong != value)
-                    Tracker.TrackSet(PropertyTable.vLong, _vLong, value);
-                _vLong = value;
+                if (Tracker != null && ValLong != value)
+                    Tracker.TrackSet(PropertyTable.ValLong, _ValLong, value);
+                _ValLong = value;
             }
         }
 
-        private float _vFloat;
+        private float _ValFloat;
 
-        public float vFloat
+        public float ValFloat
         {
             get
             {
-                return _vFloat;
+                return _ValFloat;
             }
             set
             {
-                if (Tracker != null && vFloat != value)
-                    Tracker.TrackSet(PropertyTable.vFloat, _vFloat, value);
-                _vFloat = value;
+                if (Tracker != null && ValFloat != value)
+                    Tracker.TrackSet(PropertyTable.ValFloat, _ValFloat, value);
+                _ValFloat = value;
             }
         }
 
-        private double _vDouble;
+        private double _ValDouble;
 
-        public double vDouble
+        public double ValDouble
         {
             get
             {
-                return _vDouble;
+                return _ValDouble;
             }
             set
             {
-                if (Tracker != null && vDouble != value)
-                    Tracker.TrackSet(PropertyTable.vDouble, _vDouble, value);
-                _vDouble = value;
+                if (Tracker != null && ValDouble != value)
+                    Tracker.TrackSet(PropertyTable.ValDouble, _ValDouble, value);
+                _ValDouble = value;
             }
         }
 
-        private decimal _vDecimal;
+        private decimal _ValDecimal;
 
-        public decimal vDecimal
+        public decimal ValDecimal
         {
             get
             {
-                return _vDecimal;
+                return _ValDecimal;
             }
             set
             {
-                if (Tracker != null && vDecimal != value)
-                    Tracker.TrackSet(PropertyTable.vDecimal, _vDecimal, value);
-                _vDecimal = value;
+                if (Tracker != null && ValDecimal != value)
+                    Tracker.TrackSet(PropertyTable.ValDecimal, _ValDecimal, value);
+                _ValDecimal = value;
             }
         }
 
-        private DateTime _vDateTime;
+        private DateTime _ValDateTime;
 
-        public DateTime vDateTime
+        public DateTime ValDateTime
         {
             get
             {
-                return _vDateTime;
+                return _ValDateTime;
             }
             set
             {
-                if (Tracker != null && vDateTime != value)
-                    Tracker.TrackSet(PropertyTable.vDateTime, _vDateTime, value);
-                _vDateTime = value;
+                if (Tracker != null && ValDateTime != value)
+                    Tracker.TrackSet(PropertyTable.ValDateTime, _ValDateTime, value);
+                _ValDateTime = value;
             }
         }
 
-        private DateTimeOffset _vDateTimeOffset;
+        private DateTimeOffset _ValDateTimeOffset;
 
-        public DateTimeOffset vDateTimeOffset
+        public DateTimeOffset ValDateTimeOffset
         {
             get
             {
-                return _vDateTimeOffset;
+                return _ValDateTimeOffset;
             }
             set
             {
-                if (Tracker != null && vDateTimeOffset != value)
-                    Tracker.TrackSet(PropertyTable.vDateTimeOffset, _vDateTimeOffset, value);
-                _vDateTimeOffset = value;
+                if (Tracker != null && ValDateTimeOffset != value)
+                    Tracker.TrackSet(PropertyTable.ValDateTimeOffset, _ValDateTimeOffset, value);
+                _ValDateTimeOffset = value;
             }
         }
 
-        private TimeSpan _vTimeSpan;
+        private TimeSpan _ValTimeSpan;
 
-        public TimeSpan vTimeSpan
+        public TimeSpan ValTimeSpan
         {
             get
             {
-                return _vTimeSpan;
+                return _ValTimeSpan;
             }
             set
             {
-                if (Tracker != null && vTimeSpan != value)
-                    Tracker.TrackSet(PropertyTable.vTimeSpan, _vTimeSpan, value);
-                _vTimeSpan = value;
+                if (Tracker != null && ValTimeSpan != value)
+                    Tracker.TrackSet(PropertyTable.ValTimeSpan, _ValTimeSpan, value);
+                _ValTimeSpan = value;
             }
         }
 
-        private string _vString;
+        private string _ValString;
 
-        public string vString
+        public string ValString
         {
             get
             {
-                return _vString;
+                return _ValString;
             }
             set
             {
-                if (Tracker != null && vString != value)
-                    Tracker.TrackSet(PropertyTable.vString, _vString, value);
-                _vString = value;
+                if (Tracker != null && ValString != value)
+                    Tracker.TrackSet(PropertyTable.ValString, _ValString, value);
+                _ValString = value;
             }
         }
 
-        private byte[] _vBytes;
+        private byte[] _ValBytes;
 
-        public byte[] vBytes
+        public byte[] ValBytes
         {
             get
             {
-                return _vBytes;
+                return _ValBytes;
             }
             set
             {
-                if (Tracker != null && vBytes != value)
-                    Tracker.TrackSet(PropertyTable.vBytes, _vBytes, value);
-                _vBytes = value;
+                if (Tracker != null && ValBytes != value)
+                    Tracker.TrackSet(PropertyTable.ValBytes, _ValBytes, value);
+                _ValBytes = value;
             }
         }
 
-        private Guid _vGuid;
+        private Guid _ValGuid;
 
-        public Guid vGuid
+        public Guid ValGuid
         {
             get
             {
-                return _vGuid;
+                return _ValGuid;
             }
             set
             {
-                if (Tracker != null && vGuid != value)
-                    Tracker.TrackSet(PropertyTable.vGuid, _vGuid, value);
-                _vGuid = value;
+                if (Tracker != null && ValGuid != value)
+                    Tracker.TrackSet(PropertyTable.ValGuid, _ValGuid, value);
+                _ValGuid = value;
             }
         }
 
-        private Suit _vSuit;
+        private Suit _ValSuit;
 
-        public Suit vSuit
+        public Suit ValSuit
         {
             get
             {
-                return _vSuit;
+                return _ValSuit;
             }
             set
             {
-                if (Tracker != null && vSuit != value)
-                    Tracker.TrackSet(PropertyTable.vSuit, _vSuit, value);
-                _vSuit = value;
+                if (Tracker != null && ValSuit != value)
+                    Tracker.TrackSet(PropertyTable.ValSuit, _ValSuit, value);
+                _ValSuit = value;
             }
         }
     }
@@ -744,20 +744,20 @@ namespace TrackableData.SqlTestKits
         public static class PropertyTable
         {
             public static readonly PropertyInfo Id = typeof(ITestTypeNullablePoco).GetProperty("Id");
-            public static readonly PropertyInfo vBool = typeof(ITestTypeNullablePoco).GetProperty("vBool");
-            public static readonly PropertyInfo vByte = typeof(ITestTypeNullablePoco).GetProperty("vByte");
-            public static readonly PropertyInfo vShort = typeof(ITestTypeNullablePoco).GetProperty("vShort");
-            public static readonly PropertyInfo vChar = typeof(ITestTypeNullablePoco).GetProperty("vChar");
-            public static readonly PropertyInfo vInt = typeof(ITestTypeNullablePoco).GetProperty("vInt");
-            public static readonly PropertyInfo vLong = typeof(ITestTypeNullablePoco).GetProperty("vLong");
-            public static readonly PropertyInfo vFloat = typeof(ITestTypeNullablePoco).GetProperty("vFloat");
-            public static readonly PropertyInfo vDouble = typeof(ITestTypeNullablePoco).GetProperty("vDouble");
-            public static readonly PropertyInfo vDecimal = typeof(ITestTypeNullablePoco).GetProperty("vDecimal");
-            public static readonly PropertyInfo vDateTime = typeof(ITestTypeNullablePoco).GetProperty("vDateTime");
-            public static readonly PropertyInfo vDateTimeOffset = typeof(ITestTypeNullablePoco).GetProperty("vDateTimeOffset");
-            public static readonly PropertyInfo vTimeSpan = typeof(ITestTypeNullablePoco).GetProperty("vTimeSpan");
-            public static readonly PropertyInfo vGuid = typeof(ITestTypeNullablePoco).GetProperty("vGuid");
-            public static readonly PropertyInfo vSuit = typeof(ITestTypeNullablePoco).GetProperty("vSuit");
+            public static readonly PropertyInfo ValBool = typeof(ITestTypeNullablePoco).GetProperty("ValBool");
+            public static readonly PropertyInfo ValByte = typeof(ITestTypeNullablePoco).GetProperty("ValByte");
+            public static readonly PropertyInfo ValShort = typeof(ITestTypeNullablePoco).GetProperty("ValShort");
+            public static readonly PropertyInfo ValChar = typeof(ITestTypeNullablePoco).GetProperty("ValChar");
+            public static readonly PropertyInfo ValInt = typeof(ITestTypeNullablePoco).GetProperty("ValInt");
+            public static readonly PropertyInfo ValLong = typeof(ITestTypeNullablePoco).GetProperty("ValLong");
+            public static readonly PropertyInfo ValFloat = typeof(ITestTypeNullablePoco).GetProperty("ValFloat");
+            public static readonly PropertyInfo ValDouble = typeof(ITestTypeNullablePoco).GetProperty("ValDouble");
+            public static readonly PropertyInfo ValDecimal = typeof(ITestTypeNullablePoco).GetProperty("ValDecimal");
+            public static readonly PropertyInfo ValDateTime = typeof(ITestTypeNullablePoco).GetProperty("ValDateTime");
+            public static readonly PropertyInfo ValDateTimeOffset = typeof(ITestTypeNullablePoco).GetProperty("ValDateTimeOffset");
+            public static readonly PropertyInfo ValTimeSpan = typeof(ITestTypeNullablePoco).GetProperty("ValTimeSpan");
+            public static readonly PropertyInfo ValGuid = typeof(ITestTypeNullablePoco).GetProperty("ValGuid");
+            public static readonly PropertyInfo ValSuit = typeof(ITestTypeNullablePoco).GetProperty("ValSuit");
         }
 
         private int _Id;
@@ -776,227 +776,227 @@ namespace TrackableData.SqlTestKits
             }
         }
 
-        private bool? _vBool;
+        private bool? _ValBool;
 
-        public bool? vBool
+        public bool? ValBool
         {
             get
             {
-                return _vBool;
+                return _ValBool;
             }
             set
             {
-                if (Tracker != null && vBool != value)
-                    Tracker.TrackSet(PropertyTable.vBool, _vBool, value);
-                _vBool = value;
+                if (Tracker != null && ValBool != value)
+                    Tracker.TrackSet(PropertyTable.ValBool, _ValBool, value);
+                _ValBool = value;
             }
         }
 
-        private byte? _vByte;
+        private byte? _ValByte;
 
-        public byte? vByte
+        public byte? ValByte
         {
             get
             {
-                return _vByte;
+                return _ValByte;
             }
             set
             {
-                if (Tracker != null && vByte != value)
-                    Tracker.TrackSet(PropertyTable.vByte, _vByte, value);
-                _vByte = value;
+                if (Tracker != null && ValByte != value)
+                    Tracker.TrackSet(PropertyTable.ValByte, _ValByte, value);
+                _ValByte = value;
             }
         }
 
-        private short? _vShort;
+        private short? _ValShort;
 
-        public short? vShort
+        public short? ValShort
         {
             get
             {
-                return _vShort;
+                return _ValShort;
             }
             set
             {
-                if (Tracker != null && vShort != value)
-                    Tracker.TrackSet(PropertyTable.vShort, _vShort, value);
-                _vShort = value;
+                if (Tracker != null && ValShort != value)
+                    Tracker.TrackSet(PropertyTable.ValShort, _ValShort, value);
+                _ValShort = value;
             }
         }
 
-        private char? _vChar;
+        private char? _ValChar;
 
-        public char? vChar
+        public char? ValChar
         {
             get
             {
-                return _vChar;
+                return _ValChar;
             }
             set
             {
-                if (Tracker != null && vChar != value)
-                    Tracker.TrackSet(PropertyTable.vChar, _vChar, value);
-                _vChar = value;
+                if (Tracker != null && ValChar != value)
+                    Tracker.TrackSet(PropertyTable.ValChar, _ValChar, value);
+                _ValChar = value;
             }
         }
 
-        private int? _vInt;
+        private int? _ValInt;
 
-        public int? vInt
+        public int? ValInt
         {
             get
             {
-                return _vInt;
+                return _ValInt;
             }
             set
             {
-                if (Tracker != null && vInt != value)
-                    Tracker.TrackSet(PropertyTable.vInt, _vInt, value);
-                _vInt = value;
+                if (Tracker != null && ValInt != value)
+                    Tracker.TrackSet(PropertyTable.ValInt, _ValInt, value);
+                _ValInt = value;
             }
         }
 
-        private long? _vLong;
+        private long? _ValLong;
 
-        public long? vLong
+        public long? ValLong
         {
             get
             {
-                return _vLong;
+                return _ValLong;
             }
             set
             {
-                if (Tracker != null && vLong != value)
-                    Tracker.TrackSet(PropertyTable.vLong, _vLong, value);
-                _vLong = value;
+                if (Tracker != null && ValLong != value)
+                    Tracker.TrackSet(PropertyTable.ValLong, _ValLong, value);
+                _ValLong = value;
             }
         }
 
-        private float? _vFloat;
+        private float? _ValFloat;
 
-        public float? vFloat
+        public float? ValFloat
         {
             get
             {
-                return _vFloat;
+                return _ValFloat;
             }
             set
             {
-                if (Tracker != null && vFloat != value)
-                    Tracker.TrackSet(PropertyTable.vFloat, _vFloat, value);
-                _vFloat = value;
+                if (Tracker != null && ValFloat != value)
+                    Tracker.TrackSet(PropertyTable.ValFloat, _ValFloat, value);
+                _ValFloat = value;
             }
         }
 
-        private double? _vDouble;
+        private double? _ValDouble;
 
-        public double? vDouble
+        public double? ValDouble
         {
             get
             {
-                return _vDouble;
+                return _ValDouble;
             }
             set
             {
-                if (Tracker != null && vDouble != value)
-                    Tracker.TrackSet(PropertyTable.vDouble, _vDouble, value);
-                _vDouble = value;
+                if (Tracker != null && ValDouble != value)
+                    Tracker.TrackSet(PropertyTable.ValDouble, _ValDouble, value);
+                _ValDouble = value;
             }
         }
 
-        private decimal? _vDecimal;
+        private decimal? _ValDecimal;
 
-        public decimal? vDecimal
+        public decimal? ValDecimal
         {
             get
             {
-                return _vDecimal;
+                return _ValDecimal;
             }
             set
             {
-                if (Tracker != null && vDecimal != value)
-                    Tracker.TrackSet(PropertyTable.vDecimal, _vDecimal, value);
-                _vDecimal = value;
+                if (Tracker != null && ValDecimal != value)
+                    Tracker.TrackSet(PropertyTable.ValDecimal, _ValDecimal, value);
+                _ValDecimal = value;
             }
         }
 
-        private DateTime? _vDateTime;
+        private DateTime? _ValDateTime;
 
-        public DateTime? vDateTime
+        public DateTime? ValDateTime
         {
             get
             {
-                return _vDateTime;
+                return _ValDateTime;
             }
             set
             {
-                if (Tracker != null && vDateTime != value)
-                    Tracker.TrackSet(PropertyTable.vDateTime, _vDateTime, value);
-                _vDateTime = value;
+                if (Tracker != null && ValDateTime != value)
+                    Tracker.TrackSet(PropertyTable.ValDateTime, _ValDateTime, value);
+                _ValDateTime = value;
             }
         }
 
-        private DateTimeOffset? _vDateTimeOffset;
+        private DateTimeOffset? _ValDateTimeOffset;
 
-        public DateTimeOffset? vDateTimeOffset
+        public DateTimeOffset? ValDateTimeOffset
         {
             get
             {
-                return _vDateTimeOffset;
+                return _ValDateTimeOffset;
             }
             set
             {
-                if (Tracker != null && vDateTimeOffset != value)
-                    Tracker.TrackSet(PropertyTable.vDateTimeOffset, _vDateTimeOffset, value);
-                _vDateTimeOffset = value;
+                if (Tracker != null && ValDateTimeOffset != value)
+                    Tracker.TrackSet(PropertyTable.ValDateTimeOffset, _ValDateTimeOffset, value);
+                _ValDateTimeOffset = value;
             }
         }
 
-        private TimeSpan? _vTimeSpan;
+        private TimeSpan? _ValTimeSpan;
 
-        public TimeSpan? vTimeSpan
+        public TimeSpan? ValTimeSpan
         {
             get
             {
-                return _vTimeSpan;
+                return _ValTimeSpan;
             }
             set
             {
-                if (Tracker != null && vTimeSpan != value)
-                    Tracker.TrackSet(PropertyTable.vTimeSpan, _vTimeSpan, value);
-                _vTimeSpan = value;
+                if (Tracker != null && ValTimeSpan != value)
+                    Tracker.TrackSet(PropertyTable.ValTimeSpan, _ValTimeSpan, value);
+                _ValTimeSpan = value;
             }
         }
 
-        private Guid? _vGuid;
+        private Guid? _ValGuid;
 
-        public Guid? vGuid
+        public Guid? ValGuid
         {
             get
             {
-                return _vGuid;
+                return _ValGuid;
             }
             set
             {
-                if (Tracker != null && vGuid != value)
-                    Tracker.TrackSet(PropertyTable.vGuid, _vGuid, value);
-                _vGuid = value;
+                if (Tracker != null && ValGuid != value)
+                    Tracker.TrackSet(PropertyTable.ValGuid, _ValGuid, value);
+                _ValGuid = value;
             }
         }
 
-        private Suit? _vSuit;
+        private Suit? _ValSuit;
 
-        public Suit? vSuit
+        public Suit? ValSuit
         {
             get
             {
-                return _vSuit;
+                return _ValSuit;
             }
             set
             {
-                if (Tracker != null && vSuit != value)
-                    Tracker.TrackSet(PropertyTable.vSuit, _vSuit, value);
-                _vSuit = value;
+                if (Tracker != null && ValSuit != value)
+                    Tracker.TrackSet(PropertyTable.ValSuit, _ValSuit, value);
+                _ValSuit = value;
             }
         }
     }

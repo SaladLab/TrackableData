@@ -26,8 +26,10 @@ namespace TrackableData
 
         ITracker ITrackable.Tracker
         {
-            get { return Tracker; }
-
+            get
+            {
+                return Tracker;
+            }
             set
             {
                 var tracker = (ISetTracker<T>)value;
@@ -37,8 +39,10 @@ namespace TrackableData
 
         ITracker<ICollection<T>> ITrackable<ICollection<T>>.Tracker
         {
-            get { return Tracker; }
-
+            get
+            {
+                return Tracker;
+            }
             set
             {
                 var tracker = (ISetTracker<T>)value;

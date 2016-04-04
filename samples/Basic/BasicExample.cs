@@ -6,7 +6,7 @@ using TrackableData;
 
 namespace Basic
 {
-    class BasicExample
+    internal class BasicExample
     {
         private static void RunTrackablePoco()
         {

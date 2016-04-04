@@ -104,7 +104,8 @@ namespace TrackableData.Redis
             }
         }
 
-        private ConverterSet RegisterNullableType<T>() where T : struct
+        private ConverterSet RegisterNullableType<T>()
+            where T : struct
         {
             var underlyingTypeConverter = GetConverterSet(typeof(T));
             if (underlyingTypeConverter == null)

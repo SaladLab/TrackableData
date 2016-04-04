@@ -58,8 +58,10 @@ namespace TrackableData
 
         ITracker ITrackable.Tracker
         {
-            get { return Tracker; }
-
+            get
+            {
+                return Tracker;
+            }
             set
             {
                 var tracker = (IDictionaryTracker<TKey, TValue>)value;
@@ -69,8 +71,10 @@ namespace TrackableData
 
         ITracker<IDictionary<TKey, TValue>> ITrackable<IDictionary<TKey, TValue>>.Tracker
         {
-            get { return Tracker; }
-
+            get
+            {
+                return Tracker;
+            }
             set
             {
                 var tracker = (IDictionaryTracker<TKey, TValue>)value;
@@ -138,7 +142,10 @@ namespace TrackableData
 
         public TValue this[TKey key]
         {
-            get { return _dictionary[key]; }
+            get
+            {
+                return _dictionary[key];
+            }
             set
             {
                 TValue oldValue;

@@ -87,15 +87,15 @@ namespace TrackableData.MsSql
                 return (o => Convert.ToInt64(o).ToString(CultureInfo.InvariantCulture));
             if (Nullable.GetUnderlyingType(type) != null)
             {
-                return (Func<object, string>)
-                       s_methodForGetConvertToSqlValueFuncForNullable
+                return (Func<object, string>)s_methodForGetConvertToSqlValueFuncForNullable
                            .MakeGenericMethod(Nullable.GetUnderlyingType(type))
                            .Invoke(this, new object[] { });
             }
             return (o => o.ToString());
         }
 
-        public Func<object, string> GetConvertToSqlValueFuncForNullable<T>() where T : struct
+        public Func<object, string> GetConvertToSqlValueFuncForNullable<T>()
+            where T : struct
         {
             var func = GetConvertToSqlValueFunc(typeof(T));
             return (o =>
@@ -127,7 +127,7 @@ namespace TrackableData.MsSql
 
         public static string GetSqlValue(byte[] value)
         {
-            var sb = new StringBuilder(value.Length * 2 + 2);
+            var sb = new StringBuilder((value.Length * 2) + 2);
 
             sb.Append("0x");
             foreach (var b in value)

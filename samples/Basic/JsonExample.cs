@@ -8,9 +8,9 @@ using TrackableData.Json;
 
 namespace Basic
 {
-    class JsonExample
+    internal class JsonExample
     {
-        private static JsonSerializerSettings JsonSerializerSettings =
+        private static JsonSerializerSettings s_jsonSerializerSettings =
             new JsonSerializerSettings
             {
                 TypeNameHandling = TypeNameHandling.None,
@@ -35,14 +35,14 @@ namespace Basic
             u.Level = 1;
             u.Gold = 10;
 
-            var json = JsonConvert.SerializeObject(u.Tracker, JsonSerializerSettings);
+            var json = JsonConvert.SerializeObject(u.Tracker, s_jsonSerializerSettings);
             Console.WriteLine(json);
             u.Tracker.Clear();
 
             u.Level += 10;
             u.Gold += 100;
 
-            var json2 = JsonConvert.SerializeObject(u.Tracker, JsonSerializerSettings);
+            var json2 = JsonConvert.SerializeObject(u.Tracker, s_jsonSerializerSettings);
             Console.WriteLine(json2);
             u.Tracker.Clear();
 
@@ -60,7 +60,7 @@ namespace Basic
             dict.Add(2, "Two");
             dict.Add(3, "Three");
 
-            var json = JsonConvert.SerializeObject(dict.Tracker, JsonSerializerSettings);
+            var json = JsonConvert.SerializeObject(dict.Tracker, s_jsonSerializerSettings);
             Console.WriteLine(json);
             dict.Tracker.Clear();
 
@@ -68,7 +68,7 @@ namespace Basic
             dict[2] = "TwoTwo";
             dict.Add(4, "Four");
 
-            var json2 = JsonConvert.SerializeObject(dict.Tracker, JsonSerializerSettings);
+            var json2 = JsonConvert.SerializeObject(dict.Tracker, s_jsonSerializerSettings);
             Console.WriteLine(json2);
             dict.Tracker.Clear();
 
@@ -86,14 +86,14 @@ namespace Basic
             set.Add(2);
             set.Add(3);
 
-            var json = JsonConvert.SerializeObject(set.Tracker, JsonSerializerSettings);
+            var json = JsonConvert.SerializeObject(set.Tracker, s_jsonSerializerSettings);
             Console.WriteLine(json);
             set.Tracker.Clear();
 
             set.Remove(1);
             set.Add(4);
 
-            var json2 = JsonConvert.SerializeObject(set.Tracker, JsonSerializerSettings);
+            var json2 = JsonConvert.SerializeObject(set.Tracker, s_jsonSerializerSettings);
             Console.WriteLine(json2);
             set.Tracker.Clear();
 
@@ -111,7 +111,7 @@ namespace Basic
             list.Add("Two");
             list.Add("Three");
 
-            var json = JsonConvert.SerializeObject(list.Tracker, JsonSerializerSettings);
+            var json = JsonConvert.SerializeObject(list.Tracker, s_jsonSerializerSettings);
             Console.WriteLine(json);
             list.Tracker.Clear();
 
@@ -119,7 +119,7 @@ namespace Basic
             list[1] = "TwoTwo";
             list.Add("Four");
 
-            var json2 = JsonConvert.SerializeObject(list.Tracker, JsonSerializerSettings);
+            var json2 = JsonConvert.SerializeObject(list.Tracker, s_jsonSerializerSettings);
             Console.WriteLine(json2);
             list.Tracker.Clear();
 

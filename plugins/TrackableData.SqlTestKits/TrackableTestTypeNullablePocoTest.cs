@@ -32,18 +32,18 @@ namespace TrackableData.SqlTestKits
         public async Task Test_CreateAsIdentity_LoadAndCheckEqual()
         {
             var p0 = new TrackableTestTypeNullablePoco();
-            p0.vBool = true;
-            p0.vByte = 1;
-            p0.vShort = 1;
-            p0.vChar = '\x1';
-            p0.vFloat = 1;
-            p0.vDouble = 1;
-            p0.vDecimal = 1;
-            p0.vDateTime = new DateTime(2001, 1, 1, 1, 1, 1);
-            p0.vDateTimeOffset = new DateTimeOffset(2001, 1, 1, 1, 1, 1, TimeSpan.Zero);
-            p0.vTimeSpan = new TimeSpan(1, 1, 1);
-            p0.vGuid = new Guid(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-            p0.vSuit = Suit.Spade;
+            p0.ValBool = true;
+            p0.ValByte = 1;
+            p0.ValShort = 1;
+            p0.ValChar = '\x1';
+            p0.ValFloat = 1;
+            p0.ValDouble = 1;
+            p0.ValDecimal = 1;
+            p0.ValDateTime = new DateTime(2001, 1, 1, 1, 1, 1);
+            p0.ValDateTimeOffset = new DateTimeOffset(2001, 1, 1, 1, 1, 1, TimeSpan.Zero);
+            p0.ValTimeSpan = new TimeSpan(1, 1, 1);
+            p0.ValGuid = new Guid(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+            p0.ValSuit = Suit.Spade;
             await _mapper.CreateAsync(_db.Connection, p0);
 
             var p1 = await _mapper.LoadAsync(_db.Connection, p0.Id);
@@ -52,19 +52,19 @@ namespace TrackableData.SqlTestKits
 
         private void AssertTestPocoEqual(ITestTypeNullablePoco p0, ITestTypeNullablePoco p1)
         {
-            Assert.Equal(p0.vBool, p1.vBool);
-            Assert.Equal(p0.vByte, p1.vByte);
-            Assert.Equal(p0.vShort, p1.vShort);
-            Assert.Equal(p0.vChar, p1.vChar);
-            Assert.Equal(p0.vInt, p1.vInt);
-            Assert.Equal(p0.vLong, p1.vLong);
-            Assert.Equal(p0.vFloat, p1.vFloat);
-            Assert.Equal(p0.vDouble, p1.vDouble);
-            Assert.Equal(p0.vDecimal, p1.vDecimal);
-            Assert.Equal(p0.vDateTime, p1.vDateTime);
-            Assert.Equal(p0.vDateTimeOffset, p1.vDateTimeOffset);
-            Assert.Equal(p0.vTimeSpan, p1.vTimeSpan);
-            Assert.Equal(p0.vGuid, p1.vGuid);
+            Assert.Equal(p0.ValBool, p1.ValBool);
+            Assert.Equal(p0.ValByte, p1.ValByte);
+            Assert.Equal(p0.ValShort, p1.ValShort);
+            Assert.Equal(p0.ValChar, p1.ValChar);
+            Assert.Equal(p0.ValInt, p1.ValInt);
+            Assert.Equal(p0.ValLong, p1.ValLong);
+            Assert.Equal(p0.ValFloat, p1.ValFloat);
+            Assert.Equal(p0.ValDouble, p1.ValDouble);
+            Assert.Equal(p0.ValDecimal, p1.ValDecimal);
+            Assert.Equal(p0.ValDateTime, p1.ValDateTime);
+            Assert.Equal(p0.ValDateTimeOffset, p1.ValDateTimeOffset);
+            Assert.Equal(p0.ValTimeSpan, p1.ValTimeSpan);
+            Assert.Equal(p0.ValGuid, p1.ValGuid);
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using StackExchange.Redis;
 using TrackableData.TestKits;
 using Xunit;
-using System.Collections.Generic;
 
 namespace TrackableData.Redis.Tests
 {

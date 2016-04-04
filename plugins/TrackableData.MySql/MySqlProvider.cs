@@ -83,15 +83,15 @@ namespace TrackableData.MySql
                 return (o => Convert.ToInt64(o).ToString(CultureInfo.InvariantCulture));
             if (Nullable.GetUnderlyingType(type) != null)
             {
-                return (Func<object, string>)
-                       s_methodForGetConvertToSqlValueFuncForNullable
+                return (Func<object, string>)s_methodForGetConvertToSqlValueFuncForNullable
                            .MakeGenericMethod(Nullable.GetUnderlyingType(type))
                            .Invoke(this, new object[] { });
             }
             return (o => o.ToString());
         }
 
-        public Func<object, string> GetConvertToSqlValueFuncForNullable<T>() where T : struct
+        public Func<object, string> GetConvertToSqlValueFuncForNullable<T>()
+            where T : struct
         {
             var func = GetConvertToSqlValueFunc(typeof(T));
             return (o =>
@@ -181,7 +181,7 @@ namespace TrackableData.MySql
                         var identity = c.IsIdentity ? " AUTO_INCREMENT" : "";
                         var notnull = c.Type.IsValueType ? " NOT NULL" : "";
                         return $"{c.EscapedName} {GetSqlType(c.Type, c.Length)}{identity}{notnull}";
-                    };
+                    }
                 }));
 
             var primaryKeyDef = string.Join(
