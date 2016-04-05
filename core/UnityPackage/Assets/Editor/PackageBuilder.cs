@@ -5,6 +5,13 @@ public static class PackageBuilder
     [MenuItem("Assets/Build UnityPackage")]
     public static void BuildPackage()
     {
+        BuildPackageCore();
+        BuildPackageFull();
+    }
+
+    [MenuItem("Assets/Build UnityPackage (Core)")]
+    public static void BuildPackageCore()
+    {
         var assetPaths = new string[]
         {
             "Assets/Middlewares/TrackableData",
