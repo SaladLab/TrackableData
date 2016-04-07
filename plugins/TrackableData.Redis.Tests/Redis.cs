@@ -4,7 +4,7 @@ using StackExchange.Redis;
 
 namespace TrackableData.Redis.Tests
 {
-    public class Redis : IDisposable
+    public sealed class Redis : IDisposable
     {
         public ConnectionMultiplexer Connection { get; private set; }
 
