@@ -31,7 +31,7 @@ dict.Add(4, "Four");
 
 var t = dict.Tracker;
 Print(JsonConvert.SerializeObject(t));      // show tracker as json without converter
-                                            // TODO:
+                                            // {"ChangeMap":{"1":{"Operation":2},"2":...}
 var s = new JsonSerializerSettings {
     Converters = new JsonConverter[] {
         new TrackableDictionaryTrackerJsonConverter<int, string>()
