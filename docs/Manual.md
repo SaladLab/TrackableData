@@ -7,13 +7,12 @@ its changes. For example TrackableSet uses TrackableSetTracker like this:
 
 ```csharp
 var set = new TrackableSet<int>() { 1, 2, 3 };
-set.SetDefaultTracker();                // attach TrackableSetTracker to set
+set.SetDefaultTracker();                    // attach TrackableSetTracker to set
 
-set.Remove(2);                          // make changes and set write down these
-set.Add(4);                             // changes to TrackableSetTracker
+set.Remove(2);                              // make changes and set write down these
+set.Add(4);                                 // changes to TrackableSetTracker
 
-Console.WriteLine(set.Tracker);         // show changes written to Tracker
-                                        // { -2, +4 }
+Console.WriteLine(set.Tracker);             // show changes written to Tracker: { -2, +4 } 
 ```
 
 ## Types
@@ -49,13 +48,13 @@ You can use TrackablePerson for tracking person data.
 
 ```csharp
 var person = new TrackablePerson { Name = "Alice", Age = 10 };
-person.SetDefaultTracker();             // attach tracker to person
+person.SetDefaultTracker();                 // attach tracker to person
 
-person.Name = "Bob";                    // make changes
+person.Name = "Bob";                        // make changes
 person.Age = 20;
 
-Console.WriteLine(person.Tracker);      // show changes
-                                        // { Name:Alice->Bob, Age:10->20 }
+Console.WriteLine(person.Tracker);          // show changes
+                                            // { Name:Alice->Bob, Age:10->20 }
 ```
 
 
@@ -66,19 +65,16 @@ TrackableDictionary traces add, modify and remove. Key and value should be immut
 Source
 
 ```csharp
-var dict = new TrackableDictionary<int, string>()
-dict.Add(1, "One");
-dict.Add(2, "Two");
-dict.Add(3, "Three");
+var dict = new TrackableDictionary<int, string>() {
+    { 1, "One" }, { 2, "Two" }, { 3, "Three" } };
+dict.SetDefaultTracker();                   // attach tracker to dictionary
 
-dict.SetDefaultTracker();               // attach tracker to dictionary
-
-dict.Remove(1);                         // make changes
+dict.Remove(1);                             // make changes
 dict[2] = "TwoTwo";
 dict.Add(4, "Four");
 
-Console.WriteLine(dict.Tracker);        // show changes
-                                        // { -1:One, =2:Two->TwoTwo, +4:Four }
+Console.WriteLine(dict.Tracker);            // show changes
+                                            // { -1:One, =2:Two->TwoTwo, +4:Four }
 ```
 
 ### List
@@ -90,14 +86,14 @@ access options. Value should be immutable.
 
 ```csharp
 var list = new TrackableList<string>() { "One", "Two", "Three" };
-list.SetDefaultTracker();               // attach tracker to set
+list.SetDefaultTracker();                   // attach tracker to set
 
-list.RemoveAt(0);                       // make changes
+list.RemoveAt(0);                           // make changes
 list[1] = "TwoTwo";
 list.Add("Four");
 
-Console.WriteLine(list.Tracker);        // show changes
-                                        // [ -0:One, =1:Three=>TwoTwo, +2:Four ]
+Console.WriteLine(list.Tracker);            // show changes
+                                            // [ -0:One, =1:Three=>TwoTwo, +2:Four ]
 ```
 
 ### Set
@@ -106,13 +102,12 @@ TrackableSet traces add and remove. Value should be immutable.
 
 ```csharp
 var set = new TrackableSet<int>() { 1, 2, 3 };
-set.SetDefaultTracker();                // attach tracker to set
+set.SetDefaultTracker();                    // attach tracker to set
 
-set.Remove(2);                          // make changes
+set.Remove(2);                              // make changes
 set.Add(4);
 
-Console.WriteLine(set.Tracker);         // show changes
-                                        // { -2, +4 }
+Console.WriteLine(set.Tracker);             // show changes: { -2, +4 }
 ```
 
 ### Container
@@ -151,7 +146,7 @@ Use it.
 ```csharp
 var c = CreateTestContainerWithTracker();
 
-c.Person.Name = "Bob";                  // make changes
+c.Person.Name = "Bob";                      // make changes
 c.Person.Age = 30;
 
 c.Dictionary[1] = "OneModified";
@@ -162,18 +157,129 @@ c.List[0] = "OneModified";
 c.List.RemoveAt(1);
 c.List.Insert(1, "TwoInserted");
 
-Console.WriteLine(c.Tracker);           // show changes
-                                        // { TODO }
+Console.WriteLine(c.Tracker);               // show changes
+                                            // { TODO }
 ```
 
 ## Operations
 
 ### Tracker
 
-### Apply changes to Trackable
+Trackable data can have tracker or not. When tracking is not needed,
+Tracker property of trackable data could be null. In this case all change are
+still applied to trackable data itself but changes are not written to tracker.
+
+```csharp
+var set = new TrackableSet<int>();
+set.SetDefaultTracker();                    // attach tracker to set
+
+set.Add(2);                                 // make changes
+set.Add(4);
+
+Console.WriteLine(set.Tracker);             // show changes: { +2, +4 }
+
+var tracker = set.Tracker;
+set.Tracker = null;                         // turn off tracking
+
+set.Add(3);                                 // make changes
+
+Console.WriteLine(tracker);                 // show changes on tracker: { +2, +4 }
+Console.WriteLine(set);                     // show set itself: { 2, 3, 4 }
+```
+
+### Apply changes to other data
+
+Changes which tracker has can be applied to other trackable. With this feature,
+change can be propagated to other trackable data.
+
+```csharp
+var set = new TrackableSet<int>();
+set.SetDefaultTracker();                    // attach tracker to set
+
+set.Add(1);                                 // make changes
+set.Add(2);
+
+var set2 = new TrackableSet<int>();         // create new TrackableSet
+set.Tracker.ApplyTo(set2);                  // apply changes to this set
+
+Console.WriteLine(set2);                    // show new TrackableSet: { 1, 2 }
+```
+
+This feature is essential for multi tier application. And changes can be applied
+to not only trackable data but also normal data.
+
+```csharp
+var set2 = new HashSet<int>();              // create new HashSet
+set.Tracker.ApplyTo(set2);                  // apply changes to this set
+
+Console.WriteLine(set2);                    // show new set: { 1, 2 }
+```
 
 ### Apply changes to Tracker
 
-### Rollback
+Changes which track can be applied to other tracker. With this feature,
+changes that multiple trackers hold are easily merged to one tracker. 
 
-### Tracker.HasChangeSet
+```csharp
+var set = new TrackableSet<int>();
+set.SetDefaultTracker();                    // attach tracker to set
+
+set.Add(1);                                 // make changes
+set.Add(2);
+
+Console.WriteLine(set2);                    // show changes: { +1, +2 }
+
+var tracker1 = set.Tracker;
+set.SetDefaultTracker();                    // create new tracker and attach it
+
+set.Add(3);                                 // make other changes
+
+Console.WriteLine(set2.Tracker);            // show other changes: { +3 }
+
+set.Tracker.ApplyTo(tracker1);              // apply other changes to tracker1
+Console.WriteLine(tracker1);                // show merged changes: { +1, +2, +3 }
+```
+
+### Revert changes
+
+When change happens, a tracker holds old values of changes. For example,
+TrackableDictionary keeps old values when an entity is removed or modified.
+With these values, every changes that tracker traces can be reverted easily.
+
+```csharp
+var dict = new TrackableDictionary<int, string>();
+dict.SetDefaultTracker();                   // attach tracker to dictionary
+
+dict[1] = "One";                            // make changes
+dict[2] = "Two";
+
+Console.WriteLine(dict);                    // show dictionary: { 1: "One", 2: "Two "}
+
+dict.Tracker.RollbackTo(dict);              // revert changes
+Console.WriteLine(dict);                    // show dictionary: { }
+
+dict.Tracker.Clear();                       // for further operation, clear tracker.
+```
+
+### Tracker.HasChangeSet event
+
+When a tracker has first change (which means HasChange becomes true from false),
+it fires HasChangeSet event. It can be used for removing unnecessary change checking code.
+
+```csharp
+var set = new TrackableSet();
+set.SetDefaultTracker();
+set.Tracker.HasChangeSet += _ => {          // listen HasChangeSet event
+  Console.WriteLine("* Changed *"); 
+}
+
+set.Add(1);                                 // * Changed *
+set.Add(2);
+
+set.Tracker.Clear();                        // clear all changes.
+set.Add(3);                                 // * Changed *
+set.Add(4);
+```
+
+After tracker being cleared, HasChangeSet event is fired again when gets new first change.
+
