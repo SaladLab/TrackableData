@@ -5,138 +5,86 @@
 [![Coverage Status](https://coveralls.io/repos/github/SaladLab/TrackableData/badge.svg?branch=master)](https://coveralls.io/github/SaladLab/TrackableData?branch=master)
 [![Coverity Status](https://scan.coverity.com/projects/8371/badge.svg?flat=1)](https://scan.coverity.com/projects/saladlab-trackabledata)
 
-Simple library to track changes of poco, list and dictionary.
+TrackableData provides a way to track the changes of poco, list, set and dictionary. It's small and simple to use. For example:
 
-## Example
-
-Source
 ```csharp
-var u = new TrackableUserData();
-u.SetDefaultTracker();
+var u = new TrackableUserData();     // create UserData can track changes
+u.SetDefaultTracker();               // set Tracker to track changes of UserData
 
-u.Name = "Bob";
+u.Name = "Bob";                      // make changes
 u.Level = 1;
 u.Gold = 10;
 
-Console.WriteLine(u.Tracker);
-u.Tracker.Clear();
+Console.WriteLine(u.Tracker);        // watch what has changed via Tracker
+                                     // { Name:->Bob, Level:0->1, Gold:0->10 }
 
-u.Level += 10;
+u.Tracker.Clear();                   // clear all changes
+
+u.Level += 10;                       // make another changes
 u.Gold += 100;
 
-Console.WriteLine(u.Tracker);
+Console.WriteLine(u.Tracker);        // watch what has changed via Tracker
+                                     // { Level:1->11, Gold:10->110 }
 ```
 
-Output
+## Where can I get it?
+
 ```
-{ Name:->Bob, Level:0->1, Gold:0->10 }
-{ Level:1->11, Gold:10->110 }
+PM> Install-Package TrackableData
+```
+
+TrackableData uses compile-time code generation to track poco and user
+container. So if you want use it, install TrackableData.Templates too.
+
+```
+PM> Install-Package TrackableData.Templates
 ```
 
 ## Why do you make another trackable library?
 
-There are several trackable libraries including famous entity framework. But primary reasons for making new library is
+There are many good libraries for tracking data.
+Most of them are ORM libraries like EntityFramework and NHibernate.
+They provides several good-to-have features and affordable performance.
+But just for tracking data it seems a little bit big.
 
- - Lean Library
-   - Minimal library.
-   - Easy to understand and extend.
+This library has been developed for two goals.
+
+#### Lean library.
+
+It works only for tracking data and doesn't aim at being versatile ORM.
+Because of that, it can be kept small and simple and also provides 
+additional features like rollback and merge of changes. 
    
- - Support Unity3D (.NET Framework 3.5)
-   - Unity only supports .NET Framework 3.5
-   - Common libraries support only .NET Framework 4.0 and above.
+#### Support Unity3D (.NET Framework 3.5)
 
-# Manual
+Unity3D only supports .NET Framework 3.5 until now. And dynamic code generation
+is forbidden to support iOS and WebGL which uses IL2CPP.
+Core library and transfer plugins are written under this limitation.
 
-## Types supported
+## Manual
 
-### POCO
+Comprehensive manual for using TrackableData: [Manual](./docs/Manual.md)
 
-TrackablePoco traces property set.
+## Plugins
 
-You already saw this in Example.
+TrackableData itself just tracks changes. For more jobs, plugins are required.
+There are two categories for plugins.
 
-### Dictionary
+### Transfer Changes
 
-TrackableDictionary traces add, modify and remove.
+Common serialization library works for transfering changes. But more readable
+and optimized representation can be achieved with help of plugin.
 
-Source
-```csharp
-var dict = new TrackableDictionary<int, string>();
-dict.SetDefaultTracker();
+- Json: [TrackableData.Json](./docs/Json.md)
+- Protocol Buffer: [TrackbleData.Protobuf](./docs/Protobuf.md)
 
-dict.Add(1, "One");
-dict.Add(2, "Two");
-dict.Add(3, "Three");
+### Save Changes
 
-Console.WriteLine(dict.Tracker);
-dict.Tracker.Clear();
+For data persistency, storage plugin is essential.
 
-dict.Remove(1);
-dict[2] = "TwoTwo";
-dict.Add(4, "Four");
+- Microsoft SQL Server: [TrackableData.MsSql](./docs/Sql.md)
+- MySQL: [TrackableData.MySql](./docs/Sql.md)
+- PostgreSQL: [TrackableData.PostgreSql](./docs/Sql.md)
+- MongoDB: [TrackableData.MongoDB](./docs/MongoDB.md)
+- Redis: [TrackableData.Redis](./docs/Redis.md)
 
-Console.WriteLine(dict.Tracker);
-```
-
-Output
-```
-{ +1:One, +2:Two, +3:Three }
-{ -1:One, =2:Two->TwoTwo, +4:Four }
-```
-
-### List
-
-TrackableList traces add, modify and remove.
-
-Source
-```csharp
-var list = new TrackableList<string>();
-list.SetDefaultTracker();
-
-list.Add("One");
-list.Add("Two");
-list.Add("Three");
-
-Console.WriteLine(list.Tracker);
-list.Tracker.Clear();
-
-list.RemoveAt(0);
-list[1] = "TwoTwo";
-list.Add("Four");
-
-```
-
-Output
-```
-[ +0:One, +1:Two, +2:Three ]
-[ -0:One, =1:Three=>TwoTwo, +2:Four ]
-```
-
-## Etc
-
-### Tracker
-
-TODO
-
-### Nested Tracker
-
-TODO
-
-## Pluging
-
-### Json.NET
-
-TODO
-
-### ProtocolBuffer.NET
-
-TODO
-
-### MSSQL
-
-TODO
-Poco, Dictionary. Not List.
-
-### MongoDB
-
-TODO: Implementation
