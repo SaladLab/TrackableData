@@ -57,7 +57,8 @@ namespace CodeGen
 
                 // ITrackable.Changed
 
-                w._("public bool Changed { get { return Tracker != null && Tracker.HasChange; } }");
+                w._("[IgnoreDataMember]",
+                    "public bool Changed { get { return Tracker != null && Tracker.HasChange; } }");
                 w._();
 
                 // ITrackable.Tracker
