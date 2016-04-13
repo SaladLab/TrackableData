@@ -46,7 +46,7 @@ namespace TrackableData.Redis
             var items = new List<PropertyItem>();
             foreach (var property in typeof(T).GetProperties())
             {
-                var keySuffix = "." + property.Name;
+                var keySuffix = ":" + property.Name;
 
                 var attr = property.GetCustomAttribute<TrackablePropertyAttribute>();
                 if (attr != null)
@@ -115,24 +115,24 @@ namespace TrackableData.Redis
             item.CreateAsync = (db, container, key) =>
             {
                 var value = (TPoco)item.PropertyInfo.GetValue(container);
-                return mapper.CreateAsync(db, value, key.Prepend(item.KeySuffix));
+                return mapper.CreateAsync(db, value, key.Append(item.KeySuffix));
             };
             item.DeleteAsync = (db, key) =>
             {
-                return mapper.DeleteAsync(db, key.Prepend(item.KeySuffix));
+                return mapper.DeleteAsync(db, key.Append(item.KeySuffix));
             };
             item.LoadAsync = (db, container, key) =>
             {
                 var value = (TPoco)item.PropertyInfo.GetValue(container);
                 // when there is no entry for poco, it is regarded as non-existent container.
-                return mapper.LoadAsync(db, value, key.Prepend(item.KeySuffix));
+                return mapper.LoadAsync(db, value, key.Append(item.KeySuffix));
             };
             item.SaveAsync = async (db, tracker, key) =>
             {
                 var valueTracker = (TrackablePocoTracker<TPoco>)item.TrackerPropertyInfo.GetValue(tracker);
                 if (valueTracker.HasChange)
                 {
-                    await mapper.SaveAsync(db, valueTracker, key.Prepend(item.KeySuffix));
+                    await mapper.SaveAsync(db, valueTracker, key.Append(item.KeySuffix));
                 }
             };
         }
@@ -146,17 +146,17 @@ namespace TrackableData.Redis
             item.CreateAsync = (db, container, key) =>
             {
                 var dictionary = (IDictionary<TKey, TValue>)item.PropertyInfo.GetValue(container);
-                return mapper.CreateAsync(db, dictionary, key.Prepend(item.KeySuffix));
+                return mapper.CreateAsync(db, dictionary, key.Append(item.KeySuffix));
             };
             item.DeleteAsync = (db, key) =>
             {
-                return mapper.DeleteAsync(db, key.Prepend(item.KeySuffix));
+                return mapper.DeleteAsync(db, key.Append(item.KeySuffix));
             };
             item.LoadAsync = async (db, container, key) =>
             {
                 var dictionary = (IDictionary<TKey, TValue>)item.PropertyInfo.GetValue(container);
                 // when there is no entry for dictionary, it is regarded as an empty dictionary.
-                await mapper.LoadAsync(db, dictionary, key.Prepend(item.KeySuffix));
+                await mapper.LoadAsync(db, dictionary, key.Append(item.KeySuffix));
                 return true;
             };
             item.SaveAsync = async (db, tracker, key) =>
@@ -164,7 +164,7 @@ namespace TrackableData.Redis
                 var valueTracker = (TrackableDictionaryTracker<TKey, TValue>)item.TrackerPropertyInfo.GetValue(tracker);
                 if (valueTracker.HasChange)
                 {
-                    await mapper.SaveAsync(db, valueTracker, key.Prepend(item.KeySuffix));
+                    await mapper.SaveAsync(db, valueTracker, key.Append(item.KeySuffix));
                 }
             };
         }
@@ -178,17 +178,17 @@ namespace TrackableData.Redis
             item.CreateAsync = (db, container, key) =>
             {
                 var set = (ICollection<TValue>)item.PropertyInfo.GetValue(container);
-                return mapper.CreateAsync(db, set, key.Prepend(item.KeySuffix));
+                return mapper.CreateAsync(db, set, key.Append(item.KeySuffix));
             };
             item.DeleteAsync = (db, key) =>
             {
-                return mapper.DeleteAsync(db, key.Prepend(item.KeySuffix));
+                return mapper.DeleteAsync(db, key.Append(item.KeySuffix));
             };
             item.LoadAsync = async (db, container, key) =>
             {
                 var set = (ICollection<TValue>)item.PropertyInfo.GetValue(container);
                 // when there is no entry for set, it is regarded as an empty set.
-                await mapper.LoadAsync(db, set, key.Prepend(item.KeySuffix));
+                await mapper.LoadAsync(db, set, key.Append(item.KeySuffix));
                 return true;
             };
             item.SaveAsync = async (db, tracker, key) =>
@@ -196,7 +196,7 @@ namespace TrackableData.Redis
                 var valueTracker = (TrackableSetTracker<TValue>)item.TrackerPropertyInfo.GetValue(tracker);
                 if (valueTracker.HasChange)
                 {
-                    await mapper.SaveAsync(db, valueTracker, key.Prepend(item.KeySuffix));
+                    await mapper.SaveAsync(db, valueTracker, key.Append(item.KeySuffix));
                 }
             };
         }
@@ -210,17 +210,17 @@ namespace TrackableData.Redis
             item.CreateAsync = (db, container, key) =>
             {
                 var list = (IList<TValue>)item.PropertyInfo.GetValue(container);
-                return mapper.CreateAsync(db, list, key.Prepend(item.KeySuffix));
+                return mapper.CreateAsync(db, list, key.Append(item.KeySuffix));
             };
             item.DeleteAsync = (db, key) =>
             {
-                return mapper.DeleteAsync(db, key.Prepend(item.KeySuffix));
+                return mapper.DeleteAsync(db, key.Append(item.KeySuffix));
             };
             item.LoadAsync = async (db, container, key) =>
             {
                 var list = (IList<TValue>)item.PropertyInfo.GetValue(container);
                 // when there is no entry for list, it is regarded as an empty list.
-                await mapper.LoadAsync(db, list, key.Prepend(item.KeySuffix));
+                await mapper.LoadAsync(db, list, key.Append(item.KeySuffix));
                 return true;
             };
             item.SaveAsync = async (db, tracker, key) =>
@@ -228,7 +228,7 @@ namespace TrackableData.Redis
                 var valueTracker = (TrackableListTracker<TValue>)item.TrackerPropertyInfo.GetValue(tracker);
                 if (valueTracker.HasChange)
                 {
-                    await mapper.SaveAsync(db, valueTracker, key.Prepend(item.KeySuffix));
+                    await mapper.SaveAsync(db, valueTracker, key.Append(item.KeySuffix));
                 }
             };
         }
