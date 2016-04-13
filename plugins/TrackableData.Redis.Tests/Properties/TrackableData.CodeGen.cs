@@ -28,6 +28,7 @@ namespace TrackableData.Redis.Tests
         [IgnoreDataMember]
         public IPocoTracker<ITestPocoForContainer> Tracker { get; set; }
 
+        [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
@@ -137,6 +138,7 @@ namespace TrackableData.Redis.Tests
         [IgnoreDataMember]
         public IPocoTracker<ITestPoco> Tracker { get; set; }
 
+        [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
@@ -263,6 +265,7 @@ namespace TrackableData.Redis.Tests
         [IgnoreDataMember]
         public IPocoTracker<ITestTypeNullablePoco> Tracker { get; set; }
 
+        [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
@@ -576,6 +579,7 @@ namespace TrackableData.Redis.Tests
         [IgnoreDataMember]
         public IPocoTracker<ITestTypePoco> Tracker { get; set; }
 
+        [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker

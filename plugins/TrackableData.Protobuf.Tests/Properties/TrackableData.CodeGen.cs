@@ -26,6 +26,7 @@ namespace TrackableData.Protobuf.Tests
         [IgnoreDataMember]
         public IPocoTracker<IPerson> Tracker { get; set; }
 
+        [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
@@ -220,6 +221,7 @@ namespace TrackableData.Protobuf.Tests
         [IgnoreDataMember]
         public IPocoTracker<IHand> Tracker { get; set; }
 
+        [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
@@ -366,6 +368,7 @@ namespace TrackableData.Protobuf.Tests
         [IgnoreDataMember]
         public IPocoTracker<IRing> Tracker { get; set; }
 
+        [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker

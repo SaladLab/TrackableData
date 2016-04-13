@@ -29,6 +29,7 @@ namespace TrackableData.MongoDB.Tests
         [IgnoreDataMember]
         public IPocoTracker<ITestPocoForContainer> Tracker { get; set; }
 
+        [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
@@ -138,6 +139,7 @@ namespace TrackableData.MongoDB.Tests
         [IgnoreDataMember]
         public IPocoTracker<ITestPoco> Tracker { get; set; }
 
+        [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
@@ -264,6 +266,7 @@ namespace TrackableData.MongoDB.Tests
         [IgnoreDataMember]
         public IPocoTracker<ITestPocoWithCustomId> Tracker { get; set; }
 
+        [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
