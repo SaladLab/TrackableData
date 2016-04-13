@@ -38,5 +38,5 @@ var s = new JsonSerializerSettings {
     }
 };
 Print(JsonConvert.SerializeObject(t, s));   // show tracker as json with converter
-                                            // TODO:
+                                            // {"-1":0,"=2":"TwoTwo","+4":"Four"}
 ```
