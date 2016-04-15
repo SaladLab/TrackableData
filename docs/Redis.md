@@ -112,7 +112,7 @@ HMSET Person:1 Name "Admin" Age 20
 Following code delete a person whose id is 1 on redis.
 
 ```csharp
-await DeleteAsync("Person:" + 1);
+await mapper.DeleteAsync(redis, "Person:" + 1);
 ```
 
 DeleteAsync method generates following command and run it on redis.
@@ -161,12 +161,12 @@ var mapper = new TrackableSetRedisMapper<int>();
 var set = mapper.LoadAsync(redis, "TestSet:" + 1);
 ```
 
-#### Collection
+#### Container
 
-Two types of redis mapper for collection are implemented. Redis doesn't provide
+Two types of redis mapper for container are implemented. Redis doesn't provide
 key hierarchy and two  mapper solve this limitation differently.
 
-At first following collection will be used for explanation.
+At first following container will be used for explanation.
 
 ```csharp
 public interface ITestContainer : ITrackableContainer<ITestContainer> {

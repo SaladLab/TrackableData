@@ -47,7 +47,7 @@ var mapper = new TrackablePocoSqlMapper(
 
 #### SQL generate methods and helper async methods.
 
-SQL wrapper class provides SQL generate methods for every operations. For example, load
+SQL mapper class provides SQL generate methods for every operations. For example, load
 operation for TrackableDictionary can be achived by two ways. First, SQL mapper and
 dictionary are prepared.
 
@@ -62,13 +62,16 @@ SQL for creating trackable data is generated with BuildSqlForCreate method of ma
 Generated SQL is quite raw but this can be used for batching SQLs.
 
 ```csharp
+// generate sql
 var sql = mapper.BuildSqlForCreate(dict);
+
+// run sql
 using (var command = _sqlProvider.CreateDbCommand(sql, dbConnection)) {
     return await command.ExecuteNonQueryAsync();
 }
 ```
 
-For simple cases, a helper method simplifies code like this:
+Second, a helper method simplifies code for most cases.
 
 ```csharp
 await mapper.CreateAsync(dbConnection, dict);
