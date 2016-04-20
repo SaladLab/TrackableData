@@ -6,7 +6,7 @@ namespace TrackableData.MongoDB
 {
     public static class UniqueInt64Id
     {
-        private static readonly ulong _baseId;
+        private static ulong _baseId;
         private static int _staticIncrement;
 
         static UniqueInt64Id()
@@ -16,6 +16,16 @@ namespace TrackableData.MongoDB
             var p = refId.Pid;
             _baseId = ((ulong)((m >> 16) ^ (m >> 8) ^ (m)) << 24) |
                       ((ulong)((p >> 8) ^ (p)) << 16);
+        }
+
+        public static void SetMachineNumber(byte number)
+        {
+            _baseId = (_baseId & 0xFFFFFFFF00FFFFFFUL) | ((ulong)number << 24);
+        }
+
+        public static void SetProcessNumber(byte number)
+        {
+            _baseId = (_baseId & 0xFFFFFFFFFF00FFFFUL) | ((ulong)number << 16);
         }
 
         // GenerateNewId like MongoDB.ObjectID but use 8 bytes instead of 12 bytes
