@@ -63,8 +63,8 @@ namespace TrackableData.MongoDB
                        : update.Set(valuePath, bson);
         }
 
-        public IEnumerable<UpdateDefinition<BsonDocument>> BuildUpdatesForSave(
-            TrackableListTracker<T> tracker, params object[] keyValues)
+        public List<UpdateDefinition<BsonDocument>> BuildUpdatesForSave(
+            UpdateDefinition<BsonDocument> update, TrackableListTracker<T> tracker, params object[] keyValues)
         {
             var keyNamespace = DocumentHelper.ToDotPath(keyValues);
 
@@ -72,56 +72,80 @@ namespace TrackableData.MongoDB
             if (tracker.ChangeList.Count > 1 &&
                 tracker.ChangeList.All(c => c.Operation == TrackableListOperation.PushBack))
             {
-                yield return Builders<BsonDocument>.Update.PushEach(
-                    keyNamespace, tracker.ChangeList.Select(c => c.NewValue));
-                yield break;
+                var newValues = tracker.ChangeList.Select(c => c.NewValue);
+                return new List<UpdateDefinition<BsonDocument>>
+                {
+                    update == null
+                        ? Builders<BsonDocument>.Update.PushEach(keyNamespace, newValues)
+                        : update.PushEach(keyNamespace, newValues)
+                };
             }
 
             // Multiple push-front batching optimization
             if (tracker.ChangeList.Count > 1 &&
                 tracker.ChangeList.All(c => c.Operation == TrackableListOperation.PushFront))
             {
-                yield return Builders<BsonDocument>.Update.PushEach(
-                    keyNamespace, tracker.ChangeList.Select(c => c.NewValue).Reverse(), position: 0);
-                yield break;
+                var newValues = tracker.ChangeList.Select(c => c.NewValue).Reverse();
+                return new List<UpdateDefinition<BsonDocument>>
+                {
+                    update == null
+                        ? Builders<BsonDocument>.Update.PushEach(keyNamespace, newValues, position: 0)
+                        : update.PushEach(keyNamespace, newValues, position: 0)
+                };
             }
 
             // List update can process only one change each time
+            var updates = new List<UpdateDefinition<BsonDocument>>();
             foreach (var change in tracker.ChangeList)
             {
                 switch (change.Operation)
                 {
                     case TrackableListOperation.Insert:
-                        yield return Builders<BsonDocument>.Update.PushEach(
-                            keyNamespace, new[] { change.NewValue }, position: change.Index);
+                        updates.Add(update == null
+                            ? Builders<BsonDocument>.Update.PushEach(keyNamespace, new[] { change.NewValue }, position: change.Index)
+                            : update.PushEach(keyNamespace, new[] { change.NewValue }, position: change.Index));
+                        update = null;
                         break;
 
                     case TrackableListOperation.Remove:
                         throw new Exception("Remove operation is not supported!");
 
                     case TrackableListOperation.Modify:
-                        yield return Builders<BsonDocument>.Update.Set(
-                            keyNamespace + "." + change.Index, change.NewValue);
+                        updates.Add(update == null
+                            ? Builders<BsonDocument>.Update.Set(keyNamespace + "." + change.Index, change.NewValue)
+                            : update.Set(keyNamespace + "." + change.Index, change.NewValue));
                         break;
 
                     case TrackableListOperation.PushFront:
-                        yield return Builders<BsonDocument>.Update.PushEach(
-                            keyNamespace, new[] { change.NewValue }, position: 0);
+                        updates.Add(update == null
+                            ? Builders<BsonDocument>.Update.PushEach(keyNamespace, new[] { change.NewValue }, position: 0)
+                            : update.PushEach(keyNamespace, new[] { change.NewValue }, position: 0));
                         break;
 
                     case TrackableListOperation.PushBack:
-                        yield return Builders<BsonDocument>.Update.Push(keyNamespace, change.NewValue);
+                        updates.Add(update == null
+                            ? Builders<BsonDocument>.Update.Push(keyNamespace, change.NewValue)
+                            : update.Push(keyNamespace, change.NewValue));
                         break;
 
                     case TrackableListOperation.PopFront:
-                        yield return Builders<BsonDocument>.Update.PopFirst(keyNamespace);
+                        updates.Add(update == null
+                            ? Builders<BsonDocument>.Update.PopFirst(keyNamespace)
+                            : update.PopFirst(keyNamespace));
                         break;
 
                     case TrackableListOperation.PopBack:
-                        yield return Builders<BsonDocument>.Update.PopLast(keyNamespace);
+                        updates.Add(update == null
+                            ? Builders<BsonDocument>.Update.PopLast(keyNamespace)
+                            : update.PopLast(keyNamespace));
                         break;
                 }
             }
+
+            if (update != null)
+                updates.Add(update);
+
+            return updates;
         }
 
         public Task CreateAsync(IMongoCollection<BsonDocument> collection, IList<T> list, params object[] keyValues)
@@ -184,7 +208,7 @@ namespace TrackableData.MongoDB
                 return;
 
             var filter = Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]);
-            foreach (var update in BuildUpdatesForSave(tracker, keyValues.Skip(1).ToArray()))
+            foreach (var update in BuildUpdatesForSave(null, tracker, keyValues.Skip(1).ToArray()))
             {
                 await collection.UpdateOneAsync(
                     filter, update, new UpdateOptions { IsUpsert = true });

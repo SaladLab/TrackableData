@@ -63,13 +63,32 @@ namespace TrackableData.MongoDB
                        : update.Set(valuePath, bson);
         }
 
-        public IEnumerable<UpdateDefinition<BsonDocument>> BuildUpdatesForSave(
-            TrackableSetTracker<T> tracker, params object[] keyValues)
+        public List<UpdateDefinition<BsonDocument>> BuildUpdatesForSave(
+            UpdateDefinition<BsonDocument> update, TrackableSetTracker<T> tracker, params object[] keyValues)
         {
+            var updates = new List<UpdateDefinition<BsonDocument>>();
             var keyNamespace = DocumentHelper.ToDotPath(keyValues);
 
-            yield return Builders<BsonDocument>.Update.AddToSetEach(keyNamespace, tracker.AddValues);
-            yield return Builders<BsonDocument>.Update.PullAll(keyNamespace, tracker.RemoveValues);
+            if (tracker.AddValues.Any())
+            {
+                updates.Add(update == null
+                    ? Builders<BsonDocument>.Update.AddToSetEach(keyNamespace, tracker.AddValues)
+                    : update.AddToSetEach(keyNamespace, tracker.AddValues));
+                update = null;
+            }
+
+            if (tracker.RemoveValues.Any())
+            {
+                updates.Add(update == null
+                    ? Builders<BsonDocument>.Update.PullAll(keyNamespace, tracker.RemoveValues)
+                    : update.PullAll(keyNamespace, tracker.RemoveValues));
+                update = null;
+            }
+
+            if (update != null)
+                updates.Add(update);
+
+            return updates;
         }
 
         public Task CreateAsync(IMongoCollection<BsonDocument> collection, ICollection<T> set, params object[] keyValues)
@@ -132,7 +151,7 @@ namespace TrackableData.MongoDB
                 return;
 
             var filter = Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]);
-            foreach (var update in BuildUpdatesForSave(tracker, keyValues.Skip(1).ToArray()))
+            foreach (var update in BuildUpdatesForSave(null, tracker, keyValues.Skip(1).ToArray()))
             {
                 await collection.UpdateOneAsync(
                     filter, update, new UpdateOptions { IsUpsert = true });

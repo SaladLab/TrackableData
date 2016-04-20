@@ -22,7 +22,7 @@ namespace TrackableData.MongoDB
             public Action<T, BsonDocument> ExportToBson;
             public Action<BsonDocument, T> ImportFromBson;
             public Func<UpdateDefinition<BsonDocument>, IContainerTracker<T>, IEnumerable<object>,
-                UpdateDefinition<BsonDocument>> SaveChanges;
+                List<UpdateDefinition<BsonDocument>>> SaveChanges;
         }
 
         private readonly PropertyItem[] _items;
@@ -72,6 +72,13 @@ namespace TrackableData.MongoDB
                         .MakeGenericMethod(property.PropertyType.GetGenericArguments())
                         .Invoke(null, new object[] { item });
                 }
+                else if (TrackableResolver.IsTrackableSet(property.PropertyType))
+                {
+                    typeof(TrackableContainerMongoDbMapper<T>)
+                        .GetMethod("BuildTrackableSetProperty", BindingFlags.Static | BindingFlags.NonPublic)
+                        .MakeGenericMethod(property.PropertyType.GetGenericArguments())
+                        .Invoke(null, new object[] { item });
+                }
                 else if (TrackableResolver.IsTrackableList(property.PropertyType))
                 {
                     typeof(TrackableContainerMongoDbMapper<T>)
@@ -109,13 +116,15 @@ namespace TrackableData.MongoDB
             item.SaveChanges = (update, tracker, keyValues) =>
             {
                 var valueTracker = (TrackablePocoTracker<TPoco>)item.TrackerPropertyInfo.GetValue(tracker);
-                if (valueTracker.HasChange)
+                if (valueTracker.HasChange == false)
+                    return null;
+
+                return new List<UpdateDefinition<BsonDocument>>
                 {
-                    update = mapper.BuildUpdatesForSave(
+                    mapper.BuildUpdatesForSave(
                         update, valueTracker,
-                        keyValues.Concat(new object[] { item.PropertyInfo.Name }).ToArray());
-                }
-                return update;
+                        keyValues.Concat(new object[] { item.PropertyInfo.Name }).ToArray())
+                };
             };
         }
 
@@ -138,13 +147,44 @@ namespace TrackableData.MongoDB
             item.SaveChanges = (update, tracker, keyValues) =>
             {
                 var valueTracker = (TrackableDictionaryTracker<TKey, TValue>)item.TrackerPropertyInfo.GetValue(tracker);
-                if (valueTracker.HasChange)
+                if (valueTracker.HasChange == false)
+                    return null;
+
+                return new List<UpdateDefinition<BsonDocument>>
                 {
-                    update = mapper.BuildUpdatesForSave(
+                    mapper.BuildUpdatesForSave(
                         update, valueTracker,
-                        keyValues.Concat(new object[] { item.PropertyInfo.Name }).ToArray());
-                }
-                return update;
+                        keyValues.Concat(new object[] { item.PropertyInfo.Name }).ToArray())
+                };
+            };
+        }
+
+        private static void BuildTrackableSetProperty<TValue>(PropertyItem item)
+        {
+            var mapper = new TrackableSetMongoDbMapper<TValue>();
+            item.Mapper = mapper;
+
+            item.ExportToBson = (container, doc) =>
+            {
+                var value = (ICollection<TValue>)item.PropertyInfo.GetValue(container);
+                if (value != null)
+                    doc.Add(item.PropertyInfo.Name, mapper.ConvertToBsonArray(value));
+            };
+            item.ImportFromBson = (doc, container) =>
+            {
+                var value = mapper.ConvertToTrackableSet(doc, item.PropertyInfo.Name);
+                item.PropertyInfo.SetValue(container, value);
+            };
+            item.SaveChanges = (update, tracker, keyValues) =>
+            {
+                var valueTracker = (TrackableSetTracker<TValue>)item.TrackerPropertyInfo.GetValue(tracker);
+                if (valueTracker.HasChange == false)
+                    return null;
+
+                return mapper.BuildUpdatesForSave(
+                    update,
+                    valueTracker,
+                    keyValues.Concat(new object[] { item.PropertyInfo.Name }).ToArray()).ToList();
             };
         }
 
@@ -167,18 +207,13 @@ namespace TrackableData.MongoDB
             item.SaveChanges = (update, tracker, keyValues) =>
             {
                 var valueTracker = (TrackableListTracker<TValue>)item.TrackerPropertyInfo.GetValue(tracker);
-                if (valueTracker.HasChange)
-                {
-                    var listUpdates = mapper.BuildUpdatesForSave(
-                        valueTracker,
-                        keyValues.Concat(new object[] { item.PropertyInfo.Name }).ToArray()).ToList();
-                    if (listUpdates.Count > 1)
-                        throw new InvalidOperationException("Container cannot save multiple changes from list.");
-                    update = update == null
-                                 ? listUpdates[0]
-                                 : Builders<BsonDocument>.Update.Combine(update, listUpdates[0]);
-                }
-                return update;
+                if (valueTracker.HasChange == false)
+                    return null;
+
+                return mapper.BuildUpdatesForSave(
+                    update,
+                    valueTracker,
+                    keyValues.Concat(new object[] { item.PropertyInfo.Name }).ToArray()).ToList();
             };
         }
 
@@ -278,30 +313,39 @@ namespace TrackableData.MongoDB
             return doc != null ? ConvertToTrackableContainer(doc) : default(T);
         }
 
-        public Task<UpdateResult> SaveAsync(IMongoCollection<BsonDocument> collection,
+        public Task SaveAsync(IMongoCollection<BsonDocument> collection,
                                             ITracker tracker,
                                             params object[] keyValues)
         {
             return SaveAsync(collection, (IContainerTracker<T>)tracker, keyValues);
         }
 
-        public Task<UpdateResult> SaveAsync(IMongoCollection<BsonDocument> collection,
-                                            IContainerTracker<T> tracker,
-                                            params object[] keyValues)
+        public async Task SaveAsync(IMongoCollection<BsonDocument> collection,
+                                    IContainerTracker<T> tracker,
+                                    params object[] keyValues)
         {
             if (keyValues.Length == 0)
                 throw new ArgumentException("At least 1 keyValue required.");
 
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]);
             var partialKeys = keyValues.Skip(1).ToArray();
+
             UpdateDefinition<BsonDocument> update = null;
             foreach (var pi in _items)
             {
-                update = pi.SaveChanges(update, tracker, partialKeys);
+                var updates = pi.SaveChanges(update, tracker, partialKeys);
+                if (updates != null)
+                {
+                    if (updates.Count > 1)
+                    {
+                        for (var i = 0; i < updates.Count - 1; i++)
+                            await collection.UpdateOneAsync(filter, updates[i], new UpdateOptions { IsUpsert = true });
+                    }
+                    update = updates.Last();
+                }
             }
-            return collection.UpdateOneAsync(
-                Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
-                update,
-                new UpdateOptions { IsUpsert = true });
+            if (update != null)
+                await collection.UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = true });
         }
     }
 }
