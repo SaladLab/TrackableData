@@ -123,9 +123,12 @@ namespace TrackableData.MongoDB
             }
             else
             {
-                var update = BuildUpdatesForCreate(null, dictionary, keyValues.Skip(1).ToArray());
+                var subKeys = keyValues.Skip(1).ToArray();
+                var update = BuildUpdatesForCreate(null, dictionary, subKeys);
                 return collection.UpdateOneAsync(
-                    Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
+                    Builders<BsonDocument>.Filter.And(
+                        Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
+                        Builders<BsonDocument>.Filter.Exists(DocumentHelper.ToDotPath(subKeys), false)),
                     update,
                     new UpdateOptions { IsUpsert = true });
             }

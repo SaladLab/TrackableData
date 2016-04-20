@@ -276,8 +276,11 @@ namespace TrackableData.MongoDB
             {
                 var setPath = DocumentHelper.ToDotPath(keyValues.Skip(1));
                 await collection.UpdateOneAsync(
-                    Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
-                    Builders<BsonDocument>.Update.Set(setPath, bson));
+                    Builders<BsonDocument>.Filter.And(
+                        Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
+                        Builders<BsonDocument>.Filter.Exists(setPath, false)),
+                    Builders<BsonDocument>.Update.Set(setPath, bson),
+                    new UpdateOptions { IsUpsert = true });
             }
         }
 
@@ -339,13 +342,13 @@ namespace TrackableData.MongoDB
                     if (updates.Count > 1)
                     {
                         for (var i = 0; i < updates.Count - 1; i++)
-                            await collection.UpdateOneAsync(filter, updates[i], new UpdateOptions { IsUpsert = true });
+                            await collection.UpdateOneAsync(filter, updates[i]);
                     }
                     update = updates.Last();
                 }
             }
             if (update != null)
-                await collection.UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = true });
+                await collection.UpdateOneAsync(filter, update);
         }
     }
 }

@@ -153,9 +153,12 @@ namespace TrackableData.MongoDB
             if (keyValues.Length < 2)
                 throw new ArgumentException("At least 2 keyValue required.");
 
-            var update = BuildUpdatesForCreate(null, list, keyValues.Skip(1).ToArray());
+            var subKeys = keyValues.Skip(1).ToArray();
+            var update = BuildUpdatesForCreate(null, list, subKeys);
             return collection.UpdateOneAsync(
-                Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
+                Builders<BsonDocument>.Filter.And(
+                    Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
+                    Builders<BsonDocument>.Filter.Exists(DocumentHelper.ToDotPath(subKeys), false)),
                 update,
                 new UpdateOptions { IsUpsert = true });
         }

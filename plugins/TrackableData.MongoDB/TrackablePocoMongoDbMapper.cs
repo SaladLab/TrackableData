@@ -89,12 +89,12 @@ namespace TrackableData.MongoDB
                 }
                 else
                 {
-                    // TODO: throw exception if already item exists ?
-
                     var keyPath = keyValues.Length > 1 ? DocumentHelper.ToDotPath(keyValues.Skip(1)) + "." : "";
                     var setPath = keyPath + _idProperty.GetValue(value);
                     await collection.UpdateOneAsync(
-                        Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
+                        Builders<BsonDocument>.Filter.And(
+                            Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
+                            Builders<BsonDocument>.Filter.Exists(setPath, false)),
                         Builders<BsonDocument>.Update.Set(setPath, bson),
                         new UpdateOptions { IsUpsert = true });
                 }
@@ -112,12 +112,13 @@ namespace TrackableData.MongoDB
                 }
                 else
                 {
-                    // TODO: throw exception if already item exists ?
-
                     var setPath = DocumentHelper.ToDotPath(keyValues.Skip(1));
                     await collection.UpdateOneAsync(
-                        Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
-                        Builders<BsonDocument>.Update.Set(setPath, bson));
+                        Builders<BsonDocument>.Filter.And(
+                            Builders<BsonDocument>.Filter.Eq("_id", keyValues[0]),
+                            Builders<BsonDocument>.Filter.Exists(setPath, false)),
+                        Builders<BsonDocument>.Update.Set(setPath, bson),
+                        new UpdateOptions { IsUpsert = true });
                 }
             }
         }
