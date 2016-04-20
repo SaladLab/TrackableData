@@ -519,6 +519,7 @@ namespace TrackableData.Protobuf.Tests
                 Person.Tracker = value?.PersonTracker;
                 Dictionary.Tracker = value?.DictionaryTracker;
                 List.Tracker = value?.ListTracker;
+                Set.Tracker = value?.SetTracker;
             }
         }
 
@@ -573,6 +574,8 @@ namespace TrackableData.Protobuf.Tests
                     return Dictionary as ITrackable;
                 case "List":
                     return List as ITrackable;
+                case "Set":
+                    return Set as ITrackable;
                 default:
                     return null;
             }
@@ -589,6 +592,9 @@ namespace TrackableData.Protobuf.Tests
             var trackableList = List as ITrackable;
             if (trackableList != null && (changedOnly == false || trackableList.Changed))
                 yield return new KeyValuePair<object, ITrackable>("List", trackableList);
+            var trackableSet = Set as ITrackable;
+            if (trackableSet != null && (changedOnly == false || trackableSet.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Set", trackableSet);
         }
 
         private TrackablePerson _Person = new TrackablePerson();
@@ -665,6 +671,31 @@ namespace TrackableData.Protobuf.Tests
             get { return _List; }
             set { _List = (TrackableList<string>)value; }
         }
+
+        private TrackableSet<int> _Set = new TrackableSet<int>();
+
+        [ProtoMember(4)] 
+        public TrackableSet<int> Set
+        {
+            get
+            {
+                return _Set;
+            }
+            set
+            {
+                if (_Set != null)
+                    _Set.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.SetTracker;
+                _Set = value;
+            }
+        }
+
+        TrackableSet<int> IDataContainer.Set
+        {
+            get { return _Set; }
+            set { _Set = (TrackableSet<int>)value; }
+        }
     }
 
     [ProtoContract]
@@ -676,6 +707,8 @@ namespace TrackableData.Protobuf.Tests
         public TrackableDictionaryTracker<int, string> DictionaryTracker { get; set; } = new TrackableDictionaryTracker<int, string>();
         [ProtoMember(3)] 
         public TrackableListTracker<string> ListTracker { get; set; } = new TrackableListTracker<string>();
+        [ProtoMember(4)] 
+        public TrackableSetTracker<int> SetTracker { get; set; } = new TrackableSetTracker<int>();
 
         public override string ToString()
         {
@@ -712,6 +745,16 @@ namespace TrackableData.Protobuf.Tests
                 sb.Append(ListTracker);
             }
 
+            if (SetTracker != null && SetTracker.HasChange)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(", ");
+                sb.Append("Set:");
+                sb.Append(SetTracker);
+            }
+
             sb.Append(" }");
             return sb.ToString();
         }
@@ -724,6 +767,7 @@ namespace TrackableData.Protobuf.Tests
                     (PersonTracker != null && PersonTracker.HasChange) ||
                     (DictionaryTracker != null && DictionaryTracker.HasChange) ||
                     (ListTracker != null && ListTracker.HasChange) ||
+                    (SetTracker != null && SetTracker.HasChange) ||
                     false;
             }
         }
@@ -742,6 +786,8 @@ namespace TrackableData.Protobuf.Tests
                 DictionaryTracker.Clear();
             if (ListTracker != null)
                 ListTracker.Clear();
+            if (SetTracker != null)
+                SetTracker.Clear();
         }
 
         public void ApplyTo(object trackable)
@@ -757,6 +803,8 @@ namespace TrackableData.Protobuf.Tests
                 DictionaryTracker.ApplyTo(trackable.Dictionary);
             if (ListTracker != null)
                 ListTracker.ApplyTo(trackable.List);
+            if (SetTracker != null)
+                SetTracker.ApplyTo(trackable.Set);
         }
 
         public void ApplyTo(ITracker tracker)
@@ -777,6 +825,8 @@ namespace TrackableData.Protobuf.Tests
                 DictionaryTracker.ApplyTo(tracker.DictionaryTracker);
             if (ListTracker != null)
                 ListTracker.ApplyTo(tracker.ListTracker);
+            if (SetTracker != null)
+                SetTracker.ApplyTo(tracker.SetTracker);
         }
 
         public void RollbackTo(object trackable)
@@ -792,6 +842,8 @@ namespace TrackableData.Protobuf.Tests
                 DictionaryTracker.RollbackTo(trackable.Dictionary);
             if (ListTracker != null)
                 ListTracker.RollbackTo(trackable.List);
+            if (SetTracker != null)
+                SetTracker.RollbackTo(trackable.Set);
         }
 
         public void RollbackTo(ITracker tracker)
@@ -812,6 +864,8 @@ namespace TrackableData.Protobuf.Tests
                 DictionaryTracker.RollbackTo(tracker.DictionaryTracker);
             if (ListTracker != null)
                 ListTracker.RollbackTo(tracker.ListTracker);
+            if (SetTracker != null)
+                SetTracker.RollbackTo(tracker.SetTracker);
         }
     }
 }

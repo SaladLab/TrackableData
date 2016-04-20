@@ -19,6 +19,8 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using TrackableData.TestKits;
 using Xunit;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 
 #region ITestPocoForContainer
 
@@ -406,6 +408,7 @@ namespace TrackableData.MongoDB.Tests
                 Person.Tracker = value?.PersonTracker;
                 Missions.Tracker = value?.MissionsTracker;
                 Tags.Tracker = value?.TagsTracker;
+                Aliases.Tracker = value?.AliasesTracker;
             }
         }
 
@@ -460,6 +463,8 @@ namespace TrackableData.MongoDB.Tests
                     return Missions as ITrackable;
                 case "Tags":
                     return Tags as ITrackable;
+                case "Aliases":
+                    return Aliases as ITrackable;
                 default:
                     return null;
             }
@@ -476,6 +481,9 @@ namespace TrackableData.MongoDB.Tests
             var trackableTags = Tags as ITrackable;
             if (trackableTags != null && (changedOnly == false || trackableTags.Changed))
                 yield return new KeyValuePair<object, ITrackable>("Tags", trackableTags);
+            var trackableAliases = Aliases as ITrackable;
+            if (trackableAliases != null && (changedOnly == false || trackableAliases.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Aliases", trackableAliases);
         }
 
         private TrackableTestPocoForContainer _Person = new TrackableTestPocoForContainer();
@@ -549,6 +557,30 @@ namespace TrackableData.MongoDB.Tests
             get { return _Tags; }
             set { _Tags = (TrackableList<TagData>)value; }
         }
+
+        private TrackableSet<string> _Aliases = new TrackableSet<string>();
+
+        public TrackableSet<string> Aliases
+        {
+            get
+            {
+                return _Aliases;
+            }
+            set
+            {
+                if (_Aliases != null)
+                    _Aliases.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.AliasesTracker;
+                _Aliases = value;
+            }
+        }
+
+        TrackableSet<string> ITestContainer.Aliases
+        {
+            get { return _Aliases; }
+            set { _Aliases = (TrackableSet<string>)value; }
+        }
     }
 
     public class TrackableTestContainerTracker : IContainerTracker<ITestContainer>
@@ -556,6 +588,7 @@ namespace TrackableData.MongoDB.Tests
         public TrackablePocoTracker<ITestPocoForContainer> PersonTracker { get; set; } = new TrackablePocoTracker<ITestPocoForContainer>();
         public TrackableDictionaryTracker<int, MissionData> MissionsTracker { get; set; } = new TrackableDictionaryTracker<int, MissionData>();
         public TrackableListTracker<TagData> TagsTracker { get; set; } = new TrackableListTracker<TagData>();
+        public TrackableSetTracker<string> AliasesTracker { get; set; } = new TrackableSetTracker<string>();
 
         public override string ToString()
         {
@@ -592,6 +625,16 @@ namespace TrackableData.MongoDB.Tests
                 sb.Append(TagsTracker);
             }
 
+            if (AliasesTracker != null && AliasesTracker.HasChange)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(", ");
+                sb.Append("Aliases:");
+                sb.Append(AliasesTracker);
+            }
+
             sb.Append(" }");
             return sb.ToString();
         }
@@ -604,6 +647,7 @@ namespace TrackableData.MongoDB.Tests
                     (PersonTracker != null && PersonTracker.HasChange) ||
                     (MissionsTracker != null && MissionsTracker.HasChange) ||
                     (TagsTracker != null && TagsTracker.HasChange) ||
+                    (AliasesTracker != null && AliasesTracker.HasChange) ||
                     false;
             }
         }
@@ -622,6 +666,8 @@ namespace TrackableData.MongoDB.Tests
                 MissionsTracker.Clear();
             if (TagsTracker != null)
                 TagsTracker.Clear();
+            if (AliasesTracker != null)
+                AliasesTracker.Clear();
         }
 
         public void ApplyTo(object trackable)
@@ -637,6 +683,8 @@ namespace TrackableData.MongoDB.Tests
                 MissionsTracker.ApplyTo(trackable.Missions);
             if (TagsTracker != null)
                 TagsTracker.ApplyTo(trackable.Tags);
+            if (AliasesTracker != null)
+                AliasesTracker.ApplyTo(trackable.Aliases);
         }
 
         public void ApplyTo(ITracker tracker)
@@ -657,6 +705,8 @@ namespace TrackableData.MongoDB.Tests
                 MissionsTracker.ApplyTo(tracker.MissionsTracker);
             if (TagsTracker != null)
                 TagsTracker.ApplyTo(tracker.TagsTracker);
+            if (AliasesTracker != null)
+                AliasesTracker.ApplyTo(tracker.AliasesTracker);
         }
 
         public void RollbackTo(object trackable)
@@ -672,6 +722,8 @@ namespace TrackableData.MongoDB.Tests
                 MissionsTracker.RollbackTo(trackable.Missions);
             if (TagsTracker != null)
                 TagsTracker.RollbackTo(trackable.Tags);
+            if (AliasesTracker != null)
+                AliasesTracker.RollbackTo(trackable.Aliases);
         }
 
         public void RollbackTo(ITracker tracker)
@@ -692,6 +744,8 @@ namespace TrackableData.MongoDB.Tests
                 MissionsTracker.RollbackTo(tracker.MissionsTracker);
             if (TagsTracker != null)
                 TagsTracker.RollbackTo(tracker.TagsTracker);
+            if (AliasesTracker != null)
+                AliasesTracker.RollbackTo(tracker.AliasesTracker);
         }
     }
 }

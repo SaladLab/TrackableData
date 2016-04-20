@@ -13,5 +13,8 @@ namespace TrackableData.Protobuf.Tests
 
         [ProtoMember(3)]
         TrackableList<string> List { get; set; }
+
+        [ProtoMember(4)]
+        TrackableSet<int> Set { get; set; }
     }
 }

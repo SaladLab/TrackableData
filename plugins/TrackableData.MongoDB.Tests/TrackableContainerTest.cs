@@ -21,6 +21,7 @@ namespace TrackableData.MongoDB.Tests
         TrackableTestPocoForContainer Person { get; set; }
         TrackableDictionary<int, MissionData> Missions { get; set; }
         TrackableList<TagData> Tags { get; set; }
+        TrackableSet<string> Aliases { get; set; }
     }
 
     public class TrackableContainerTest :
@@ -35,7 +36,7 @@ namespace TrackableData.MongoDB.Tests
         private ObjectId _testId = ObjectId.GenerateNewId();
 
         public TrackableContainerTest(Database db)
-            : base(true)
+            : base(true, true)
         {
             _db = db;
             _db.Test.DropCollectionAsync(nameof(TrackableContainerTest)).Wait();
@@ -85,7 +86,7 @@ namespace TrackableData.MongoDB.Tests
         private ObjectId _testId = ObjectId.GenerateNewId();
 
         public TrackableContainerTestWithHeadKeysTest(Database db)
-            : base(true)
+            : base(true, true)
         {
             _db = db;
             _db.Test.DropCollectionAsync(nameof(TrackableContainerTestWithHeadKeysTest)).Wait();

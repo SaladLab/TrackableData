@@ -14,7 +14,7 @@ namespace TrackableData.SqlTestKits
         private int _testId = 1;
 
         public TrackableContainerTest(IDbConnectionProvider dbConnectionProvider, ISqlProvider sqlProvider)
-            : base(false)
+            : base(false, true)
         {
             _db = dbConnectionProvider;
             _mapper = new TrackableContainerSqlMapper<ITestContainer>(
@@ -31,6 +31,12 @@ namespace TrackableData.SqlTestKits
                         "TrackableContainerMission",
                         new ColumnDefinition("MissionId"),
                         new[] { new ColumnDefinition("ContainerId", typeof(int)) },
+                    }),
+                    Tuple.Create("Aliases", new object[]
+                    {
+                        "TrackableContainerAlias",
+                        new ColumnDefinition("Value", typeof(string), 64),
+                        new[] { new ColumnDefinition("ContainerId", typeof(int)) }
                     }),
                 });
             _mapper.ResetTableAsync(_db.Connection, true).Wait();

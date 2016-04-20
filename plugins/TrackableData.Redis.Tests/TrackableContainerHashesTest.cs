@@ -17,7 +17,7 @@ namespace TrackableData.Redis.Tests
         private string _testId = "TestContainerHashes";
 
         public TrackableContainerHashesTest(Redis redis)
-            : base(true)
+            : base(true, true)
         {
             _db = redis.Db;
         }

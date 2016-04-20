@@ -1,4 +1,5 @@
-﻿using ProtoBuf.Meta;
+﻿using System.Linq;
+using ProtoBuf.Meta;
 using Xunit;
 
 namespace TrackableData.Protobuf.Tests
@@ -25,6 +26,10 @@ namespace TrackableData.Protobuf.Tests
                     "One",
                     "Two",
                     "Three"
+                },
+                Set = new TrackableSet<int>()
+                {
+                    1, 2, 3
                 }
             };
         }
@@ -45,6 +50,8 @@ namespace TrackableData.Protobuf.Tests
                  .SetSurrogate(typeof(TrackableDictionaryTrackerSurrogate<int, string>));
             model.Add(typeof(TrackableListTracker<string>), false)
                  .SetSurrogate(typeof(TrackableListTrackerSurrogate<string>));
+            model.Add(typeof(TrackableSetTracker<int>), false)
+                 .SetSurrogate(typeof(TrackableSetTrackerSurrogate<int>));
             return model;
         }
 
@@ -79,6 +86,11 @@ namespace TrackableData.Protobuf.Tests
             c.List.RemoveAt(1);
             c.List.Insert(1, "TwoInserted");
 
+            c.Set.Remove(1);
+            c.Set.Remove(2);
+            c.Set.Add(4);
+            c.Set.Add(5);
+
             // Assert
 
             var typeModel = CreateTypeModel();
@@ -89,8 +101,9 @@ namespace TrackableData.Protobuf.Tests
 
             Assert.Equal(c.Person.Name, c2.Person.Name);
             Assert.Equal(c.Person.Age, c2.Person.Age);
-            Assert.Equal(c.Dictionary.Count, c2.Dictionary.Count);
-            Assert.Equal(c.List.Count, c2.List.Count);
+            Assert.Equal(c.Dictionary.OrderBy(x => x.Key), c2.Dictionary.OrderBy(x => x.Key));
+            Assert.Equal(c.List, c2.List);
+            Assert.Equal(c.Set.OrderBy(x => x), c2.Set.OrderBy(x => x));
         }
     }
 }

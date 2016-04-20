@@ -18,6 +18,7 @@ namespace TrackableData.Redis.Tests
         TrackableTestPocoForContainer Person { get; set; }
         TrackableDictionary<int, MissionData> Missions { get; set; }
         TrackableList<TagData> Tags { get; set; }
+        TrackableSet<string> Aliases { get; set; }
     }
 
     public class TrackableContainerTest :
@@ -31,7 +32,7 @@ namespace TrackableData.Redis.Tests
         private string _testId = "TestContainer";
 
         public TrackableContainerTest(Redis redis)
-            : base(true)
+            : base(true, true)
         {
             _db = redis.Db;
         }

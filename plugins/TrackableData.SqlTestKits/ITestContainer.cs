@@ -6,5 +6,6 @@ namespace TrackableData.SqlTestKits
     {
         TrackableTestPocoForContainer Person { get; set; }
         TrackableDictionary<int, MissionData> Missions { get; set; }
+        TrackableSet<string> Aliases { get; set; }
     }
 }

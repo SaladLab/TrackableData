@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -22,6 +23,7 @@ namespace TrackableData.TestKits
         where TTrackablePerson : ITrackablePoco, new()
     {
         private bool _useList;
+        private bool _useSet;
 
         protected abstract Task CreateAsync(TTrackableContainer person);
         protected abstract Task<int> DeleteAsync();
@@ -30,9 +32,10 @@ namespace TrackableData.TestKits
         protected abstract IEnumerable<ITrackable> GetTrackables(TTrackableContainer person);
         protected abstract IEnumerable<ITracker> GetTrackers(TTrackableContainer person);
 
-        protected StorageContainerTestKit(bool useList)
+        protected StorageContainerTestKit(bool useList, bool useSet)
         {
             _useList = useList;
+            _useSet = useSet;
         }
 
         private TTrackableContainer CreateTestContainer(bool withTracker)
@@ -48,6 +51,12 @@ namespace TrackableData.TestKits
             if (_useList)
             {
                 container.Tags = tags;
+            }
+
+            var aliases = new TrackableSet<string>();
+            if (_useSet)
+            {
+                container.Aliases = aliases;
             }
 
             if (withTracker)
@@ -80,11 +89,19 @@ namespace TrackableData.TestKits
                 tags.Add(new TagData { Text = "World", Priority = 2 });
             }
 
+            // Aliases
+            if (_useSet)
+            {
+                aliases.Add("alpha");
+                aliases.Add("beta");
+                aliases.Add("gamma");
+            }
+
             return container;
         }
 
-        private void AssertEqualDictionary(TrackableDictionary<int, MissionData> a,
-                                           TrackableDictionary<int, MissionData> b)
+        private void AssertEqual(TrackableDictionary<int, MissionData> a,
+                                 TrackableDictionary<int, MissionData> b)
         {
             Assert.Equal(a.Count, b.Count);
             foreach (var item in a)
@@ -97,7 +114,7 @@ namespace TrackableData.TestKits
             }
         }
 
-        private void AssertEqualDictionary(TrackableList<TagData> a, TrackableList<TagData> b)
+        private void AssertEqual(TrackableList<TagData> a, TrackableList<TagData> b)
         {
             Assert.Equal(a.Count, b.Count);
             for (var i = 0; i < a.Count; i++)
@@ -109,6 +126,23 @@ namespace TrackableData.TestKits
             }
         }
 
+        private void AssertEqual(TrackableSet<string> a, TrackableSet<string> b)
+        {
+            Assert.Equal(a.OrderBy(x => x).ToList(), b.OrderBy(x => x).ToList());
+        }
+
+        private void AssertContainerEqual(dynamic a, dynamic b)
+        {
+            Assert.Equal(a.Person.Name, b.Person.Name);
+            Assert.Equal(a.Person.Age, b.Person.Age);
+            Assert.Equal(a.Missions.Count, b.Missions.Count);
+            AssertEqual(a.Missions, b.Missions);
+            if (_useList)
+                AssertEqual(a.Tags, b.Tags);
+            if (_useSet)
+                AssertEqual(a.Aliases, b.Aliases);
+        }
+
         [Fact]
         public async Task Test_CreateAndLoad()
         {
@@ -116,12 +150,7 @@ namespace TrackableData.TestKits
             await CreateAsync(container);
 
             dynamic container2 = await LoadAsync();
-            Assert.Equal(container.Person.Name, container2.Person.Name);
-            Assert.Equal(container.Person.Age, container2.Person.Age);
-            Assert.Equal(container.Missions.Count, container2.Missions.Count);
-            AssertEqualDictionary(container.Missions, container2.Missions);
-            if (_useList)
-                AssertEqualDictionary(container.Tags, container2.Tags);
+            AssertContainerEqual(container, container2);
         }
 
         [Fact]
@@ -168,7 +197,18 @@ namespace TrackableData.TestKits
             // modify tags
 
             if (_useList)
+            {
+                container.Tags.RemoveAt(0);
                 container.Tags.Add(new TagData { Text = "Data", Priority = 3 });
+            }
+
+            // modify aliases
+
+            if (_useSet)
+            {
+                container.Aliases.Remove("alpha");
+                container.Aliases.Add("delta");
+            }
 
             // save modification
 
@@ -178,10 +218,7 @@ namespace TrackableData.TestKits
             // check equality
 
             dynamic container2 = await LoadAsync();
-            Assert.Equal(container.Person.Age, container2.Person.Age);
-            AssertEqualDictionary(container.Missions, container2.Missions);
-            if (_useList)
-                AssertEqualDictionary(container.Tags, container2.Tags);
+            AssertContainerEqual(container, container2);
         }
 
         [Fact]
@@ -189,27 +226,14 @@ namespace TrackableData.TestKits
         {
             dynamic container = CreateTestContainer(false);
             var trackables = new HashSet<ITrackable>(GetTrackables(container));
-            if (_useList)
-            {
-                Assert.Equal(new HashSet<ITrackable>(
-                                 new ITrackable[]
-                                 {
-                                     container.Person,
-                                     container.Missions,
-                                     container.Tags
-                                 }),
-                             trackables);
-            }
-            else
-            {
-                Assert.Equal(new HashSet<ITrackable>(
-                                 new ITrackable[]
-                                 {
-                                     container.Person,
-                                     container.Missions
-                                 }),
-                             trackables);
-            }
+            Assert.Equal(new ITrackable[]
+                         {
+                            container.Person,
+                            container.Missions,
+                            _useList ? container.Tags : null,
+                            _useSet ? container.Aliases : null,
+                         }.Where(x => x != null).OrderBy(x => x.GetHashCode()),
+                         trackables.OrderBy(x => x.GetHashCode()));
         }
 
         [Fact]
@@ -217,27 +241,14 @@ namespace TrackableData.TestKits
         {
             dynamic container = CreateTestContainer(true);
             var trackers = new HashSet<ITracker>(GetTrackers(container));
-            if (_useList)
-            {
-                Assert.Equal(new HashSet<ITracker>(
-                                 new ITracker[]
-                                 {
-                                     container.Person.Tracker,
-                                     container.Missions.Tracker,
-                                     container.Tags.Tracker
-                                 }),
-                             trackers);
-            }
-            else
-            {
-                Assert.Equal(new HashSet<ITracker>(
-                                 new ITracker[]
-                                 {
-                                     container.Person.Tracker,
-                                     container.Missions.Tracker
-                                 }),
-                             trackers);
-            }
+            Assert.Equal(new ITracker[]
+                        {
+                            container.Person.Tracker,
+                            container.Missions.Tracker,
+                            _useList ? container.Tags.Tracker : null,
+                            _useSet ? container.Aliases.Tracker : null,
+                        }.Where(x => x != null).OrderBy(x => x.GetHashCode()),
+                        trackers.OrderBy(x => x.GetHashCode()));
         }
     }
 }

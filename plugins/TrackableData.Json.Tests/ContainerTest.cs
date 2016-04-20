@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Linq;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace TrackableData.Json.Tests
@@ -51,8 +52,8 @@ namespace TrackableData.Json.Tests
                     new TrackableContainerTrackerJsonConverter(),
                     new TrackablePocoTrackerJsonConverter<IPerson>(),
                     new TrackableDictionaryTrackerJsonConverter<int, string>(),
-                    new TrackableSetTrackerJsonConverter<int>(),
                     new TrackableListTrackerJsonConverter<string>(),
+                    new TrackableSetTrackerJsonConverter<int>(),
                 }
             };
         }
@@ -102,6 +103,9 @@ namespace TrackableData.Json.Tests
 
             Assert.Equal(c.Person.Name, c2.Person.Name);
             Assert.Equal(c.Person.Age, c2.Person.Age);
+            Assert.Equal(c.Dictionary.OrderBy(x => x.Key), c2.Dictionary.OrderBy(x => x.Key));
+            Assert.Equal(c.List, c2.List);
+            Assert.Equal(c.Set.OrderBy(x => x), c2.Set.OrderBy(x => x));
         }
     }
 }

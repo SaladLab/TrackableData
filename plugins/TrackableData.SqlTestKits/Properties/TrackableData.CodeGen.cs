@@ -1029,6 +1029,7 @@ namespace TrackableData.SqlTestKits
                 _tracker = value;
                 Person.Tracker = value?.PersonTracker;
                 Missions.Tracker = value?.MissionsTracker;
+                Aliases.Tracker = value?.AliasesTracker;
             }
         }
 
@@ -1081,6 +1082,8 @@ namespace TrackableData.SqlTestKits
                     return Person as ITrackable;
                 case "Missions":
                     return Missions as ITrackable;
+                case "Aliases":
+                    return Aliases as ITrackable;
                 default:
                     return null;
             }
@@ -1094,6 +1097,9 @@ namespace TrackableData.SqlTestKits
             var trackableMissions = Missions as ITrackable;
             if (trackableMissions != null && (changedOnly == false || trackableMissions.Changed))
                 yield return new KeyValuePair<object, ITrackable>("Missions", trackableMissions);
+            var trackableAliases = Aliases as ITrackable;
+            if (trackableAliases != null && (changedOnly == false || trackableAliases.Changed))
+                yield return new KeyValuePair<object, ITrackable>("Aliases", trackableAliases);
         }
 
         private TrackableTestPocoForContainer _Person = new TrackableTestPocoForContainer();
@@ -1143,12 +1149,37 @@ namespace TrackableData.SqlTestKits
             get { return _Missions; }
             set { _Missions = (TrackableDictionary<int, MissionData>)value; }
         }
+
+        private TrackableSet<string> _Aliases = new TrackableSet<string>();
+
+        public TrackableSet<string> Aliases
+        {
+            get
+            {
+                return _Aliases;
+            }
+            set
+            {
+                if (_Aliases != null)
+                    _Aliases.Tracker = null;
+                if (value != null)
+                    value.Tracker = Tracker?.AliasesTracker;
+                _Aliases = value;
+            }
+        }
+
+        TrackableSet<string> ITestContainer.Aliases
+        {
+            get { return _Aliases; }
+            set { _Aliases = (TrackableSet<string>)value; }
+        }
     }
 
     public class TrackableTestContainerTracker : IContainerTracker<ITestContainer>
     {
         public TrackablePocoTracker<ITestPocoForContainer> PersonTracker { get; set; } = new TrackablePocoTracker<ITestPocoForContainer>();
         public TrackableDictionaryTracker<int, MissionData> MissionsTracker { get; set; } = new TrackableDictionaryTracker<int, MissionData>();
+        public TrackableSetTracker<string> AliasesTracker { get; set; } = new TrackableSetTracker<string>();
 
         public override string ToString()
         {
@@ -1175,6 +1206,16 @@ namespace TrackableData.SqlTestKits
                 sb.Append(MissionsTracker);
             }
 
+            if (AliasesTracker != null && AliasesTracker.HasChange)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(", ");
+                sb.Append("Aliases:");
+                sb.Append(AliasesTracker);
+            }
+
             sb.Append(" }");
             return sb.ToString();
         }
@@ -1186,6 +1227,7 @@ namespace TrackableData.SqlTestKits
                 return
                     (PersonTracker != null && PersonTracker.HasChange) ||
                     (MissionsTracker != null && MissionsTracker.HasChange) ||
+                    (AliasesTracker != null && AliasesTracker.HasChange) ||
                     false;
             }
         }
@@ -1202,6 +1244,8 @@ namespace TrackableData.SqlTestKits
                 PersonTracker.Clear();
             if (MissionsTracker != null)
                 MissionsTracker.Clear();
+            if (AliasesTracker != null)
+                AliasesTracker.Clear();
         }
 
         public void ApplyTo(object trackable)
@@ -1215,6 +1259,8 @@ namespace TrackableData.SqlTestKits
                 PersonTracker.ApplyTo(trackable.Person);
             if (MissionsTracker != null)
                 MissionsTracker.ApplyTo(trackable.Missions);
+            if (AliasesTracker != null)
+                AliasesTracker.ApplyTo(trackable.Aliases);
         }
 
         public void ApplyTo(ITracker tracker)
@@ -1233,6 +1279,8 @@ namespace TrackableData.SqlTestKits
                 PersonTracker.ApplyTo(tracker.PersonTracker);
             if (MissionsTracker != null)
                 MissionsTracker.ApplyTo(tracker.MissionsTracker);
+            if (AliasesTracker != null)
+                AliasesTracker.ApplyTo(tracker.AliasesTracker);
         }
 
         public void RollbackTo(object trackable)
@@ -1246,6 +1294,8 @@ namespace TrackableData.SqlTestKits
                 PersonTracker.RollbackTo(trackable.Person);
             if (MissionsTracker != null)
                 MissionsTracker.RollbackTo(trackable.Missions);
+            if (AliasesTracker != null)
+                AliasesTracker.RollbackTo(trackable.Aliases);
         }
 
         public void RollbackTo(ITracker tracker)
@@ -1264,6 +1314,8 @@ namespace TrackableData.SqlTestKits
                 PersonTracker.RollbackTo(tracker.PersonTracker);
             if (MissionsTracker != null)
                 MissionsTracker.RollbackTo(tracker.MissionsTracker);
+            if (AliasesTracker != null)
+                AliasesTracker.RollbackTo(tracker.AliasesTracker);
         }
     }
 }
