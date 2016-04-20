@@ -18,19 +18,30 @@ namespace TrackableData.TestKits
             _useDuplicateCheck = useDuplicateCheck;
         }
 
-        [Fact]
-        public async Task Test_CreateAndLoad()
+        private TTrackablePoco CreateTestPoco()
         {
             dynamic person = new TTrackablePoco();
             person.Id = default(TId);
             person.Name = "Testor";
             person.Age = 10;
+            return person;
+        }
+
+        private void AssertEqualPoco(dynamic a, dynamic b)
+        {
+            Assert.Equal(a.Id, b.Id);
+            Assert.Equal(a.Name, b.Name);
+            Assert.Equal(a.Age, b.Age);
+        }
+
+        [Fact]
+        public async Task Test_CreateAndLoad()
+        {
+            dynamic person = CreateTestPoco();
             await CreateAsync(person);
 
             var person2 = await LoadAsync(person.Id);
-            Assert.Equal(person.Id, person2.Id);
-            Assert.Equal(person.Name, person2.Name);
-            Assert.Equal(person.Age, person2.Age);
+            AssertEqualPoco(person, person2);
         }
 
         [Fact]
@@ -39,10 +50,7 @@ namespace TrackableData.TestKits
             if (_useDuplicateCheck == false)
                 return;
 
-            dynamic person = new TTrackablePoco();
-            person.Id = default(TId);
-            person.Name = "Testor";
-            person.Age = 10;
+            dynamic person = CreateTestPoco();
             await CreateAsync(person);
             var e = await Record.ExceptionAsync(async () => await CreateAsync(person));
             Assert.NotNull(e);
@@ -66,20 +74,16 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_Save()
         {
-            dynamic person = new TTrackablePoco();
-            person.Id = default(TId);
-            person.Name = "Alice";
+            dynamic person = CreateTestPoco();
             await CreateAsync(person);
 
             ((ITrackable)person).SetDefaultTracker();
-            person.Name = "Testor";
-            person.Age = 10;
+            person.Name = "Alice";
+            person.Age = 11;
             await SaveAsync(person, person.Id);
 
             var person2 = await LoadAsync(person.Id);
-            Assert.Equal(person.Id, person2.Id);
-            Assert.Equal(person.Name, person2.Name);
-            Assert.Equal(person.Age, person2.Age);
+            AssertEqualPoco(person, person2);
         }
     }
 }

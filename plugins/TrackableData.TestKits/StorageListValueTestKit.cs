@@ -18,11 +18,9 @@ namespace TrackableData.TestKits
             _useDuplicateCheck = useDuplicateCheck;
         }
 
-        private TrackableList<string> CreateTestList(bool withTracker)
+        private TrackableList<string> CreateTestList()
         {
             var list = new TrackableList<string>();
-            if (withTracker)
-                list.SetDefaultTracker();
             list.Add("One");
             list.Add("Two");
             list.Add("Three");
@@ -43,7 +41,7 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_CreateAndLoad()
         {
-            var list = CreateTestList(false);
+            var list = CreateTestList();
             await CreateAsync(list);
 
             var list2 = await LoadAsync();
@@ -56,7 +54,7 @@ namespace TrackableData.TestKits
             if (_useDuplicateCheck == false)
                 return;
 
-            var list = CreateTestList(false);
+            var list = CreateTestList();
             await CreateAsync(list);
             var e = await Record.ExceptionAsync(async () => await CreateAsync(list));
             Assert.NotNull(e);
@@ -65,7 +63,7 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_Delete()
         {
-            var list = CreateTestList(false);
+            var list = CreateTestList();
             await CreateAsync(list);
 
             var count = await DeleteAsync();
@@ -78,10 +76,10 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_Save()
         {
-            var list = CreateTestList(true);
-            await SaveAsync(list);
-            list.Tracker.Clear();
+            var list = CreateTestList();
+            await CreateAsync(list);
 
+            list.SetDefaultTracker();
             ModifyListForTest(list);
             await SaveAsync(list);
 

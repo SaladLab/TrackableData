@@ -42,12 +42,13 @@ namespace TrackableData.TestKits
         public async Task Test_Save()
         {
             dynamic person = new TTrackablePoco();
-            person.Name = "Alice";
+            person.Name = "Testor";
+            person.Age = 10;
             await CreateAsync(person);
 
             ((ITrackable)person).SetDefaultTracker();
-            person.Name = "Testor";
-            person.Age = 10;
+            person.Name = "Alice";
+            person.Age = 11;
             await SaveAsync(person, person.Id);
 
             var person2 = await LoadAsync(person.Id);

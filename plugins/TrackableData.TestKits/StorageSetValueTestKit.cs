@@ -19,11 +19,9 @@ namespace TrackableData.TestKits
             _useDuplicateCheck = useDuplicateCheck;
         }
 
-        private TrackableSet<int> CreateTestSet(bool withTracker)
+        private TrackableSet<int> CreateTestSet()
         {
             var set = new TrackableSet<int>();
-            if (withTracker)
-                set.SetDefaultTracker();
             set.Add(1);
             set.Add(2);
             set.Add(3);
@@ -41,7 +39,7 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_CreateAndLoad()
         {
-            var set = CreateTestSet(false);
+            var set = CreateTestSet();
             await CreateAsync(set);
 
             var set2 = await LoadAsync();
@@ -54,7 +52,7 @@ namespace TrackableData.TestKits
             if (_useDuplicateCheck == false)
                 return;
 
-            var set = CreateTestSet(false);
+            var set = CreateTestSet();
             await CreateAsync(set);
             var e = await Record.ExceptionAsync(async () => await CreateAsync(set));
             Assert.NotNull(e);
@@ -63,7 +61,7 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_Delete()
         {
-            var set = CreateTestSet(false);
+            var set = CreateTestSet();
             await CreateAsync(set);
 
             var count = await DeleteAsync();
@@ -76,10 +74,10 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_Save()
         {
-            var set = CreateTestSet(true);
-            await SaveAsync(set);
-            set.Tracker.Clear();
+            var set = CreateTestSet();
+            await CreateAsync(set);
 
+            set.SetDefaultTracker();
             ModifySetForTest(set);
             await SaveAsync(set);
 

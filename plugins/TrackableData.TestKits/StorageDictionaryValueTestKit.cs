@@ -20,16 +20,12 @@ namespace TrackableData.TestKits
             _useDuplicateCheck = useDuplicateCheck;
         }
 
-        private TrackableDictionary<TKey, string> CreateTestDictionary(bool withTracker)
+        private TrackableDictionary<TKey, string> CreateTestDictionary()
         {
             var dict = new TrackableDictionary<TKey, string>();
-            if (withTracker)
-                dict.SetDefaultTracker();
-
             dict.Add(CreateKey(1), "One");
             dict.Add(CreateKey(2), "Two");
             dict.Add(CreateKey(3), "Three");
-
             return dict;
         }
 
@@ -41,7 +37,7 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_CreateAndLoad()
         {
-            var dict = CreateTestDictionary(false);
+            var dict = CreateTestDictionary();
             await CreateAsync(dict);
 
             var dict2 = await LoadAsync();
@@ -54,7 +50,7 @@ namespace TrackableData.TestKits
             if (_useDuplicateCheck == false)
                 return;
 
-            var dict = CreateTestDictionary(false);
+            var dict = CreateTestDictionary();
             await CreateAsync(dict);
             var e = await Record.ExceptionAsync(async () => await CreateAsync(dict));
             Assert.NotNull(e);
@@ -63,7 +59,7 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_Delete()
         {
-            var dict = CreateTestDictionary(false);
+            var dict = CreateTestDictionary();
             await CreateAsync(dict);
 
             var count = await DeleteAsync();
@@ -76,11 +72,10 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_Save()
         {
-            var dict = CreateTestDictionary(true);
+            var dict = CreateTestDictionary();
+            await CreateAsync(dict);
 
-            await SaveAsync(dict);
-            dict.Tracker.Clear();
-
+            dict.SetDefaultTracker();
             dict.Remove(CreateKey(1));
             dict[CreateKey(2)] = "TwoTwo";
             dict.Add(CreateKey(4), "Four");
