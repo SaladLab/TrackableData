@@ -10,6 +10,7 @@ namespace TrackableData.SqlTestKits
         private TrackablePocoSqlMapper<ITestPoco> _mapper;
 
         protected TrackablePocoTest(IDbConnectionProvider dbConnectionProvider, ISqlProvider sqlProvider)
+            : base(useDuplicateCheck: true)
         {
             _db = dbConnectionProvider;
             _mapper = new TrackablePocoSqlMapper<ITestPoco>(sqlProvider, nameof(TrackablePocoTest));

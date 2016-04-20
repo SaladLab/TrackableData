@@ -30,6 +30,7 @@ namespace TrackableData.MongoDB.Tests
         private IMongoCollection<BsonDocument> _collection;
 
         public TrackablePocoTest(Database db)
+            : base(useDuplicateCheck: true)
         {
             _db = db;
             _db.Test.DropCollectionAsync(nameof(TrackablePocoTest)).Wait();

@@ -50,8 +50,8 @@ namespace TrackableData.SqlTestKits
             var id = 2;
             var c0 = new TrackableTestContainerWithIgnore();
             await _mapper.CreateAsync(_db.Connection, c0, id);
-            ((ITrackable)c0).SetDefaultTracker();
 
+            ((ITrackable)c0).SetDefaultTracker();
             c0.Person.Name = "Testor";
             c0.Person.Age = 10;
             c0.Missions[1] = new MissionData { Kind = 101, Count = 20, Note = "Ignored" };

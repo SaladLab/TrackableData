@@ -14,7 +14,7 @@ namespace TrackableData.SqlTestKits
         private int _testId = 1;
 
         public TrackableContainerTest(IDbConnectionProvider dbConnectionProvider, ISqlProvider sqlProvider)
-            : base(false, true)
+            : base(useList: false, useSet: true, useDuplicateCheck: true)
         {
             _db = dbConnectionProvider;
             _mapper = new TrackableContainerSqlMapper<ITestContainer>(

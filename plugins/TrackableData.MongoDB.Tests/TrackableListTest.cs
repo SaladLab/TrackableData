@@ -17,6 +17,7 @@ namespace TrackableData.MongoDB.Tests
         private ObjectId _testId = ObjectId.GenerateNewId();
 
         public TrackableListStringTest(Database db)
+            : base(useDuplicateCheck: true)
         {
             _db = db;
             _db.Test.DropCollectionAsync(nameof(TrackableListStringTest)).Wait();

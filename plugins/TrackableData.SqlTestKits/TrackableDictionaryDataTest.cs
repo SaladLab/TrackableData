@@ -11,6 +11,7 @@ namespace TrackableData.SqlTestKits
         private TrackableDictionarySqlMapper<int, ItemData> _mapper;
 
         public TrackableDictionaryDataTest(IDbConnectionProvider dbConnectionProvider, ISqlProvider sqlProvider)
+            : base(useDuplicateCheck: true)
         {
             _db = dbConnectionProvider;
             _mapper = new TrackableDictionarySqlMapper<int, ItemData>(

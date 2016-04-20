@@ -36,7 +36,7 @@ namespace TrackableData.MongoDB.Tests
         private ObjectId _testId = ObjectId.GenerateNewId();
 
         public TrackableContainerTest(Database db)
-            : base(true, true)
+            : base(useList: true, useSet: true, useDuplicateCheck: true)
         {
             _db = db;
             _db.Test.DropCollectionAsync(nameof(TrackableContainerTest)).Wait();

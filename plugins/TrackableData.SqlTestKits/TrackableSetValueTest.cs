@@ -11,6 +11,7 @@ namespace TrackableData.SqlTestKits
         private TrackableSetSqlMapper<int> _mapper;
 
         public TrackableSetValueTest(IDbConnectionProvider dbConnectionProvider, ISqlProvider sqlProvider)
+            : base(useDuplicateCheck: true)
         {
             _db = dbConnectionProvider;
             _mapper = new TrackableSetSqlMapper<int>(
