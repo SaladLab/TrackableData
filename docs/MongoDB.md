@@ -90,8 +90,7 @@ await mapper.CreateAsync(collection, person);
 CreateAsync method generates following command and run it on MongoDB.
 
 ```javascript
-// TODO
-db.collection.insert({ _id: ObjectID(1), Name: "Testor", Age: 10 })
+db.collection.insert({ _id: 1, Name: "Testor", Age: 10 })
 ```
 
 #### Read data
@@ -106,8 +105,7 @@ Print(person);                    // { Id:1, Name:"Tester", Age:10 }
 LoadAsync method generates following command and run it on redis for fetching data.
 
 ```javascript
-// TODO
-db.inventory.find( { _id: ObjectID(1) } )
+db.inventory.find({ _id: 1 })
 ```
 
 #### Update data
@@ -125,9 +123,8 @@ return mapper.SaveAsync(collection, person.Tracker, person.Id);
 SaveAsync method generates following command and run it on MongoDB.
 
 ```javascript
-// TODO
 db.collection.update(
-  { _id: ObjectID(1) },
+  { _id: 1 },
   { $set: { Name: "Admin", Age: 20 } })
 ```
 
@@ -142,8 +139,7 @@ await mapper.DeleteAsync(collection, 1);
 DeleteAsync method generates following command and run it on MongoDB.
 
 ```javascript
-// TODO
-db.collection.remove({ _id : ObjectID(1) })
+db.collection.remove({ _id : 1 })
 ```
 
 ### Type-Mapping
@@ -244,27 +240,34 @@ we can get hierarchy with help of it.
 Without headkey, all trackable data is treated as top-level document.
 
 ```csharp
-await mapper.CreateAsync(collection, person, 1);
-await mapper.CreateAsync(collection, person, 2);
+await mapper.CreateAsync(collection, person1); // person1.Id = 1
+await mapper.CreateAsync(collection, person2); // person2.Id = 2
 ```
 
 You can see person 1 and 2 are documents.
 
 ```javascript
-TODO
+db.collection.insert({ _id: 1, Name: "Testor", Age: 10 })
+db.collection.insert({ _id: 2, Name: "Testor", Age: 10 })
 ```
 
 But with headkey, trackable data could be a part of top-level document.
 
 ```csharp
-await mapper.CreateAsync(collection, person, 1, "Head");
-await mapper.CreateAsync(collection, person, 2, "Head");
+await mapper.CreateAsync(collection, person1, "Head"); // person1.Id = 1
+await mapper.CreateAsync(collection, person2, "Head"); // person2.Id = 2
 ```
 
 You can see person 1 and 2 are in same document whose id is "Head".
 
 ```javascript
-TODO
+db.collection.insert(
+  { _id: "Head" },
+  { $set: { "1": { "Name": "Admin", Age: 20 } } })
+
+db.collection.update(
+  { _id: "Head" },
+  { $set: { "2": { "Name": "Admin", Age: 20 } } })
 ```
 
 #### UniqueInt64Id
