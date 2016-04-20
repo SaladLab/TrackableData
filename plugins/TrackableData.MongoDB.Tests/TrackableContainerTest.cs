@@ -4,6 +4,8 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using TrackableData.TestKits;
 using Xunit;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace TrackableData.MongoDB.Tests
 {
@@ -88,7 +90,7 @@ namespace TrackableData.MongoDB.Tests
             _db = db;
             _db.Test.DropCollectionAsync(nameof(TrackableContainerTestWithHeadKeysTest)).Wait();
             _collection = _db.Test.GetCollection<BsonDocument>(nameof(TrackableContainerTestWithHeadKeysTest));
-            _collection.InsertOneAsync(new BsonDocument { { "_id", _testId } });
+            _collection.InsertOneAsync(new BsonDocument { { "_id", _testId } }).Wait();
         }
 
         protected override Task CreateAsync(TrackableTestContainer container)
