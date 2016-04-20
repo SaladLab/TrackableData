@@ -102,7 +102,7 @@ Target "Help" <| fun _ ->
 "Restore" ==> "Coverity"
 
 "Test" ==> "CI"
-"Cover" ==> "CI"
+// "Cover" ==> "CI" // make run faster on appveyor to avoid timeout
 "Nuget" ==> "CI"
 
 RunTargetOrDefault "Help"
