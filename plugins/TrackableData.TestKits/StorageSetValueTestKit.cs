@@ -7,10 +7,17 @@ namespace TrackableData.TestKits
 {
     public abstract class StorageSetValueTestKit
     {
+        private bool _useDuplicateCheck;
+
         protected abstract Task CreateAsync(ICollection<int> set);
         protected abstract Task<int> DeleteAsync();
         protected abstract Task<TrackableSet<int>> LoadAsync();
         protected abstract Task SaveAsync(TrackableSet<int> set);
+
+        protected StorageSetValueTestKit(bool useDuplicateCheck = false)
+        {
+            _useDuplicateCheck = useDuplicateCheck;
+        }
 
         private TrackableSet<int> CreateTestSet(bool withTracker)
         {
@@ -39,6 +46,18 @@ namespace TrackableData.TestKits
 
             var set2 = await LoadAsync();
             Assert.Equal(set.OrderBy(x => x), set2.OrderBy(x => x));
+        }
+
+        [Fact]
+        public async Task Test_CreateAndCreate_DuplicateError()
+        {
+            if (_useDuplicateCheck == false)
+                return;
+
+            var set = CreateTestSet(false);
+            await CreateAsync(set);
+            var e = await Record.ExceptionAsync(async () => await CreateAsync(set));
+            Assert.NotNull(e);
         }
 
         [Fact]

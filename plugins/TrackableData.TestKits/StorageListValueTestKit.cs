@@ -6,10 +6,17 @@ namespace TrackableData.TestKits
 {
     public abstract class StorageListValueTestKit
     {
+        private bool _useDuplicateCheck;
+
         protected abstract Task CreateAsync(IList<string> list);
         protected abstract Task<int> DeleteAsync();
         protected abstract Task<TrackableList<string>> LoadAsync();
         protected abstract Task SaveAsync(TrackableList<string> list);
+
+        protected StorageListValueTestKit(bool useDuplicateCheck = false)
+        {
+            _useDuplicateCheck = useDuplicateCheck;
+        }
 
         private TrackableList<string> CreateTestList(bool withTracker)
         {
@@ -41,6 +48,18 @@ namespace TrackableData.TestKits
 
             var list2 = await LoadAsync();
             Assert.Equal(list, list2);
+        }
+
+        [Fact]
+        public async Task Test_CreateAndCreate_DuplicateError()
+        {
+            if (_useDuplicateCheck == false)
+                return;
+
+            var list = CreateTestList(false);
+            await CreateAsync(list);
+            var e = await Record.ExceptionAsync(async () => await CreateAsync(list));
+            Assert.NotNull(e);
         }
 
         [Fact]

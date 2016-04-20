@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -6,41 +7,63 @@ namespace TrackableData.TestKits
 {
     public abstract class StorageDictionaryValueTestKit<TKey>
     {
+        private bool _useDuplicateCheck;
+
         protected abstract TKey CreateKey(int value);
         protected abstract Task CreateAsync(IDictionary<TKey, string> dictionary);
         protected abstract Task<int> DeleteAsync();
         protected abstract Task<TrackableDictionary<TKey, string>> LoadAsync();
         protected abstract Task SaveAsync(TrackableDictionary<TKey, string> dictionary);
 
-        private void AssertEqualDictionary(TrackableDictionary<TKey, string> a, TrackableDictionary<TKey, string> b)
+        protected StorageDictionaryValueTestKit(bool useDuplicateCheck = false)
         {
-            Assert.Equal(a.Count, b.Count);
-            foreach (var item in a)
-            {
-                Assert.Equal(item.Value, item.Value);
-            }
+            _useDuplicateCheck = useDuplicateCheck;
+        }
+
+        private TrackableDictionary<TKey, string> CreateTestDictionary(bool withTracker)
+        {
+            var dict = new TrackableDictionary<TKey, string>();
+            if (withTracker)
+                dict.SetDefaultTracker();
+
+            dict.Add(CreateKey(1), "One");
+            dict.Add(CreateKey(2), "Two");
+            dict.Add(CreateKey(3), "Three");
+
+            return dict;
+        }
+
+        private void AssertEqual(TrackableDictionary<TKey, string> a, TrackableDictionary<TKey, string> b)
+        {
+            Assert.Equal(a.OrderBy(x => x.Key), b.OrderBy(x => x.Key));
         }
 
         [Fact]
         public async Task Test_CreateAndLoad()
         {
-            var dict = new TrackableDictionary<TKey, string>();
-            dict.Add(CreateKey(1), "One");
-            dict.Add(CreateKey(2), "Two");
-            dict.Add(CreateKey(3), "Three");
-
+            var dict = CreateTestDictionary(false);
             await CreateAsync(dict);
 
             var dict2 = await LoadAsync();
-            AssertEqualDictionary(dict, dict2);
+            AssertEqual(dict, dict2);
+        }
+
+        [Fact]
+        public async Task Test_CreateAndCreate_DuplicateError()
+        {
+            if (_useDuplicateCheck == false)
+                return;
+
+            var dict = CreateTestDictionary(false);
+            await CreateAsync(dict);
+            var e = await Record.ExceptionAsync(async () => await CreateAsync(dict));
+            Assert.NotNull(e);
         }
 
         [Fact]
         public async Task Test_Delete()
         {
-            var dict = new TrackableDictionary<TKey, string>();
-            dict.Add(CreateKey(1), "One");
-
+            var dict = CreateTestDictionary(false);
             await CreateAsync(dict);
 
             var count = await DeleteAsync();
@@ -53,11 +76,7 @@ namespace TrackableData.TestKits
         [Fact]
         public async Task Test_Save()
         {
-            var dict = new TrackableDictionary<TKey, string>();
-            dict.SetDefaultTracker();
-            dict.Add(CreateKey(1), "One");
-            dict.Add(CreateKey(2), "Two");
-            dict.Add(CreateKey(3), "Three");
+            var dict = CreateTestDictionary(true);
 
             await SaveAsync(dict);
             dict.Tracker.Clear();
@@ -68,7 +87,7 @@ namespace TrackableData.TestKits
             await SaveAsync(dict);
 
             var dict2 = await LoadAsync();
-            AssertEqualDictionary(dict, dict2);
+            AssertEqual(dict, dict2);
         }
     }
 }

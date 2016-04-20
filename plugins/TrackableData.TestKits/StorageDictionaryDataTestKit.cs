@@ -13,11 +13,18 @@ namespace TrackableData.TestKits
 
     public abstract class StorageDictionaryDataTestKit<TKey>
     {
+        private bool _useDuplicateCheck;
+
         protected abstract TKey CreateKey(int value);
         protected abstract Task CreateAsync(IDictionary<TKey, ItemData> dictionary);
         protected abstract Task<int> DeleteAsync();
         protected abstract Task<TrackableDictionary<TKey, ItemData>> LoadAsync();
         protected abstract Task SaveAsync(TrackableDictionary<TKey, ItemData> dictionary);
+
+        protected StorageDictionaryDataTestKit(bool useDuplicateCheck = false)
+        {
+            _useDuplicateCheck = useDuplicateCheck;
+        }
 
         private TrackableDictionary<TKey, ItemData> CreateTestDictionary(bool withTracker)
         {
@@ -40,7 +47,7 @@ namespace TrackableData.TestKits
             return dict;
         }
 
-        private void AssertEqualDictionary(TrackableDictionary<TKey, ItemData> a, TrackableDictionary<TKey, ItemData> b)
+        private void AssertEqual(TrackableDictionary<TKey, ItemData> a, TrackableDictionary<TKey, ItemData> b)
         {
             Assert.Equal(a.Count, b.Count);
             foreach (var item in a)
@@ -60,7 +67,19 @@ namespace TrackableData.TestKits
             await CreateAsync(dict);
 
             var dict2 = await LoadAsync();
-            AssertEqualDictionary(dict, dict2);
+            AssertEqual(dict, dict2);
+        }
+
+        [Fact]
+        public async Task Test_CreateAndCreate_DuplicateError()
+        {
+            if (_useDuplicateCheck == false)
+                return;
+
+            var dict = CreateTestDictionary(false);
+            await CreateAsync(dict);
+            var e = await Record.ExceptionAsync(async () => await CreateAsync(dict));
+            Assert.NotNull(e);
         }
 
         [Fact]
@@ -109,7 +128,7 @@ namespace TrackableData.TestKits
             // check equality
 
             var dict2 = await LoadAsync();
-            AssertEqualDictionary(dict, dict2);
+            AssertEqual(dict, dict2);
         }
     }
 }

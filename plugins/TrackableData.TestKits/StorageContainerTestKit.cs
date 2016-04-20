@@ -24,6 +24,7 @@ namespace TrackableData.TestKits
     {
         private bool _useList;
         private bool _useSet;
+        private bool _useDuplicateCheck;
 
         protected abstract Task CreateAsync(TTrackableContainer person);
         protected abstract Task<int> DeleteAsync();
@@ -32,10 +33,11 @@ namespace TrackableData.TestKits
         protected abstract IEnumerable<ITrackable> GetTrackables(TTrackableContainer person);
         protected abstract IEnumerable<ITracker> GetTrackers(TTrackableContainer person);
 
-        protected StorageContainerTestKit(bool useList, bool useSet)
+        protected StorageContainerTestKit(bool useList = false, bool useSet = false, bool useDuplicateCheck = false)
         {
             _useList = useList;
             _useSet = useSet;
+            _useDuplicateCheck = useDuplicateCheck;
         }
 
         private TTrackableContainer CreateTestContainer(bool withTracker)
@@ -151,6 +153,18 @@ namespace TrackableData.TestKits
 
             dynamic container2 = await LoadAsync();
             AssertContainerEqual(container, container2);
+        }
+
+        [Fact]
+        public async Task Test_CreateAndCreate_DuplicateError()
+        {
+            if (_useDuplicateCheck == false)
+                return;
+
+            dynamic container = CreateTestContainer(false);
+            await CreateAsync(container);
+            var e = await Record.ExceptionAsync(async () => await CreateAsync(container));
+            Assert.NotNull(e);
         }
 
         [Fact]

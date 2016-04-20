@@ -13,10 +13,17 @@ namespace TrackableData.TestKits
 
     public abstract class StorageListDataTestKit
     {
+        private bool _useDuplicateCheck;
+
         protected abstract Task CreateAsync(IList<JobData> list);
         protected abstract Task<int> DeleteAsync();
         protected abstract Task<TrackableList<JobData>> LoadAsync();
         protected abstract Task SaveAsync(TrackableList<JobData> list);
+
+        protected StorageListDataTestKit(bool useDuplicateCheck = false)
+        {
+            _useDuplicateCheck = useDuplicateCheck;
+        }
 
         private TrackableList<JobData> CreateTestList(bool withTracker)
         {
@@ -57,7 +64,7 @@ namespace TrackableData.TestKits
             list.Add(value3);
         }
 
-        private void AssertEqualDictionary(TrackableList<JobData> a, TrackableList<JobData> b)
+        private void AssertEqual(TrackableList<JobData> a, TrackableList<JobData> b)
         {
             Assert.Equal(a.Count, b.Count);
             for (int i = 0; i < a.Count; i++)
@@ -77,7 +84,19 @@ namespace TrackableData.TestKits
             await CreateAsync(list);
 
             var list2 = await LoadAsync();
-            AssertEqualDictionary(list, list2);
+            AssertEqual(list, list2);
+        }
+
+        [Fact]
+        public async Task Test_CreateAndCreate_DuplicateError()
+        {
+            if (_useDuplicateCheck == false)
+                return;
+
+            var list = CreateTestList(false);
+            await CreateAsync(list);
+            var e = await Record.ExceptionAsync(async () => await CreateAsync(list));
+            Assert.NotNull(e);
         }
 
         [Fact]
@@ -104,7 +123,7 @@ namespace TrackableData.TestKits
             await SaveAsync(list);
 
             var list2 = await LoadAsync();
-            AssertEqualDictionary(list, list2);
+            AssertEqual(list, list2);
         }
     }
 }
