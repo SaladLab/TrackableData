@@ -101,7 +101,7 @@ namespace TrackableData.Redis
         private static RedisValue ToRedisValue(DateTime v) => v.ToString("o");
 
         private static DateTime ToDateTime(RedisValue v) =>
-            DateTime.ParseExact(v, "o", CultureInfo.InvariantCulture);
+            DateTime.ParseExact(v, "o", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal);
 
         private static RedisValue ToRedisValue(DateTimeOffset v) => v.ToString("o");
 
