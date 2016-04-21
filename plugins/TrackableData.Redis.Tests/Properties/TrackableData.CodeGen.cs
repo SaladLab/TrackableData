@@ -497,7 +497,7 @@ namespace TrackableData.Redis.Tests
             }
             set
             {
-                if (Tracker != null && ValDateTime != value)
+                if (Tracker != null && (ValDateTime != value || (ValDateTime.HasValue && ValDateTime.Value.Kind != value.Value.Kind)))
                     Tracker.TrackSet(PropertyTable.ValDateTime, _ValDateTime, value);
                 _ValDateTime = value;
             }
@@ -796,7 +796,7 @@ namespace TrackableData.Redis.Tests
             }
             set
             {
-                if (Tracker != null && ValDateTime != value)
+                if (Tracker != null && (ValDateTime != value || ValDateTime.Kind != value.Kind))
                     Tracker.TrackSet(PropertyTable.ValDateTime, _ValDateTime, value);
                 _ValDateTime = value;
             }

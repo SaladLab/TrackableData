@@ -162,7 +162,15 @@ namespace CodeGen
                         }
                         using (w.b($"set"))
                         {
-                            w._($"if (Tracker != null && {propertyName} != value)",
+                            var compare = $"{propertyName} != value";
+
+                            // Because DateTime ignores Kind for checking equal, compare it additionally.
+                            if (CodeAnalaysisExtensions.CompareTypeName(propertyType, "System.DateTime"))
+                                compare = $"({propertyName} != value || {propertyName}.Kind != value.Kind)";
+                            if (CodeAnalaysisExtensions.CompareTypeName(propertyType, "System.DateTime?"))
+                                compare = $"({propertyName} != value || ({propertyName}.HasValue && {propertyName}.Value.Kind != value.Value.Kind))";
+
+                            w._($"if (Tracker != null && {compare})",
                                 $"    Tracker.TrackSet(PropertyTable.{propertyName}, _{propertyName}, value);",
                                 $"_{propertyName} = value;");
                         }

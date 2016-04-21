@@ -260,7 +260,7 @@ namespace TrackableData.TestKits
             }
             set
             {
-                if (Tracker != null && ValDateTime != value)
+                if (Tracker != null && (ValDateTime != value || (ValDateTime.HasValue && ValDateTime.Value.Kind != value.Value.Kind)))
                     Tracker.TrackSet(PropertyTable.ValDateTime, _ValDateTime, value);
                 _ValDateTime = value;
             }
@@ -608,7 +608,7 @@ namespace TrackableData.TestKits
             }
             set
             {
-                if (Tracker != null && ValDateTime != value)
+                if (Tracker != null && (ValDateTime != value || ValDateTime.Kind != value.Kind))
                     Tracker.TrackSet(PropertyTable.ValDateTime, _ValDateTime, value);
                 _ValDateTime = value;
             }
