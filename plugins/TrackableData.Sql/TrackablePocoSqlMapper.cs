@@ -101,6 +101,16 @@ namespace TrackableData.Sql
                     _identityColumn = column;
             }
 
+            if (primaryKeyColumns.Any() == false)
+            {
+                var idColumn = allColumns.FirstOrDefault(p => p.Name.ToLower() == "id");
+                if (idColumn != null)
+                    primaryKeyColumns.Add(idColumn);
+            }
+
+            if (primaryKeyColumns.Any() == false)
+                throw new ArgumentException("At lease one primary key should be provided.");
+
             _allColumns = allColumns.ToArray();
             _headKeyColumns = headKeyColumns.ToArray();
             _primaryKeyColumns = primaryKeyColumns.ToArray();
