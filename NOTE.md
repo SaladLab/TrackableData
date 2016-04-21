@@ -1,32 +1,5 @@
 ## TODO SOON
 
-### Upsert 처리 정리
-
-  Mongo 는 지금 대충 Upsert 하게 해놨는데 CRUD 시맨틱을 지키도록 잘 정리하자.
-
-  - Create : 이미 존재하면 오류.
-  - Delete : 삭제가 되던 말던 OK. 결과만 리턴
-  - Load   : 없으면 NULL. (선택적으로 empty container 가 나올 수도 있다.)
-  - Save   : 이미 존재할 경우만 UPDATE. 없으면 무시.
-
-### 기본 README 작성
-
-  앞으로 작성할 매뉴얼의 큰 그림도 만들자
-
-### 필드 무시 (ignore)
-
-  필드 무시는 어떻게 할까?
-  - Trackable 은 ignore 가 필요한가?
-    - ProtoMember 혹은 JsonIgnore 과 같이 Plugin 마다 다르게 처리한다.
-    - 만약 필요한게 있다면 (예: MsSql, Mongo) 알아서 정의해 사용하자.
-  - Tracker 는 ignore 가 필요한가?
-    - Tracking 이 필요하지 않는 것에 대해 필요하다.
-    - 그렇다면 POCO 만 필요하다?
-      - POCO 는 필요업다. 애초에 Interface 로 딱 필요한 것만 정의하도록 되어 있다.
-        - Calculation method 는 partial class TrackablePoco 로 추가 가능하다.
-      - TrackableDictionary 등에 일반 타입을 사용하는 것에 대해서는 해당 플러그인
-        기능을 사용 (위 ProtoMember 등)
-
 ## TODO LATER
 
  - ITrackable 의 GetChildTrackable 를 외부로 분리하자. 여기에 있을 필요가 없다.
