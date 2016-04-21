@@ -31,5 +31,16 @@ namespace TrackableData.SqlTestKits
         {
             return _mapper.SaveAsync(_db.Connection, data.Tracker);
         }
+
+        protected override void OnDataInitialized(TrackableTypeNullableTestPoco data)
+        {
+            base.OnDataInitialized(data);
+
+            if (data.ValInt == 1)
+            {
+                data.ValDateTime = new DateTime(2001, 1, 1, 1, 1, 1);
+                data.ValDateTimeOffset = new DateTimeOffset(2001, 1, 1, 1, 1, 1, TimeSpan.Zero);
+            }
+        }
     }
 }

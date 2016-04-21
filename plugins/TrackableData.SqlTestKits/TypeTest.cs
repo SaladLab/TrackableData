@@ -68,6 +68,11 @@ namespace TrackableData.SqlTestKits
                 // 23:59:59 is maximum value of mysql
                 data.ValTimeSpan = new TimeSpan(0, 23, 59, 59, 999);
             }
+            else if (data.ValInt == 1)
+            {
+                data.ValDateTime = new DateTime(2001, 1, 1, 1, 1, 1);
+                data.ValDateTimeOffset = new DateTimeOffset(2001, 1, 1, 1, 1, 1, TimeSpan.Zero);
+            }
         }
     }
 }
