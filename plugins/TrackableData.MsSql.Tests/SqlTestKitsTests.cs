@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using TrackableData.TestKits;
+using Xunit;
 
 namespace TrackableData.MsSql.Tests
 {
@@ -26,18 +27,18 @@ namespace TrackableData.MsSql.Tests
         }
     }
 
-    public class TrackableTestTypePocoTest : SqlTestKits.TrackableTestTypePocoTest, IClassFixture<Database>
+    public class TypeTest : SqlTestKits.TypeTest, IClassFixture<Database>
     {
-        public TrackableTestTypePocoTest(Database db)
+        public TypeTest(Database db)
             : base(db, Database.SqlProvider)
         {
         }
     }
 
-    public class TrackableTestTypeNullablePocoTest : SqlTestKits.TrackableTestTypeNullablePocoTest,
+    public class TypeNullableTest : SqlTestKits.TypeNullableTest,
         IClassFixture<Database>
     {
-        public TrackableTestTypeNullablePocoTest(Database db)
+        public TypeNullableTest(Database db)
             : base(db, Database.SqlProvider)
         {
         }

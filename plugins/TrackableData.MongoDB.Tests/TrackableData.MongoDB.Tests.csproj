@@ -85,6 +85,7 @@
     <Compile Include="TrackableListTest.cs" />
     <Compile Include="TrackablePocoTest.cs" />
     <Compile Include="TrackableSetTest.cs" />
+    <Compile Include="TypeTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
