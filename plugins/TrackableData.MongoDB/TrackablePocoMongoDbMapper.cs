@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using MongoDB.Bson.IO;
 
 namespace TrackableData.MongoDB
 {
@@ -13,23 +15,38 @@ namespace TrackableData.MongoDB
     {
         private readonly Type _trackableType;
         private readonly PropertyInfo _idProperty;
+        private Dictionary<PropertyInfo, BsonMemberMap> _propertyToMemberMap;
 
         public TrackablePocoMongoDbMapper()
         {
             _trackableType = TrackableResolver.GetPocoTrackerType(typeof(T));
             TypeMapper.RegisterTrackablePocoMap(_trackableType);
 
-            var type = typeof(T);
-            foreach (var property in type.GetProperties())
+            _propertyToMemberMap = new Dictionary<PropertyInfo, BsonMemberMap>();
+
+            var classMap = BsonClassMap.LookupClassMap(_trackableType);
+            foreach (var property in typeof(T).GetProperties())
             {
                 if (property.Name.ToLower() == "id")
                     _idProperty = property;
+
+                var member = classMap.AllMemberMaps.FirstOrDefault(m => m.MemberInfo.Name == property.Name);
+                if (member != null)
+                    _propertyToMemberMap[property] = member;
             }
         }
 
         public BsonDocument ConvertToBsonDocument(T poco)
         {
-            return BsonDocumentWrapper.Create(_trackableType, poco);
+            var bsonDocument = new BsonDocument();
+            var writerSettings = BsonDocumentWriterSettings.Defaults;
+            using (var bsonWriter = new BsonDocumentWriter(bsonDocument, writerSettings))
+            {
+                var context = BsonSerializationContext.CreateRoot(bsonWriter);
+                var serializer = BsonSerializer.LookupSerializer(_trackableType);
+                serializer.Serialize(context, poco);
+            }
+            return bsonDocument;
         }
 
         public T ConvertToTrackablePoco(BsonDocument doc)
@@ -60,12 +77,44 @@ namespace TrackableData.MongoDB
             UpdateDefinition<BsonDocument> update, TrackablePocoTracker<T> tracker, params object[] keyValues)
         {
             var keyNamespace = DocumentHelper.ToDotPathWithTrailer(keyValues);
+
+            // mimic BsonClassMapSerializer.Serialize to serialize changed value correctly.
+            // build bson elements containing set field values
+
+            var setDocument = new BsonDocument();
+            var setBsonWriter = new BsonDocumentWriter(setDocument);
+            var setContext = BsonSerializationContext.CreateRoot(setBsonWriter);
+            setBsonWriter.WriteStartDocument();
+
             foreach (var change in tracker.ChangeMap)
             {
-                update = (update == null)
-                             ? Builders<BsonDocument>.Update.Set(keyNamespace + change.Key.Name, change.Value.NewValue)
-                             : update.Set(keyNamespace + change.Key.Name, change.Value.NewValue);
+                if (change.Value.NewValue != null)
+                {
+                    BsonMemberMap memberMap;
+                    if (_propertyToMemberMap.TryGetValue(change.Key, out memberMap) == false)
+                        continue;
+
+                    setBsonWriter.WriteName(memberMap.ElementName);
+                    memberMap.GetSerializer().Serialize(setContext, change.Value.NewValue);
+                }
+                else
+                {
+                    update = (update == null)
+                        ? Builders<BsonDocument>.Update.Unset(keyNamespace + change.Key.Name)
+                        : update.Unset(keyNamespace + change.Key.Name);
+                }
             }
+
+            setBsonWriter.WriteEndDocument();
+            setBsonWriter.Dispose();
+
+            foreach (var element in setDocument.Elements)
+            {
+                update = (update == null)
+                    ? Builders<BsonDocument>.Update.Set(keyNamespace + element.Name, element.Value)
+                    : update.Set(keyNamespace + element.Name, element.Value);
+            }
+
             return update;
         }
 
