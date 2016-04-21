@@ -1,3 +1,7 @@
+## 1.1.1 (Released 2016/04/21)
+
+* Link to Sql 1.1.1
+
 ## 1.1.0 (Released 2016/03/22)
 
 * Add TrackableSet

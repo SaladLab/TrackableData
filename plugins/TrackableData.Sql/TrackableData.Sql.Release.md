@@ -1,3 +1,7 @@
+## 1.1.1 (Released 2016/04/21)
+
+* Add Auto primary-key to PocoMapper
+
 ## 1.1.1 (Released 2016/03/22)
 
 * Add GetTrackers(tracker) to ContainerMapper

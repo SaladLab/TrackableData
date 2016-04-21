@@ -1,3 +1,8 @@
+## 1.1.2 (Released 2016/04/21)
+
+* Add IgnoreDataMember to POCO.Changed
+* Update CodeWriter 0.3
+
 ## 1.1.1 (Released 2016/03/28)
 
 * Use [CodeWriter](https://github.com/SaladLab/CodeWriter) for generating code
