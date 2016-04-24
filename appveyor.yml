@@ -17,3 +17,10 @@ environment:
 test: off    
 build_script:
 - cmd: build.cmd ci nugetkey=%NUGETKEY% nugetpublishurl=https://www.myget.org/F/saladlab/api/v2/package nugetprerelease=%APPVEYOR_BUILD_NUMBER% coverallskey=%COVERALLSKEY%
+artifacts:
+  - path: './bin/nuget/*.nupkg'
+    name: NugetPackage
+  - path: './bin/unity/*.unitypackage'
+    name: UnityPackage
+cache:
+- packages -> **\packages.config
