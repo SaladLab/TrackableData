@@ -6,7 +6,7 @@
     <version>@build.number@</version>
     <authors>Esun Kim</authors>
     <owners>Esun Kim</owners>
-    <description>POCO, list, dictionary and container which can track changes. These changes can be saved or rollbacked or replayed to another object.</description>
+    <description>POCO, list, dictionary, set and container which can track changes. These changes can be saved or rollbacked or replayed to another object.</description>
     <licenseUrl>https://raw.githubusercontent.com/SaladLab/TrackableData/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/SaladLab/TrackableData</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/SaladLab/TrackableData/master/docs/Icon_64.png</iconUrl>
