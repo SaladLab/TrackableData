@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData", "core\TrackableData\TrackableData.csproj", "{C2C3A8CA-62F9-4C5A-8B2B-5091E5A41C54}"
 EndProject
@@ -62,6 +62,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData.Protobuf.Test
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData.TestKits", "plugins\TrackableData.TestKits\TrackableData.TestKits.csproj", "{005F1DFC-49AD-462C-AAFF-3E3890B95C0B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{011E72B0-3E37-4652-ACB9-2CAC26665AFD} = {011E72B0-3E37-4652-ACB9-2CAC26665AFD}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrackableData.MsSql.Tests", "plugins\TrackableData.MsSql.Tests\TrackableData.MsSql.Tests.csproj", "{0C6F8BC0-37F8-4229-99D6-D4EF786A2691}"
 	ProjectSection(ProjectDependencies) = postProject
