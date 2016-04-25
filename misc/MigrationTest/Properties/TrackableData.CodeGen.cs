@@ -26,6 +26,7 @@ namespace Model
         [IgnoreDataMember]
         public IPocoTracker<IUserData> Tracker { get; set; }
 
+        [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
@@ -248,7 +249,7 @@ namespace Model
             }
             set
             {
-                if (Tracker != null && StaminaRefillTime != value)
+                if (Tracker != null && (StaminaRefillTime != value || StaminaRefillTime.Kind != value.Kind))
                     Tracker.TrackSet(PropertyTable.StaminaRefillTime, _StaminaRefillTime, value);
                 _StaminaRefillTime = value;
             }
@@ -282,7 +283,7 @@ namespace Model
             }
             set
             {
-                if (Tracker != null && RaidStaminaRefillTime != value)
+                if (Tracker != null && (RaidStaminaRefillTime != value || RaidStaminaRefillTime.Kind != value.Kind))
                     Tracker.TrackSet(PropertyTable.RaidStaminaRefillTime, _RaidStaminaRefillTime, value);
                 _RaidStaminaRefillTime = value;
             }
@@ -622,7 +623,7 @@ namespace Model
             }
             set
             {
-                if (Tracker != null && LastRubyMadeTime != value)
+                if (Tracker != null && (LastRubyMadeTime != value || LastRubyMadeTime.Kind != value.Kind))
                     Tracker.TrackSet(PropertyTable.LastRubyMadeTime, _LastRubyMadeTime, value);
                 _LastRubyMadeTime = value;
             }
@@ -639,7 +640,7 @@ namespace Model
             }
             set
             {
-                if (Tracker != null && DayChangeTime != value)
+                if (Tracker != null && (DayChangeTime != value || DayChangeTime.Kind != value.Kind))
                     Tracker.TrackSet(PropertyTable.DayChangeTime, _DayChangeTime, value);
                 _DayChangeTime = value;
             }
@@ -792,7 +793,7 @@ namespace Model
             }
             set
             {
-                if (Tracker != null && EndlessLastPlayTime != value)
+                if (Tracker != null && (EndlessLastPlayTime != value || EndlessLastPlayTime.Kind != value.Kind))
                     Tracker.TrackSet(PropertyTable.EndlessLastPlayTime, _EndlessLastPlayTime, value);
                 _EndlessLastPlayTime = value;
             }
@@ -996,7 +997,7 @@ namespace Model
             }
             set
             {
-                if (Tracker != null && CommentModifyTime != value)
+                if (Tracker != null && (CommentModifyTime != value || CommentModifyTime.Kind != value.Kind))
                     Tracker.TrackSet(PropertyTable.CommentModifyTime, _CommentModifyTime, value);
                 _CommentModifyTime = value;
             }
