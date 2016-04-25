@@ -1,3 +1,7 @@
+## 1.1.3 (Released 2016/04/26)
+
+* Set assembly version 1.0.0
+
 ## 1.1.1 (Released 2016/04/21)
 
 * Add Auto primary-key to PocoMapper
