@@ -35,7 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\protobuf-net.2.0.0.668\lib\net35\protobuf-net.dll</HintPath>
+      <HintPath>..\..\..\packages\protobuf-net.2.1.0-alpha-1\lib\net30\protobuf-net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -54,11 +54,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\..\core\TrackableData.Net35\TrackableData.Net35.csproj">
       <Project>{78305397-0ba1-4b8a-ad39-bab72ffe37ab}</Project>
       <Name>TrackableData.Net35</Name>
@@ -67,6 +62,9 @@
       <Project>{2fbb3fca-1348-410c-96d7-9aa24b79d09c}</Project>
       <Name>TrackableData.Protobuf.Net35</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)core\CodeGenerator-Templates\TrackableData.Templates.targets" Condition="Exists('$(SolutionDir)core\CodeGenerator-Templates\TrackableData.Templates.targets')" />

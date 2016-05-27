@@ -135,7 +135,8 @@ namespace Unity.Data
         [ProtoMember(2)] public EnvelopedObject<int> Gold;
         [ProtoMember(3)] public EnvelopedObject<int> Level;
 
-        public static implicit operator TrackableUserDataTrackerSurrogate(TrackablePocoTracker<IUserData> tracker)
+        [ProtoConverter]
+        public static TrackableUserDataTrackerSurrogate Convert(TrackablePocoTracker<IUserData> tracker)
         {
             if (tracker == null)
                 return null;
@@ -160,7 +161,8 @@ namespace Unity.Data
             return surrogate;
         }
 
-        public static implicit operator TrackablePocoTracker<IUserData>(TrackableUserDataTrackerSurrogate surrogate)
+        [ProtoConverter]
+        public static TrackablePocoTracker<IUserData> Convert(TrackableUserDataTrackerSurrogate surrogate)
         {
             if (surrogate == null)
                 return null;
