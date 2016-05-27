@@ -43,6 +43,7 @@ let solution =
                                                ("Npgsql", "") ] }
           { emptyProject with Name = "TrackableData.Protobuf"
                               Folder = "./plugins/TrackableData.Protobuf"
+                              PackagePrerelease = "beta"
                               Dependencies = [ ("TrackableData", "")
                                                ("protobuf-net", "") ] }
           { emptyProject with Name = "TrackableData.Redis"

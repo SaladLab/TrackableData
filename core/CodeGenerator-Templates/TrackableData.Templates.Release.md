@@ -1,4 +1,8 @@
-## 1.1.3 (Released 2016/04/26)
+## 1.1.5 (Released 2016/05/27)
+
+* Use protobuf-net 2.1.0-alpha-1
+
+## 1.1.4 (Released 2016/04/26)
 
 * Set assembly version 1.0.0
 
