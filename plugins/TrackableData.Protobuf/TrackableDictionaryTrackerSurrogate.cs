@@ -16,7 +16,8 @@ namespace TrackableData.Protobuf
 
         [ProtoMember(1)] public List<Change> ChangeList = new List<Change>();
 
-        public static implicit operator TrackableDictionaryTrackerSurrogate<TKey, TValue>(
+        [ProtoConverter]
+        public static TrackableDictionaryTrackerSurrogate<TKey, TValue> Convert(
             TrackableDictionaryTracker<TKey, TValue> tracker)
         {
             if (tracker == null)
@@ -35,7 +36,8 @@ namespace TrackableData.Protobuf
             return surrogate;
         }
 
-        public static implicit operator TrackableDictionaryTracker<TKey, TValue>(
+        [ProtoConverter]
+        public static TrackableDictionaryTracker<TKey, TValue> Convert(
             TrackableDictionaryTrackerSurrogate<TKey, TValue> surrogate)
         {
             if (surrogate == null)

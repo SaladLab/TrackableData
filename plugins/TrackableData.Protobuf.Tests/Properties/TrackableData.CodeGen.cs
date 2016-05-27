@@ -163,7 +163,8 @@ namespace TrackableData.Protobuf.Tests
         [ProtoMember(3)] public EnvelopedObject<TrackableHand> LeftHand;
         [ProtoMember(4)] public EnvelopedObject<TrackableHand> RightHand;
 
-        public static implicit operator TrackablePersonTrackerSurrogate(TrackablePocoTracker<IPerson> tracker)
+        [ProtoConverter]
+        public static TrackablePersonTrackerSurrogate Convert(TrackablePocoTracker<IPerson> tracker)
         {
             if (tracker == null)
                 return null;
@@ -191,7 +192,8 @@ namespace TrackableData.Protobuf.Tests
             return surrogate;
         }
 
-        public static implicit operator TrackablePocoTracker<IPerson>(TrackablePersonTrackerSurrogate surrogate)
+        [ProtoConverter]
+        public static TrackablePocoTracker<IPerson> Convert(TrackablePersonTrackerSurrogate surrogate)
         {
             if (surrogate == null)
                 return null;
@@ -320,7 +322,8 @@ namespace TrackableData.Protobuf.Tests
         [ProtoMember(1)] public EnvelopedObject<TrackableRing> MainRing;
         [ProtoMember(2)] public EnvelopedObject<TrackableRing> SubRing;
 
-        public static implicit operator TrackableHandTrackerSurrogate(TrackablePocoTracker<IHand> tracker)
+        [ProtoConverter]
+        public static TrackableHandTrackerSurrogate Convert(TrackablePocoTracker<IHand> tracker)
         {
             if (tracker == null)
                 return null;
@@ -342,7 +345,8 @@ namespace TrackableData.Protobuf.Tests
             return surrogate;
         }
 
-        public static implicit operator TrackablePocoTracker<IHand>(TrackableHandTrackerSurrogate surrogate)
+        [ProtoConverter]
+        public static TrackablePocoTracker<IHand> Convert(TrackableHandTrackerSurrogate surrogate)
         {
             if (surrogate == null)
                 return null;
@@ -458,7 +462,8 @@ namespace TrackableData.Protobuf.Tests
         [ProtoMember(1)] public EnvelopedObject<string> Name;
         [ProtoMember(2)] public EnvelopedObject<int> Power;
 
-        public static implicit operator TrackableRingTrackerSurrogate(TrackablePocoTracker<IRing> tracker)
+        [ProtoConverter]
+        public static TrackableRingTrackerSurrogate Convert(TrackablePocoTracker<IRing> tracker)
         {
             if (tracker == null)
                 return null;
@@ -480,7 +485,8 @@ namespace TrackableData.Protobuf.Tests
             return surrogate;
         }
 
-        public static implicit operator TrackablePocoTracker<IRing>(TrackableRingTrackerSurrogate surrogate)
+        [ProtoConverter]
+        public static TrackablePocoTracker<IRing> Convert(TrackableRingTrackerSurrogate surrogate)
         {
             if (surrogate == null)
                 return null;

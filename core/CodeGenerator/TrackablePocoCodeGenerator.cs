@@ -209,7 +209,8 @@ namespace CodeGen
 
                 // ConvertTrackerToSurrogate
 
-                using (w.B($"public static implicit operator {className}(TrackablePocoTracker<{typeName}> tracker)"))
+                w._("[ProtoConverter]");
+                using (w.B($"public static {className} Convert(TrackablePocoTracker<{typeName}> tracker)"))
                 {
                     w._($"if (tracker == null)",
                         $"    return null;");
@@ -236,7 +237,8 @@ namespace CodeGen
 
                 // ConvertSurrogateToTracker
 
-                using (w.B($"public static implicit operator TrackablePocoTracker<{typeName}>({className} surrogate)"))
+                w._("[ProtoConverter]");
+                using (w.B($"public static TrackablePocoTracker<{typeName}> Convert({className} surrogate)"))
                 {
                     w._($"if (surrogate == null)",
                         $"    return null;");
