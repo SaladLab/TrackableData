@@ -21,3 +21,6 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("5930bb18-32d9-4d38-b574-6b9f8f9449ed")]
+
+// Friend Assembly
+[assembly: InternalsVisibleTo("TrackableData.Tests")]

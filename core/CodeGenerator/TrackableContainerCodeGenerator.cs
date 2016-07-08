@@ -68,6 +68,18 @@ namespace CodeGen
                     }
                 }
 
+                // Clone
+
+                using (w.B($"public {className} Clone()"))
+                {
+                    w._($"var o = new {className}();");
+                    foreach (var p in properties)
+                    {
+                        w._($"o._{p.Identifier} = _{p.Identifier}?.Clone();");
+                    }
+                    w._($"return o;");
+                }
+
                 // ITrackable.Changed
 
                 w._("public bool Changed { get { return Tracker != null && Tracker.HasChange; } }");
@@ -116,6 +128,13 @@ namespace CodeGen
                         w._($"var t = ({className}Tracker)value;");
                         w._($"Tracker = t;");
                     }
+                }
+
+                // ITrackable.Clone
+
+                using (w.B($"ITrackable ITrackable.Clone()"))
+                {
+                    w._($"return Clone();");
                 }
 
                 // ITrackable.GetChildTrackable

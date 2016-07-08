@@ -190,5 +190,16 @@ namespace TrackableData.Tests
                 },
                 dict2.OrderBy(kv => kv.Key));
         }
+
+        [Fact]
+        public void TestDictionary_Clone_Work()
+        {
+            var a = CreateTestDictionaryWithTracker();
+            var b = a.Clone();
+
+            Assert.Null(b.Tracker);
+            Assert.False(ReferenceEquals(a._dictionary, b._dictionary));
+            Assert.Equal(a._dictionary, b._dictionary);
+        }
     }
 }

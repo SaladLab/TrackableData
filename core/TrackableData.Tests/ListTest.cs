@@ -142,5 +142,16 @@ namespace TrackableData.Tests
 
             Assert.Equal(GetInitialList(), list2);
         }
+
+        [Fact]
+        public void TestList_Clone_Work()
+        {
+            var a = CreateTestListWithTracker();
+            var b = a.Clone();
+
+            Assert.Null(b.Tracker);
+            Assert.False(ReferenceEquals(a._list, b._list));
+            Assert.Equal(a._list, b._list);
+        }
     }
 }

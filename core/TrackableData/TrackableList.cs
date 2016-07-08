@@ -6,11 +6,29 @@ namespace TrackableData
 {
     public class TrackableList<T> : IList<T>, ITrackable<IList<T>>
     {
-        private readonly List<T> _list = new List<T>();
-
-        // Specific tracker
+        internal readonly List<T> _list;
 
         public IListTracker<T> Tracker { get; set; }
+
+        public TrackableList()
+        {
+            _list = new List<T>();
+        }
+
+        public TrackableList(TrackableList<T> list)
+        {
+            _list = new List<T>(list._list);
+        }
+
+        public TrackableList(IEnumerable<T> collection)
+        {
+            _list = new List<T>(collection);
+        }
+
+        public TrackableList<T> Clone()
+        {
+            return new TrackableList<T>(this);
+        }
 
         // ITrackable
 
@@ -43,6 +61,11 @@ namespace TrackableData
                 var tracker = (IListTracker<T>)value;
                 Tracker = tracker;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)

@@ -11,11 +11,29 @@ namespace TrackableData
         ICollection<T>,
         ITrackable<ICollection<T>>
     {
-        private readonly HashSet<T> _set = new HashSet<T>();
-
-        // Specific tracker
+        internal readonly HashSet<T> _set;
 
         public ISetTracker<T> Tracker { get; set; }
+
+        public TrackableSet()
+        {
+            _set = new HashSet<T>();
+        }
+
+        public TrackableSet(TrackableSet<T> set)
+        {
+            _set = new HashSet<T>(set._set);
+        }
+
+        public TrackableSet(IEnumerable<T> collection)
+        {
+            _set = new HashSet<T>(collection);
+        }
+
+        public TrackableSet<T> Clone()
+        {
+            return new TrackableSet<T>(this);
+        }
 
         // ITrackable
 
@@ -48,6 +66,11 @@ namespace TrackableData
                 var tracker = (ISetTracker<T>)value;
                 Tracker = tracker;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)

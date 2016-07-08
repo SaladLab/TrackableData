@@ -187,5 +187,16 @@ namespace TrackableData.Tests
                 new[] { 1, 2, 3 },
                 set2.OrderBy(v => v));
         }
+
+        [Fact]
+        public void TestSet_Clone_Work()
+        {
+            var a = CreateTestSetWithTracker();
+            var b = a.Clone();
+
+            Assert.Null(b.Tracker);
+            Assert.False(ReferenceEquals(a._set, b._set));
+            Assert.Equal(a._set, b._set);
+        }
     }
 }

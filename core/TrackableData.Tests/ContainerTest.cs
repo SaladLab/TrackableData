@@ -90,5 +90,20 @@ namespace TrackableData.Tests
             Assert.Equal(c.Person.Name, c2.Person.Name);
             Assert.Equal(c.Person.Age, c2.Person.Age);
         }
+
+        [Fact]
+        public void ContainerTest_Clone_Work()
+        {
+            var a = CreateTestContainerWithTracker();
+            var b = a.Clone();
+
+            Assert.Null(b.Tracker);
+            Assert.False(ReferenceEquals(a.Person, b.Person));
+            Assert.Equal(a.Person.Name, b.Person.Name);
+            Assert.False(ReferenceEquals(a.Dictionary, b.Dictionary));
+            Assert.Equal(a.Dictionary._dictionary, b.Dictionary._dictionary);
+            Assert.False(ReferenceEquals(a.List, b.List));
+            Assert.Equal(a.List._list, b.List._list);
+        }
     }
 }

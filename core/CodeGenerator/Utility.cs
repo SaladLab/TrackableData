@@ -6,15 +6,18 @@ namespace CodeGen
 {
     public static class Utility
     {
+        public static bool IsTrackableType(TypeSyntax type)
+        {
+            // NOTE: it's naive approach because we don't know semantic type information here.
+            var parts = type.ToString().Split('.');
+            var typeName = parts[parts.Length - 1];
+            return typeName.StartsWith("Trackable");
+        }
+
         public static PropertyDeclarationSyntax[] GetTrackableProperties(PropertyDeclarationSyntax[] properties)
         {
             // NOTE: it's naive approach because we don't know semantic type information here.
-            return properties.Where(p =>
-            {
-                var parts = p.Type.ToString().Split('.');
-                var typeName = parts[parts.Length - 1];
-                return typeName.StartsWith("Trackable");
-            }).ToArray();
+            return properties.Where(p => IsTrackableType(p.Type)).ToArray();
         }
 
         public static string GetTrackerClassName(TypeSyntax type)

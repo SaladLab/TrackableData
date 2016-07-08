@@ -10,6 +10,11 @@ namespace TrackableData
         // return tracker that will track this
         ITracker Tracker { get; set; }
 
+        // return cloned object.
+        // it follows shallow memberwise clone for value and deep clone for container.
+        // it doesn't clone tracker object and let tracker object of cloned one have null.
+        ITrackable Clone();
+
         // return child trackable which have specified name, otherwise null
         ITrackable GetChildTrackable(object name);
 

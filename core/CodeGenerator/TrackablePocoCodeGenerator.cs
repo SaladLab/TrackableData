@@ -55,6 +55,21 @@ namespace CodeGen
                     $"public IPocoTracker<{typeName}> Tracker {{ get; set; }}");
                 w._();
 
+                // Clone
+
+                using (w.B($"public {className} Clone()"))
+                {
+                    w._($"var o = new {className}();");
+                    foreach (var p in properties)
+                    {
+                        if (Utility.IsTrackableType(p.Type))
+                            w._($"o._{p.Identifier} = _{p.Identifier}?.Clone();");
+                        else
+                            w._($"o._{p.Identifier} = _{p.Identifier};");
+                    }
+                    w._($"return o;");
+                }
+
                 // ITrackable.Changed
 
                 w._("[IgnoreDataMember]",
@@ -89,6 +104,13 @@ namespace CodeGen
                         w._($"var t = (IPocoTracker<{typeName}>)value;",
                             $"Tracker = t;");
                     }
+                }
+
+                // ITrackable.Clone
+
+                using (w.B($"ITrackable ITrackable.Clone()"))
+                {
+                    w._($"return Clone();");
                 }
 
                 // ITrackable.GetChildTrackable

@@ -133,5 +133,22 @@ namespace TrackableData.Tests
             Assert.Equal("Alice", person2.Name);
             Assert.Equal(20, person2.Age);
         }
+
+        [Fact]
+        public void TestPoco_Clone_Work()
+        {
+            var a = CreateTestPersonWithTracker();
+            var b = a.Clone();
+
+            Assert.Null(b.Tracker);
+            Assert.Equal(a.Name, b.Name);
+            Assert.Equal(a.Age, b.Age);
+            Assert.False(ReferenceEquals(a.LeftHand, b.LeftHand));
+            Assert.Equal(a.LeftHand.MainRing.Name, b.LeftHand.MainRing.Name);
+            Assert.Equal(a.LeftHand.MainRing.Power, b.LeftHand.MainRing.Power);
+            Assert.False(ReferenceEquals(a.RightHand, b.RightHand));
+            Assert.Equal(a.RightHand.MainRing.Name, b.RightHand.MainRing.Name);
+            Assert.Equal(a.RightHand.MainRing.Power, b.RightHand.MainRing.Power);
+        }
     }
 }

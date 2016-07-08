@@ -6,11 +6,29 @@ namespace TrackableData
 {
     public class TrackableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, ITrackable<IDictionary<TKey, TValue>>
     {
-        private readonly Dictionary<TKey, TValue> _dictionary = new Dictionary<TKey, TValue>();
-
-        // Specific tracker
+        internal readonly Dictionary<TKey, TValue> _dictionary;
 
         public IDictionaryTracker<TKey, TValue> Tracker { get; set; }
+
+        public TrackableDictionary()
+        {
+            _dictionary = new Dictionary<TKey, TValue>();
+        }
+
+        public TrackableDictionary(TrackableDictionary<TKey, TValue> dictionary)
+        {
+            _dictionary = new Dictionary<TKey, TValue>(dictionary._dictionary);
+        }
+
+        public TrackableDictionary(IDictionary<TKey, TValue> dictionary)
+        {
+            _dictionary = new Dictionary<TKey, TValue>(dictionary);
+        }
+
+        public TrackableDictionary<TKey, TValue> Clone()
+        {
+            return new TrackableDictionary<TKey, TValue>(this);
+        }
 
         public bool Update(TKey key, Func<TKey, TValue, TValue> updateValueFactory)
         {
@@ -80,6 +98,11 @@ namespace TrackableData
                 var tracker = (IDictionaryTracker<TKey, TValue>)value;
                 Tracker = tracker;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
