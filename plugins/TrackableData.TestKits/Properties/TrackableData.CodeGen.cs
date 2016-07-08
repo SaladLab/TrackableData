@@ -26,6 +26,29 @@ namespace TrackableData.TestKits
         [IgnoreDataMember]
         public IPocoTracker<ITypeNullableTestPoco> Tracker { get; set; }
 
+        public TrackableTypeNullableTestPoco Clone()
+        {
+            var o = new TrackableTypeNullableTestPoco();
+            o._Id = _Id;
+            o._ValBool = _ValBool;
+            o._ValByte = _ValByte;
+            o._ValShort = _ValShort;
+            o._ValChar = _ValChar;
+            o._ValInt = _ValInt;
+            o._ValLong = _ValLong;
+            o._ValFloat = _ValFloat;
+            o._ValDouble = _ValDouble;
+            o._ValDecimal = _ValDecimal;
+            o._ValDateTime = _ValDateTime;
+            o._ValDateTimeOffset = _ValDateTimeOffset;
+            o._ValTimeSpan = _ValTimeSpan;
+            o._ValString = _ValString;
+            o._ValBytes = _ValBytes;
+            o._ValGuid = _ValGuid;
+            o._ValEnum = _ValEnum;
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -53,6 +76,11 @@ namespace TrackableData.TestKits
                 var t = (IPocoTracker<ITypeNullableTestPoco>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -374,6 +402,29 @@ namespace TrackableData.TestKits
         [IgnoreDataMember]
         public IPocoTracker<ITypeTestPoco> Tracker { get; set; }
 
+        public TrackableTypeTestPoco Clone()
+        {
+            var o = new TrackableTypeTestPoco();
+            o._Id = _Id;
+            o._ValBool = _ValBool;
+            o._ValByte = _ValByte;
+            o._ValShort = _ValShort;
+            o._ValChar = _ValChar;
+            o._ValInt = _ValInt;
+            o._ValLong = _ValLong;
+            o._ValFloat = _ValFloat;
+            o._ValDouble = _ValDouble;
+            o._ValDecimal = _ValDecimal;
+            o._ValDateTime = _ValDateTime;
+            o._ValDateTimeOffset = _ValDateTimeOffset;
+            o._ValTimeSpan = _ValTimeSpan;
+            o._ValString = _ValString;
+            o._ValBytes = _ValBytes;
+            o._ValGuid = _ValGuid;
+            o._ValEnum = _ValEnum;
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -401,6 +452,11 @@ namespace TrackableData.TestKits
                 var t = (IPocoTracker<ITypeTestPoco>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)

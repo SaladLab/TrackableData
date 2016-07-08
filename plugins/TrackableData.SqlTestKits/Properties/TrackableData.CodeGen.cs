@@ -25,6 +25,15 @@ namespace TrackableData.SqlTestKits
         [IgnoreDataMember]
         public IPocoTracker<ITestPoco> Tracker { get; set; }
 
+        public TrackableTestPoco Clone()
+        {
+            var o = new TrackableTestPoco();
+            o._Id = _Id;
+            o._Name = _Name;
+            o._Age = _Age;
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -52,6 +61,11 @@ namespace TrackableData.SqlTestKits
                 var t = (IPocoTracker<ITestPoco>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -135,6 +149,15 @@ namespace TrackableData.SqlTestKits
         [IgnoreDataMember]
         public IPocoTracker<ITestPocoForContainer> Tracker { get; set; }
 
+        public TrackableTestPocoForContainer Clone()
+        {
+            var o = new TrackableTestPocoForContainer();
+            o._Name = _Name;
+            o._Age = _Age;
+            o._Extra = _Extra;
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -162,6 +185,11 @@ namespace TrackableData.SqlTestKits
                 var t = (IPocoTracker<ITestPocoForContainer>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -245,6 +273,15 @@ namespace TrackableData.SqlTestKits
         [IgnoreDataMember]
         public IPocoTracker<ITestPocoWithIdentity> Tracker { get; set; }
 
+        public TrackableTestPocoWithIdentity Clone()
+        {
+            var o = new TrackableTestPocoWithIdentity();
+            o._Id = _Id;
+            o._Name = _Name;
+            o._Age = _Age;
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -272,6 +309,11 @@ namespace TrackableData.SqlTestKits
                 var t = (IPocoTracker<ITestPocoWithIdentity>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -371,6 +413,15 @@ namespace TrackableData.SqlTestKits
             }
         }
 
+        public TrackableTestContainer Clone()
+        {
+            var o = new TrackableTestContainer();
+            o._Person = _Person?.Clone();
+            o._Missions = _Missions?.Clone();
+            o._Aliases = _Aliases?.Clone();
+            return o;
+        }
+
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
@@ -410,6 +461,11 @@ namespace TrackableData.SqlTestKits
                 var t = (TrackableTestContainerTracker)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -683,6 +739,14 @@ namespace TrackableData.SqlTestKits
             }
         }
 
+        public TrackableTestContainerWithIgnore Clone()
+        {
+            var o = new TrackableTestContainerWithIgnore();
+            o._Person = _Person?.Clone();
+            o._Missions = _Missions?.Clone();
+            return o;
+        }
+
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
@@ -722,6 +786,11 @@ namespace TrackableData.SqlTestKits
                 var t = (TrackableTestContainerWithIgnoreTracker)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)

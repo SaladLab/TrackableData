@@ -26,6 +26,15 @@ namespace Unity.Data
         [IgnoreDataMember]
         public IPocoTracker<IUserData> Tracker { get; set; }
 
+        public TrackableUserData Clone()
+        {
+            var o = new TrackableUserData();
+            o._Name = _Name;
+            o._Gold = _Gold;
+            o._Level = _Level;
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -53,6 +62,11 @@ namespace Unity.Data
                 var t = (IPocoTracker<IUserData>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)

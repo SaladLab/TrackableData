@@ -24,6 +24,16 @@ namespace TrackableData.Json.Tests
         [IgnoreDataMember]
         public IPocoTracker<IPerson> Tracker { get; set; }
 
+        public TrackablePerson Clone()
+        {
+            var o = new TrackablePerson();
+            o._Name = _Name;
+            o._Age = _Age;
+            o._LeftHand = _LeftHand?.Clone();
+            o._RightHand = _RightHand?.Clone();
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -51,6 +61,11 @@ namespace TrackableData.Json.Tests
                 var t = (IPocoTracker<IPerson>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -160,6 +175,14 @@ namespace TrackableData.Json.Tests
         [IgnoreDataMember]
         public IPocoTracker<IHand> Tracker { get; set; }
 
+        public TrackableHand Clone()
+        {
+            var o = new TrackableHand();
+            o._MainRing = _MainRing?.Clone();
+            o._SubRing = _SubRing?.Clone();
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -187,6 +210,11 @@ namespace TrackableData.Json.Tests
                 var t = (IPocoTracker<IHand>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -262,6 +290,14 @@ namespace TrackableData.Json.Tests
         [IgnoreDataMember]
         public IPocoTracker<IRing> Tracker { get; set; }
 
+        public TrackableRing Clone()
+        {
+            var o = new TrackableRing();
+            o._Name = _Name;
+            o._Power = _Power;
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -289,6 +325,11 @@ namespace TrackableData.Json.Tests
                 var t = (IPocoTracker<IRing>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -372,6 +413,16 @@ namespace TrackableData.Json.Tests
             }
         }
 
+        public TrackableDataContainer Clone()
+        {
+            var o = new TrackableDataContainer();
+            o._Person = _Person?.Clone();
+            o._Dictionary = _Dictionary?.Clone();
+            o._List = _List?.Clone();
+            o._Set = _Set?.Clone();
+            return o;
+        }
+
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
@@ -411,6 +462,11 @@ namespace TrackableData.Json.Tests
                 var t = (TrackableDataContainerTracker)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)

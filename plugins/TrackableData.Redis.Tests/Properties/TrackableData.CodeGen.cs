@@ -28,6 +28,15 @@ namespace TrackableData.Redis.Tests
         [IgnoreDataMember]
         public IPocoTracker<ITestPocoForContainer> Tracker { get; set; }
 
+        public TrackableTestPocoForContainer Clone()
+        {
+            var o = new TrackableTestPocoForContainer();
+            o._Name = _Name;
+            o._Age = _Age;
+            o._Extra = _Extra;
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -55,6 +64,11 @@ namespace TrackableData.Redis.Tests
                 var t = (IPocoTracker<ITestPocoForContainer>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -138,6 +152,16 @@ namespace TrackableData.Redis.Tests
         [IgnoreDataMember]
         public IPocoTracker<ITestPoco> Tracker { get; set; }
 
+        public TrackableTestPoco Clone()
+        {
+            var o = new TrackableTestPoco();
+            o._Id = _Id;
+            o._Name = _Name;
+            o._Age = _Age;
+            o._Extra = _Extra;
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -165,6 +189,11 @@ namespace TrackableData.Redis.Tests
                 var t = (IPocoTracker<ITestPoco>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -265,6 +294,27 @@ namespace TrackableData.Redis.Tests
         [IgnoreDataMember]
         public IPocoTracker<ITestTypeNullablePoco> Tracker { get; set; }
 
+        public TrackableTestTypeNullablePoco Clone()
+        {
+            var o = new TrackableTestTypeNullablePoco();
+            o._Id = _Id;
+            o._ValBool = _ValBool;
+            o._ValByte = _ValByte;
+            o._ValShort = _ValShort;
+            o._ValChar = _ValChar;
+            o._ValInt = _ValInt;
+            o._ValLong = _ValLong;
+            o._ValFloat = _ValFloat;
+            o._ValDouble = _ValDouble;
+            o._ValDecimal = _ValDecimal;
+            o._ValDateTime = _ValDateTime;
+            o._ValDateTimeOffset = _ValDateTimeOffset;
+            o._ValTimeSpan = _ValTimeSpan;
+            o._ValGuid = _ValGuid;
+            o._ValSuit = _ValSuit;
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -292,6 +342,11 @@ namespace TrackableData.Redis.Tests
                 var t = (IPocoTracker<ITestTypeNullablePoco>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -579,6 +634,28 @@ namespace TrackableData.Redis.Tests
         [IgnoreDataMember]
         public IPocoTracker<ITestTypePoco> Tracker { get; set; }
 
+        public TrackableTestTypePoco Clone()
+        {
+            var o = new TrackableTestTypePoco();
+            o._ValBool = _ValBool;
+            o._ValByte = _ValByte;
+            o._ValShort = _ValShort;
+            o._ValChar = _ValChar;
+            o._ValInt = _ValInt;
+            o._ValLong = _ValLong;
+            o._ValFloat = _ValFloat;
+            o._ValDouble = _ValDouble;
+            o._ValDecimal = _ValDecimal;
+            o._ValDateTime = _ValDateTime;
+            o._ValDateTimeOffset = _ValDateTimeOffset;
+            o._ValTimeSpan = _ValTimeSpan;
+            o._ValString = _ValString;
+            o._ValBytes = _ValBytes;
+            o._ValGuid = _ValGuid;
+            o._ValSuit = _ValSuit;
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -606,6 +683,11 @@ namespace TrackableData.Redis.Tests
                 var t = (IPocoTracker<ITestTypePoco>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -927,6 +1009,16 @@ namespace TrackableData.Redis.Tests
             }
         }
 
+        public TrackableTestContainer Clone()
+        {
+            var o = new TrackableTestContainer();
+            o._Person = _Person?.Clone();
+            o._Missions = _Missions?.Clone();
+            o._Tags = _Tags?.Clone();
+            o._Aliases = _Aliases?.Clone();
+            return o;
+        }
+
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
@@ -966,6 +1058,11 @@ namespace TrackableData.Redis.Tests
                 var t = (TrackableTestContainerTracker)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)

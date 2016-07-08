@@ -31,6 +31,15 @@ namespace TrackableData.MongoDB.Tests
         [IgnoreDataMember]
         public IPocoTracker<ITestPocoForContainer> Tracker { get; set; }
 
+        public TrackableTestPocoForContainer Clone()
+        {
+            var o = new TrackableTestPocoForContainer();
+            o._Name = _Name;
+            o._Age = _Age;
+            o._Extra = _Extra;
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -58,6 +67,11 @@ namespace TrackableData.MongoDB.Tests
                 var t = (IPocoTracker<ITestPocoForContainer>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -141,6 +155,16 @@ namespace TrackableData.MongoDB.Tests
         [IgnoreDataMember]
         public IPocoTracker<ITestPoco> Tracker { get; set; }
 
+        public TrackableTestPoco Clone()
+        {
+            var o = new TrackableTestPoco();
+            o._Id = _Id;
+            o._Name = _Name;
+            o._Age = _Age;
+            o._Extra = _Extra;
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -168,6 +192,11 @@ namespace TrackableData.MongoDB.Tests
                 var t = (IPocoTracker<ITestPoco>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -268,6 +297,16 @@ namespace TrackableData.MongoDB.Tests
         [IgnoreDataMember]
         public IPocoTracker<ITestPocoWithCustomId> Tracker { get; set; }
 
+        public TrackableTestPocoWithCustomId Clone()
+        {
+            var o = new TrackableTestPocoWithCustomId();
+            o._CustomId = _CustomId;
+            o._Name = _Name;
+            o._Age = _Age;
+            o._Extra = _Extra;
+            return o;
+        }
+
         [IgnoreDataMember]
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
@@ -295,6 +334,11 @@ namespace TrackableData.MongoDB.Tests
                 var t = (IPocoTracker<ITestPocoWithCustomId>)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
@@ -412,6 +456,16 @@ namespace TrackableData.MongoDB.Tests
             }
         }
 
+        public TrackableTestContainer Clone()
+        {
+            var o = new TrackableTestContainer();
+            o._Person = _Person?.Clone();
+            o._Missions = _Missions?.Clone();
+            o._Tags = _Tags?.Clone();
+            o._Aliases = _Aliases?.Clone();
+            return o;
+        }
+
         public bool Changed { get { return Tracker != null && Tracker.HasChange; } }
 
         ITracker ITrackable.Tracker
@@ -451,6 +505,11 @@ namespace TrackableData.MongoDB.Tests
                 var t = (TrackableTestContainerTracker)value;
                 Tracker = t;
             }
+        }
+
+        ITrackable ITrackable.Clone()
+        {
+            return Clone();
         }
 
         public ITrackable GetChildTrackable(object name)
