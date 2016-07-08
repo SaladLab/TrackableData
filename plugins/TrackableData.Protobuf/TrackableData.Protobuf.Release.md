@@ -1,3 +1,7 @@
+## 1.2.0 (Released 2016/07/08)
+
+* Sync with TrackableData 1.2.0
+
 ## 1.1.5 (Released 2016/05/27)
 
 * Use protobuf-net 2.1.0-alpha-1
