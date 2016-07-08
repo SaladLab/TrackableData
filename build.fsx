@@ -40,7 +40,7 @@ let solution =
                               Folder = "./plugins/TrackableData.PostgreSql"
                               Dependencies = [ ("TrackableData", "")
                                                ("TrackableData.Sql", "")
-                                               ("Npgsql", "") ] }
+                                               ("npgsql", "") ] }
           { emptyProject with Name = "TrackableData.Protobuf"
                               Folder = "./plugins/TrackableData.Protobuf"
                               PackagePrerelease = "beta"
